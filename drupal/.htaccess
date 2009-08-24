@@ -6,7 +6,7 @@
 <FilesMatch "\.(engine|inc|info|install|module|profile|test|po|sh|.*sql|theme|tpl(\.php)?|xtmpl|svn-base)$|^(code-style\.pl|Entries.*|Repository|Root|Tag|Template|all-wcprops|entries|format)$">
   Order allow,deny
 </FilesMatch>
-
+  
 # Don't show directory listings for URLs which map to a directory.
 Options -Indexes
 
