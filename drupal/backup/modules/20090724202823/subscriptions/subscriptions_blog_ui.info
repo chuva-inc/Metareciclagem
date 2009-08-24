@@ -1,0 +1,11 @@
+; $Id: subscriptions_blog_ui.info,v 1.1.2.1 2007/12/26 17:24:22 chx Exp $
+name = Blog Subscriptions UI
+description = Provides a separate blogs subscriptions page.
+package = "Subscriptions"
+dependencies = subscriptions subscriptions_content blog
+
+; Information added by drupal.org packaging script on 2009-01-20
+version = "5.x-2.4"
+project = "subscriptions"
+datestamp = "1232411153"
+
