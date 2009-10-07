@@ -1,0 +1,348 @@
+<?php
+// $Id: user_relationshipsactivity.module,v 1.1.2.8.2.10 2009/04/27 01:30:40 jaydub Exp $
+
+/**
+ * Activity definition file
+ * 
+ * This defines what hooks activity module should use
+ */
+function user_relationshipsactivity_activity_info() {
+  $types = user_relationships_types_load();
+
+  foreach ($types as $type) {
+    $type_admin_name = preg_replace('/\s/', '_', drupal_strtolower($type->name));
+    $token_types[$type_admin_name] = $type->name;
+  }
+  if (count($token_types) == 0) {
+    drupal_set_message(t('There are no relationships currently defined. Please define some <a href="@user_relationships">user relationship</a> types before configuring User Relationship activity messages.', array('@user_relationships' => url('admin/user/relationships'))));
+    return FALSE;
+  }
+  return array(
+    'ops' => array(
+      'requested' => t('Requested'), 
+      'approved' => t('Approved'), 
+      'denied' => t('Denied'), 
+      'canceled' => t('Canceled'), 
+      'deleted' => t('Deleted')
+    ),
+    'types' => $token_types,
+    'roles' => array(
+      // This is what corresponds to ACTIVITY_ALL
+      'all' => array(
+        '#name' => t('All (approved relationships only)'),
+        '#description' => t('The general public.'),
+        '#default' => array(
+          'approved' => t('[author-all] is now [relationship-plural] with [requestee-all]'),
+          'deleted' => t('[author-all] is no longer [relationship-plural] with [requestee-all]'),
+        ),
+      ),
+
+      'requester' => array(
+        '#name' => t('Requester'),
+        '#description' => t('The person who initiated the relationship.'),
+        '#default' => array(
+          'requested' => t('[author] requested to be [relationship-plural] with [requestee]'),
+          'approved' => t('[requestee] approved the request to be [relationship-plural] with [author]'),
+          'denied' => t('[requestee] denied the request to be [relationship-plural] with [author]'),
+          'canceled' => t('[author] cancelled the request to be [relationship-plural] with [requestee]'),
+          'deleted' => t('[author] [is-are] no longer [relationship-plural] with [requestee]'),
+        ),
+      ),
+
+      'requestee' => array(
+        '#name' => t('Requestee'),
+        '#description' => t('The person with whom a relationship has been requested or created.'),
+        '#default' => array(
+          'requested' => t('[author] requested to be [relationship-plural] with [requestee]'),
+          'approved' => t('[requestee] approved the request to be [relationship-plural] with [author]'),
+          'denied' => t('[requestee] denied the request to be [relationship-plural] with [author]'),
+          'canceled' => t('[author] cancelled the request to be [relationship-plural] with [requestee]'),
+          'deleted' => t('[author] [is-are] no longer [relationship-plural] with [requestee]'),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Token module integration. Defines available default tokens.
+ */
+function user_relationshipsactivity_token_list($type = 'all') {
+  if ($type == 'user_relationshipsactivity') {
+    $tokens['user_relationshipsactivity'] = array(
+      'requestee-uid' 		=> t('User id of the person to whom the request was issued'),
+      'requestee' 			=> t('Themed username of the person who received the request'),
+      'requestee-all'		=> t('Themed username of the person who received the request'),
+      'requestee-name' 		=> t('The username of the person to whom the request was issued'),
+      'requestee-picture'	=> t('The user picture of the person to whom the request was issued'),
+      'relationship' 		=> t('The name of the relationship'),
+      'relationship-plural' => t('The plural name of the relationship'),
+    );
+    return $tokens;
+  }
+}
+
+/**
+ * Token module integration. Defines available default token values.
+ */
+function user_relationshipsactivity_token_values($type, $data = NULL, $options = array()) {
+  global $user;
+  static $relationships;
+  if ($type == 'user_relationshipsactivity' && !empty($data)) {
+    $requestee = activity_user_load($data['requestee-uid']);
+    
+    $data['is-are']				= ($data['uid'] == $user->uid) ? 'are' : 'is' ;
+    $data['requestee']			= theme('activity_username', $requestee, TRUE);
+    $data['requestee-all']		= theme('activity_username', $requestee);
+    $data['requestee-name'] 	= $requestee->name;
+    $data['requestee-picture']  = theme('activity_user_picture', $requestee);
+
+    if (!isset($relationships[$data['relationship-type-id']])) {
+      $relationships[$data['relationship-type-id']] = user_relationships_type_load($data['relationship-type-id']);
+    }
+    $relationship = $relationships[$data['relationship-type-id']];
+    $data['relationship']		= $relationship->name;
+    $data['relationship-plural'] = $relationship->plural_name;
+    return $data;
+  }
+}
+
+/**
+ * Implementation of hook_user_relationships().
+ *
+ * @param $op
+ *   The action taken on a user relationship
+ *
+ *   Is one of the following:
+ *
+ *   $op        | Description
+ *   ----------------------------------------------------------------------
+ *   load       | When a relationship's details are loaded
+ *   presave    | Before a new relationship is requested or approved
+ *   request    | When a request for a new relationship is made
+ *   remove     | When an existing relationship is deleted by the requester or requestee
+ *   approved   | When a relationship request is approved by the requestee
+ *   disapprove | When a relationship request is disapproved by the requestee
+ *   cancel     | When a relationship request is canceled by the requester
+ *
+ * @param $relationship
+ *   The relationship object.
+ *
+ */
+function user_relationshipsactivity_user_relationships($op, $relationship) {
+  if ($op == 'load' || $op == 'presave') {
+    return;
+  }
+
+  $relationship = array_merge((array) $relationship, (array) user_relationships_type_load($relationship->rtid));
+  $type = preg_replace('/\s/', '_', drupal_strtolower($relationship['name']));
+
+  switch ($op) {
+
+    case 'request':
+      if ($relationship['approved'] && !$relationship['requires_approval']) {
+        $operation = 'approved';
+        $target_users_roles[ACTIVITY_ALL] = 'all';
+      }
+      else if ($relationship['requires_approval']) {
+        $operation = 'requested';
+      }
+      break;
+
+    case 'approve':
+      if ($relationship['approved'] && $relationship['requires_approval']) {
+        $operation = 'approved';
+        $target_users_roles[ACTIVITY_ALL] = 'all';
+      }
+      break;
+
+    case 'disapprove':
+      if (!$relationship['approved'] && $relationship['requires_approval']) {
+        $operation = 'denied';
+        $target_users_roles[ACTIVITY_ALL] = 'all';
+      }
+      break;
+
+    case 'cancel':
+      if (!$relationship['approved'] && $relationship['requires_approval']) {
+        $operation = 'canceled';
+        $target_users_roles[ACTIVITY_ALL] = 'all';
+      }
+      break;
+
+    case 'remove':
+      $operation = 'deleted';
+      $target_users_roles[ACTIVITY_ALL] = 'all';
+      break;
+
+  }
+
+  // Check if both type and operation are
+  // enabled for activity. If not then stop here
+  if (!in_array($type, variable_get('user_relationshipsactivity_token_types', array($type)), TRUE) || 
+    !in_array($operation, variable_get('user_relationshipsactivity_op_types', array($operation)), TRUE)) {
+    return FALSE;
+  }
+
+  $user = user_load(array('uid' => $relationship['requester_id']));
+
+  // Privacy setting check for user voting
+  if (activity_user_privacy_optout($user)) {
+    return FALSE;
+  }
+
+  // User hide activity permission check
+  if (user_access('hide activity', $user)) {
+    return FALSE;
+  }
+
+  $data = array(
+    'requestee-uid'         => $relationship['requestee_id'],
+    'relationship-type-id'  => $relationship['rtid'],
+  );
+
+  $target_users_roles[$relationship['requester_id']] = 'requester';
+  $target_users_roles[$relationship['requestee_id']] = 'requestee';
+
+  activity_insert($user->uid, 'user_relationshipsactivity', $type, $operation, $data, $target_users_roles);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function user_relationshipsactivity_menu() {
+  $items = array();
+
+  if ($types = user_relationships_types_load()) {
+    foreach ($types as $rtid => $type) {
+      $items['activity/'. preg_replace('/\s/', '_', drupal_strtolower($type->plural_name))] = array(
+        'title callback' => '_user_relationshipsactivity_menu_title',
+        'title arguments' => array($type->plural_name),
+        'page callback' => 'user_relationshipsactivity_page',
+        'page arguments' => array($type->rtid),
+        'access callback' => 'user_access',
+        'access arguments' => array('view own activity'),
+        'weight' => 2,
+        'type' => MENU_LOCAL_TASK,
+      );
+    }
+  }
+    
+  return $items;
+}
+
+function _user_relationshipsactivity_menu_title($type) {
+  return t('My !relationship\' activity', array('!relationship' => $type));
+}
+
+/**
+ * user_relationships activity page callback
+ */
+function user_relationshipsactivity_page($type = NULL) {
+  global $user;
+  drupal_add_css(drupal_get_path('module', 'activity') .'/activity.css');
+
+  if ($type) {
+    if (user_access('view own activity')) {
+      $relationships = user_relationships_load(
+        array(
+          'rtid' => $type, 
+          'user' => $user->uid, 
+          'approved' => 1
+        )
+      );
+
+      foreach ($relationships as $relationship) {
+        if ($relationship->requester_id == $user->uid) {
+          $uids[] = $relationship->requestee_id;
+        }
+        else {
+          $uids[] = $relationship->requester_id;
+        }
+      }
+
+      $activities = array();
+      if ($uids) {
+        $activities = activity_get_activity($uids, NULL, variable_get('activity_page_pager', 20));
+      }
+      $table = theme('activity_table', $activities);
+      return theme('activity_page', $activities, $table);
+    }
+  }
+  $table = theme('activity_table', array());
+  return theme('activity_page', array(), $table);
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function user_relationshipsactivity_block($op = 'list', $delta = 0, $edit = array()) {
+  global $user;
+
+  switch ($op) {
+    case 'list':
+      $blocks = array();
+      foreach (user_relationships_types_load() as $type) {
+        $blocks[$type->rtid] = array('info' => t("Activity - User Relationships: show activity by current user's !type.", array('!type' => $type->plural_name)));
+      }
+      return $blocks;
+      break;
+
+    case 'configure':
+      $form['items'] = array(
+        '#type' => 'select',
+        '#title' => t('Number of activity items to display'),
+        '#default_value' => variable_get('user_relationshipsactivity_block_'. $delta, 5),
+        '#options' => drupal_map_assoc(range(1, 50)),
+      );
+      return $form;
+      break;
+
+    case 'save':
+      variable_set('user_relationshipsactivity_block_'. $delta, $edit['items']);
+      break;
+
+    case 'view':
+      $type = user_relationships_type_load($delta);
+      // we need to check the relationship type
+      $params = array('user' => $user->uid, 'rtid' => $delta);
+      if ($type->requires_approval) {
+        $params['approved'] = 1;
+      }
+      $relationships = user_relationships_load($params);
+      
+      $uids = array();
+      foreach ($relationships as $relationship) {
+        if ($type->is_oneway) {
+          $uids[] = $relationship->requestee_id;
+        }
+        else {
+          // user can be requester or requestee if it isn't oneway relationship
+          $uids[] = $relationship->requestee_id != $user->uid ? $relationship->requestee_id : $relationship->requester_id;
+        }
+      }
+
+      if ($uids) {
+        $activity = activity_get_activity($uids, NULL, variable_get('user_relationshipsactivity_block_'. $delta, 5) + 1);
+        drupal_add_css(drupal_get_path('module', 'activity') .'/activity.css');
+        if (count($activity) > variable_get('user_relationshipsactivity_block_'. $delta, 5)) {
+          $more_link = theme('activity_more_link', 'activity/'. preg_replace('/\s/', '_', drupal_strtolower($type->plural_name)));
+          array_pop($activity);
+        }
+      
+        $activities = array();
+        foreach ($activity as $item) {
+          $activities[] = theme('activity', activity_token_replace($item), $item) . activity_delete_link($item);
+        }
+      
+        if (count($activity)) {
+          return array(
+            'subject' => t('My !name\' activity', array('!name' => $type->plural_name)),
+            'content' => theme('activity_block', $activities, $more_link)
+            );
+        }
+      }
+      break;
+  }
+}
+

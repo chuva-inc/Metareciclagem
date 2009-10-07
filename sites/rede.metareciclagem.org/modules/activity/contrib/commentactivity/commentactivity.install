@@ -1,0 +1,34 @@
+<?php
+// $Id: commentactivity.install,v 1.1.2.2.2.7 2009/03/16 01:04:22 jaydub Exp $
+
+/**
+ * Implementation of hook_install().
+ */
+function commentactivity_install() {
+  if (!module_exists('activity')) {
+    module_load_include('module', 'activity');
+  }
+  activity_install_activity_defaults('commentactivity');
+  drupal_set_message(t('Activity integration with Comment module installed. Go to <a href="@settings">Comment Activity settings</a> to customize ', array('@settings' => url('admin/settings/activity/commentactivity'))));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function commentactivity_uninstall() {
+  // Remove any activity entries from the commentactivity module
+  if (module_exists('activityhistory')) {
+    db_query("DELETE FROM {activity_history} WHERE aid IN (SELECT aid FROM {activity} WHERE module = '%s')", 'commentactivity');
+  }
+  db_query("DELETE FROM {activity_targets} WHERE aid IN (SELECT aid FROM {activity} WHERE module = '%s')", 'commentactivity');
+  db_query("DELETE FROM {activity_comments} WHERE aid IN (SELECT aid FROM {activity} WHERE module = '%s')", 'commentactivity');
+  db_query("DELETE FROM {activity} WHERE module = '%s'", 'commentactivity');
+
+  // Delete any variables that have been set.
+  // We don't just DELETE FROM {variable}, even though we could.
+  $result = db_query("SELECT name FROM {variable} WHERE name LIKE 'commentactivity_%'");
+  // Instead we use the API, because API's can change!
+  while ($row = db_fetch_object($result)) {
+    variable_del($row->name);
+  }
+}

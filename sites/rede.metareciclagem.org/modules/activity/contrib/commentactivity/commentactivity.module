@@ -1,0 +1,197 @@
+<?php
+// $Id: commentactivity.module,v 1.1.2.6.2.8 2009/04/27 02:04:08 sirkitree Exp $
+
+/**
+ * Activity definition file
+ *
+ * This defines what hooks activity module should use
+ */
+function commentactivity_activity_info() {
+  return array(
+    'ops' => array(
+      'insert' => t('Insert'),
+      'update' => t('Update'),
+      'delete' => t('Delete'),
+      'publish' => t('Publish'),
+      'unpublish' => t('Unpublish')
+    ),
+    'types' => array('comment' => t('Comment')),
+    'roles' => array(
+      'author' => array(
+        '#name' => t('Author'),
+        '#description' => t('The person who created the comment.'),
+        '#default' => t('[author] left the comment [comment-link] on the [parent-node-type] [parent-node-link]'),
+      ),
+      'parent_node_author' => array(
+        '#name' => t('Parent node author'),
+        '#description' => t('The person who created the node.'),
+        '#default' => t('[author] commented on the [parent-node-type] [parent-node-link] saying [comment-link]'),
+      ),
+      'parent_comment_author' => array(
+        '#name' => t('Parent comment author'),
+        '#description' => t('The person who wrote the comment.'),
+        '#default' => t('[author] replied to your comment [parent-comment-subject] saying [comment-link]'),
+      ),
+      // This is what corresponds to ACTIVITY_ALL
+      'all' => array(
+        '#name' => t('All'),
+        '#description' => t('The general public.'),
+        '#default' => t('[author-all] commented on the [parent-node-type] [parent-node-link] saying [comment-link]'),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_activityapi().
+ */
+function commentactivity_activityapi(&$activity, $op) {
+  if ($op == 'load') {
+    if ($activity['data']['module'] == 'commentactivity' && !node_access('view', node_load($activity['data']['parent-node-id']))) {
+      $activity = array();
+    }
+  }
+}
+
+/**
+ * Token module integration. Defines available default tokens.
+ */
+function commentactivity_token_list($type = 'all') {
+  if ($type == 'commentactivity') {
+    $tokens['commentactivity'] = array(
+      'comment-cid'					=> t('The Id of the comment'),
+      'comment-subject' 			=> t('The subject of the comment'),
+      'comment-link'				=> t('Link to the comment'),
+      'parent-node-author-uid' 		=> t('User Id of the person who authored the parent node'),
+      'parent-node-author' 			=> t('Person who authored the parent node'),
+      'parent-node-author-name'		=> t('The username of the person who authored the parent node'),
+      'parent-node-id '  			=> t('The Id of the parent node'),
+      'parent-node-link'  			=> t('Link to the parent node'),
+      'parent-node-title'  			=> t('Title of the parent node'),
+      'parent-node-type' 			=> t('The type of the parent node'),
+      'parent-comment-author-uid' 	=> t('User Id of the person who authored the parent comment'),
+      'parent-comment-author' 		=> t('Person who authored the parent comment'),
+      'parent-comment-author-name' 	=> t('The username of the person who authored the parent comment'),
+      'parent-comment-cid'			=> t('The Id of the parent comment'),
+      'parent-comment-subject'		=> t('The subject of the parent comment'),
+      'parent-comment-link'			=> t('Link to the parent comment'),
+    );
+    return $tokens;
+  }
+}
+
+/**
+ * Token module integration. Defines available default token values.
+ */
+function commentactivity_token_values($type, $data = NULL, $options = array()) {
+  static $authors;
+  if ($type == 'commentactivity' && !empty($data)) {
+    if (!isset($authors[$data['parent-node-author-uid']])) {
+      $authors[$data['parent-node-author-uid']] = activity_user_load($data['parent-node-author-uid']);
+    }
+    $parent_node_author = $authors[$data['parent-node-author-uid']];
+
+    if (isset($data['parent-comment-author-uid'])) {
+      if (!isset($authors[$data['parent-comment-author-uid']])) {
+        $authors[$data['parent-comment-author-uid']] = activity_user_load($data['parent-comment-author-uid']);
+      }
+      $parent_comment_author = $authors[$data['parent-comment-author-uid']];
+    }
+
+    $data['comment-link'] = l($data['comment-subject'], 'node/'. $data['parent-node-id'], array('fragment' => 'comment-'. $data['comment-cid']));
+    $data['parent-node-author'] = theme('activity_username', $parent_node_author, TRUE);
+    $data['parent-node-author-name'] = $parent_node_author->name;
+    $data['parent-node-type'] = theme('activity_node_type', $data['parent-node-type']);
+    $data['parent-node-link'] = l($data['parent-node-title'], 'node/'. $data['parent-node-id']);
+    if ($parent_comment_author) {
+      $data['parent-comment-author'] = theme('activity_username', $parent_comment_author, TRUE);
+      $data['parent-comment-author-name'] = $parent_comment_author->name;
+      $data['parent-comment-link'] = l($data['parent-comment-subject'], 'node/'. $data['parent-node-id'], array('fragment' => 'comment-'. $data['parent-comment-cid']));
+    }
+    return $data;
+  }
+}
+
+/**
+ * Implementation of hook_comment().
+ */
+function commentactivity_comment($comment, $op) {
+  switch ($op) {
+    // $comment is array for insert/update, is object for delete
+    case 'insert':
+    case 'update':
+      if ($comment['status'] == COMMENT_NOT_PUBLISHED) {
+        break;
+      }
+    case 'delete':
+      if ($comment->status == COMMENT_NOT_PUBLISHED) {
+        break;
+      }
+      // publish operation results in dupe records in D6
+      //case 'publish':
+    case 'unpublish':
+
+      // Check if both type and operation are
+      // enabled for activity. If not then stop here
+      if (!in_array('comment', variable_get('commentactivity_token_types', array('comment')), TRUE) || 
+        !in_array($op, variable_get('commentactivity_op_types', array($op)), TRUE)) {
+        return FALSE;
+      }
+
+      // cast $comment to array
+      $comment = (array) $comment;
+
+      // Privacy setting check
+      $user = user_load(array('uid' => $comment['uid']));
+      if (activity_user_privacy_optout($user)) {
+        return FALSE;
+      }
+
+      // User hide activity permission check
+      if (user_access('hide activity', $user)) {
+        return FALSE;
+      }
+
+      $node = node_load($comment['nid']);
+
+      // If using comment threading
+      if ($comment['pid']) {
+        if ($parent_comment_author_uid = db_result(db_query("SELECT uid FROM {comments} WHERE cid = %d", $comment['pid']))) {
+          $parent_comment_author = activity_user_load($parent_comment_author_uid);
+          $parent_comment = db_result(db_query("SELECT subject FROM {comments} WHERE cid = %d", $comment['pid']));
+        }
+      }
+
+      $data = array(
+        'comment-cid'			=> $comment['cid'],
+        'comment-subject'		=> $comment['subject'],
+        'parent-node-author-uid' => $node->uid,
+        'parent-node-id' 		=> $node->nid,
+        'parent-node-title'		=> $node->title,
+        'parent-node-type' 		=> $node->type,
+      );
+
+      $target_users_roles = array();
+      // The order in which elements are added to $target_users_roles is
+      // important. Since several of the roles can be the same person
+      // eg. a person comments on their own node or replies to their own
+      // comment, they may overwrite each other in the array.
+      // This is fine as long as the most important role wins...
+      if (is_object($parent_comment_author)) {
+        $data['parent-comment-cid'] = $parent_comment->cid;
+        $data['parent-comment-subject'] = $parent_comment->subject;
+        $data['parent-comment-author-uid'] = $parent_comment_author_uid;
+        $target_users_roles[$parent_comment_author_uid] = 'parent_comment_author';
+      }
+
+      $target_users_roles = array(
+        ACTIVITY_ALL => 'all',
+        $node->uid => 'parent_node_author',
+        // and the most important role is 'author' so we add it last.
+        $comment['uid'] => 'author',
+      );
+
+      activity_insert($comment['uid'], 'commentactivity', 'comment', $op, $data, $target_users_roles);
+      break;
+  }
+}

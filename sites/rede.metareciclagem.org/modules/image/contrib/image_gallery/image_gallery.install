@@ -1,0 +1,62 @@
+<?php
+// $Id: image_gallery.install,v 1.16 2009/08/09 21:03:08 joachim Exp $
+
+/**
+ * Implementation of hook_install().
+ */
+function image_gallery_install() {
+  // Notify the user of the existence of the suggested menu item.
+  $t = get_t();
+  drupal_set_message($t('Image gallery has been installed. You may want to enable the <a href="@navigation-menu-url">Image galleries menu item</a>.', array('@navigation-menu-url' => url('admin/build/menu-customize/navigation'))));
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function image_gallery_enable() {
+  // Ensure a proper vocabulary after re-enabling the module.
+  drupal_load('module', 'image_gallery');
+  _image_gallery_get_vid();
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function image_gallery_uninstall() {
+  if ($vid = variable_get('image_gallery_nav_vocabulary', FALSE)) {
+    module_invoke('taxonomy', 'del_vocabulary', $vid);
+  }
+  variable_del('image_images_per_page');
+  variable_del('image_gallery_nav_vocabulary');
+  variable_del('image_gallery_node_info');
+  variable_del('image_gallery_sort_order');
+}
+
+/**
+ * Re-assign image vocabularies to image_gallery module.
+ */
+function image_gallery_update_1() {
+  $ret = array();
+  if ($vid = variable_get('image_nav_vocabulary', '')) {
+    $ret[] = update_sql("UPDATE {vocabulary} SET module = 'image_gallery' WHERE vid = " . (int) $vid);
+  }
+  else {
+    $ret[] = update_sql("UPDATE {vocabulary} SET module = 'image_gallery' WHERE module = 'image'");
+  }
+  return $ret;
+}
+
+/**
+ * Rename permission "administer images" to "administer image galleries".
+ */
+function image_gallery_update_6100() {
+  $ret = array();
+  $result = db_query("SELECT rid, perm FROM {permission} ORDER BY rid");
+  while ($role = db_fetch_object($result)) {
+    $renamed_permission = strtr($role->perm, array('administer images' => 'administer image galleries'));
+    if ($renamed_permission != $role->perm) {
+      $ret[] = update_sql("UPDATE {permission} SET perm = '$renamed_permission' WHERE rid = $role->rid");
+    }
+  }
+  return $ret;
+}

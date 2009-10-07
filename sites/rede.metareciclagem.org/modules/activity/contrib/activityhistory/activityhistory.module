@@ -1,0 +1,44 @@
+<?php
+// $Id: activityhistory.module,v 1.1.2.3.2.6 2009/01/20 17:43:03 jaydub Exp $
+
+function activityhistory_activityapi(&$activity, $op) {
+  global $user;
+  static $history = array();
+
+  switch ($op) {
+    case 'load':
+      if (!isset($history[$activity['aid']][$user->uid])) {
+        $new = db_result(db_query('SELECT ah.timestamp FROM {activity_history} ah WHERE aid = %d AND uid = %d', $activity['aid'], $user->uid));
+        if (empty($new)) {
+          $history[$activity['aid']][$user->uid] = theme('mark', MARK_NEW, 'activityhistory');
+          // update to show that it has been seen
+          @db_query('INSERT INTO {activity_history} (uid, aid, timestamp) VALUES (%d, %d, %d)', $user->uid, $activity['aid'], time());
+        }
+        else {
+          $history[$activity['aid']][$user->uid] = '';
+        }
+      }
+      $activity['activity_history_new'] = $history[$activity['aid']][$user->uid];
+
+      if ($activity['activity_history_new']) {
+        if ($activity['mark']) {
+          $activity['mark'] .= ' '. $activity['activity_history_new'] .' ';
+        }
+        else {
+          $activity['mark'] = $activity['activity_history_new'] .' ';
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function activityhistory_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'delete':
+      db_query('DELETE FROM {activity_history} WHERE uid = %d', $account->uid);
+      break;
+  }
+}

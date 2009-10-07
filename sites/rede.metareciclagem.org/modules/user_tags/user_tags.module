@@ -1,0 +1,479 @@
+<?php 
+// $Id: user_tags.module,v 1.15.4.1 2009/03/04 20:27:28 flk Exp $
+
+/**
+ * Implementation of hook_help().
+ */
+function user_tags_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#user_tags':
+    case 'admin/modules#description':
+      return t('Allows users to free tag themselves.');
+  }
+}
+
+
+/**
+ * Implementation of hook_perm().
+ */
+function user_tags_perm() {
+  return array('administer user tags', 'tag users', 'view user tags');
+}
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function user_tags_menu() {
+  $access = 'tag users';
+  $items = array();
+
+  $items['tags'] = array(
+    'title' => 'Tags in use',
+    'page callback' => 'user_tags_page_list',
+    'access arguments' => array($access),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['tag/user'] = array(
+    'title' => 'List of tagged users',
+    'page callback' => 'user_tags_page_users',
+    'access arguments' => array($access),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/settings/user_tags'] = array(
+    'title' => 'User Tags',
+    'description' => 'Settings for user tags',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('user_tags_settings'),
+    'access arguments' => array('administer user tags'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_settings().
+ */
+function user_tags_settings() {
+  if ($_POST['user_tags_vocabulary_list']) {
+    db_query('DELETE FROM {user_tags_vocabulary}');
+    foreach ($_POST['user_tags_vocabulary_list'] as $vid) {
+      db_query("INSERT INTO {user_tags_vocabulary} (vid) VALUES (%d)", $vid);
+    }
+  }
+
+  $vocab = db_query("SELECT vid, name, description FROM {vocabulary}");
+  if (db_affected_rows() > 0) {
+    while ($vocab_list = db_fetch_object($vocab)) {
+      $options[$vocab_list->vid] = $vocab_list->name;
+    }
+    $enabled_vocab = db_query("SELECT vu.vid, v.name FROM {user_tags_vocabulary} vu INNER JOIN {vocabulary} v ON v.vid = vu.vid");
+    while ($enabled = db_fetch_object($enabled_vocab)) {
+      $match_options[] = $enabled->vid;
+    }
+    $form["user_tags_vocabulary_list"] = array(
+      "#type" => 'select',
+      "#multiple" => true,
+      "#required" => true,
+      "#title" => t("Vocabularies Available"),
+      "#description" => t("To select multiple items, hold ctrl (command) and click on the items"),
+      "#options" => $options,
+      "#default_value" => $match_options
+    );
+
+    $form["user_tags_display_options"] = array(
+      "#type" => 'fieldset',
+      "#collapsible" => true,
+      "#title" => t("Display Options")
+    );
+
+    $form["user_tags_display_options"]["user_tags_user_page"] = array(
+      "#type" => 'checkbox',
+      "#title" => t("Display tags on user's profile pages (user/username)"),
+      "#default_value" => variable_get("user_tags_user_page", true),
+      "#return_value" => true,
+    );
+
+  }
+  else {
+    drupal_set_message(t('You must add a !link before using this module.', array('!link' => l(t('vocabulary'), 'admin/content/taxonomy'))), "error");
+  }
+
+  return system_settings_form($form);
+}
+
+
+/**
+ * Implementation of hook_user().
+ */
+function user_tags_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'view':
+      if (user_access('view user tags')) {
+        return user_tags_view_tags($account);
+      }
+      break;
+
+    case 'load':
+      user_tags_load_tags($account);
+      break;
+
+    case 'form':
+      return user_tags_form_tags($category, $account);
+
+    case 'submit':
+      user_tags_submit_tags($category, $edit, $account);
+      break;
+
+    case 'categories':
+      return array(array('name' => 'tags', 'title' => t('Tags'), 'weight' => 10));
+
+    case 'delete':
+      user_tags_delete_tags($account);
+      break;
+  }
+}
+
+
+/**
+ * Find all terms associated to the given user, ordered by vocabulary and term weight.
+ *
+ * @param int - $uid : User ID
+ * @param char - $key : Key used for query rewriting - default to 'tid'
+ * @return array - of terms assigned to a user
+ */
+function user_tags_get_terms($uid, $key = 'tid') {
+  static $terms;
+
+  if (!isset($terms[$uid])) {
+    $result = db_query(db_rewrite_sql('SELECT t.* FROM {term_user} r INNER JOIN {term_data} t ON (r.tid = t.tid AND r.vid = t.vid )  WHERE r.uid = %d ORDER BY t.weight, t.name', 't', 'tid'), $uid);
+    $terms[$uid] = array();
+    while ($term = db_fetch_object($result)) {
+      $terms[$uid][$term->$key] = $term;
+    }
+  }
+  return $terms[$uid];
+}
+
+
+/**
+ * prints all the vocab in use atm
+ *
+ * @param char $tid : term id
+ * @return char - page listing off all the users with corresponding term
+ */
+function user_tags_page_list() {
+  //$term = taxonomy_get_term($tid);
+
+  //print all the tags currently in use.
+  $query = db_query('SELECT DISTINCT( td.name ) as termname, tu.tid, tu.vid as vid FROM {term_data} td INNER JOIN ({term_user} as tu)
+                      ON td.tid = tu.tid ');
+  //get all the vocabs in use
+  //$vocab_query = (db_query('SELECT DISTINCT(tu.vid) as vid, v.name FROM {term_user} tu INNER JOIN {vocabulary} v  ON tu.vid = v.vid GROUP BY vid'));
+  //$count_vocab = db_num_rows($vocab_query);
+
+  $vocabs = taxonomy_get_vocabularies();
+
+  while ($term = db_fetch_object($query)) {
+    $vocab[$term->vid][$term->tid] = $term->termname;
+  }
+
+  $output = '';
+  foreach ($vocab as $vid => $tid) {
+    $rows = array();
+    foreach ($tid as $term_tid => $term_name) {
+      $rows[] = array(l($term_name, "tag/user/$term_tid"));
+    }
+    $output .= theme('table', array(t('Tags')), $rows, array(), $vocabs[$vid]->name);
+  }
+
+  return $output;
+}
+
+
+/**
+ * Generate a table of users and their tags
+ *
+ * @param int $tid : Term ID
+ * @return char : page listing all users and their tags
+ */
+function user_tags_page_users($tid) {
+  $row = array();
+  $rows = array();
+  $term = taxonomy_get_term($tid);
+  $tmp = array();
+  if (!$tid || $term->tid != $tid) {
+    drupal_goto('tags');
+  }
+  else {
+    drupal_set_title($term->name);
+    $result = db_query('SELECT tu.tid, td.name as termname, u.uid, u.name as username FROM {users} u INNER JOIN {term_user} t ON u.uid = t.uid
+                        AND t.tid = %d INNER JOIN {term_user} tu ON u.uid = tu.uid INNER JOIN {term_data} td ON td.tid = tu.tid
+                        ORDER BY u.name, td.weight, td.name', $tid);
+    $old = '';
+    while ($term = db_fetch_object($result)) {
+      if ($term->username != $old->username && !empty($row)) {
+        $rows[] = array(l($old->username, "user/$old->uid"), implode(', ', $row));
+        unset($row); // Cleaning and reinitializing to avoid duplicates.
+        $row = array();
+      }
+      $old = $term;
+      $row[] = l($term->termname, "tag/user/$term->tid");
+    }
+    $rows[] = array(l($old->username, "user/$old->uid"), implode(', ', $row));
+    return theme('table', array(t('Name'), t('Tags')), $rows);
+  }
+}
+
+
+/**
+ * Get all the terms associated with a user but limited to a specified Vocabulary ID
+ *
+ * @param int  $uid : user ID
+ * @param int  $vid : vocabulary ID
+ * @param char $key : term ID
+ * @return array : all the tags belonging to the user with the specified uid
+ */
+function user_tags_get_terms_by_vocabulary($uid, $vid, $key = 'tid') {
+  $result = db_query('SELECT t.* FROM {term_data} t INNER JOIN {term_user} tu WHERE tu.tid = t.tid AND tu.vid = %d AND tu.uid =%d', $vid, $uid);
+  $terms = array();
+  while ($term = db_fetch_object($result)) {
+    $terms[$term->$key] = $term;
+  }
+  return $terms;
+}
+
+
+/**
+ * generate the categories selected for this module
+ * in admin setting, if user has already selected any tags
+ * show them
+ *
+ * @param  char  $category : current page name
+ * @param  array $account  : user details
+ * @return array : taxonomy form
+ */
+function user_tags_form_tags($category, $account) {
+  if ($category != 'tags') {
+    return;
+  }
+
+  if (!isset($account->taxonomy)) {
+    if ($account->uid) {
+      $terms = user_tags_get_terms($account->uid);
+    }
+    else {
+      $terms = array();
+    }
+  }
+  else {
+    $terms = $account->taxonomy;
+  }
+
+  $c = db_query(db_rewrite_sql("SELECT v.* FROM {vocabulary} v INNER JOIN {user_tags_vocabulary} u ON v.vid = u.vid ORDER BY v.weight, v.name", 'v', 'vid'));
+
+  while ($vocabulary = db_fetch_object($c)) {
+    if ($vocabulary->tags) {
+      $typed_terms = array();
+      foreach ($terms as $term) {
+        // Extract terms belonging to the vocabulary in question.
+        if ($term->vid == $vocabulary->vid) {
+          // Commas and quotes in terms are special cases, so encode 'em.
+          if (preg_match('/,/', $term->name) || preg_match('/"/', $term->name)) {
+            $term->name = '"'. preg_replace('/"/', '""', $term->name) .'"';
+          }
+          $typed_terms[] = $term->name;
+        }
+      }
+
+      $typed_string = implode(', ', $typed_terms) . (array_key_exists('tags', $terms) ? $terms['tags'][$vocabulary->vid] : NULL);
+      if ($vocabulary->help) {
+        $help = $vocabulary->help;
+      }
+      else {
+        $help = t('A comma-separated list of terms describing this content.  Example: funny, bungee jumping, "Company, Inc.".');
+      }
+
+      $form['taxonomy']['freetags'][$vocabulary->vid] = array('#type' => 'textfield',
+        '#title' => $vocabulary->name,
+        '#description' => $help,
+        '#required' => $vocabulary->required,
+        '#default_value' => $typed_string,
+        '#autocomplete_path' => 'taxonomy/autocomplete/'. $vocabulary->vid,
+        '#weight' => $vocabulary->weight,
+        '#maxlength' => 100,
+      );
+    }
+    else {
+      // Extract terms belonging to the vocabulary in question.
+      $default_terms = array();
+      foreach ($terms as $term) {
+        if ($term->vid == $vocabulary->vid) {
+          $default_terms[$term->tid] = $term;
+        }
+      }
+
+      $form['taxonomy']['tags'][$vocabulary->vid] = taxonomy_form($vocabulary->vid, array_keys($default_terms), $vocabulary->help);
+      $form['taxonomy']['tags'][$vocabulary->vid]['#weight'] = $vocabulary->weight;
+      $form['taxonomy']['tags'][$vocabulary->vid]['#required'] = $vocabulary->required;
+    }
+    if (isset($form['taxonomy'])) {
+      $form['taxonomy'] += array('#type' => 'fieldset', '#title' => t('Categories'), '#collapsible' => TRUE, '#collapsed' => FALSE, '#tree' => TRUE, '#weight' => -3);
+    }
+  }
+  return $form;
+}
+
+
+/**
+ * Load tags onto a User Object
+ *
+ * @param object $account : User Object for modifying (passed ByRef)
+ */
+function user_tags_load_tags(&$account) {
+  $result = db_query('SELECT t.* FROM {term_data} t INNER JOIN {term_user} tu WHERE tu.tid = t.tid AND tu.uid = %d ORDER BY weight, name', $account->uid);
+  $account->taxonomy = array();
+  while ($term = db_fetch_object($result)) {
+    $account->taxonomy[$term->tid] = $term;
+  }
+}
+
+
+/**
+ * Function for deleting tags from a user account
+ *
+ * @param object $account : User Object
+ */
+function user_tags_delete_tags($account) {
+  db_query('DELETE FROM {term_user} WHERE uid = %d', $account->uid);
+}
+
+
+/**
+ * User submit handling function.
+ *
+ * @param char $category : The selected tab on the user profile page.
+ * @param array $edit : the values returned from the submitted form
+ * @param object $account : The User Object
+ */
+function user_tags_submit_tags($category, $edit, $account) {
+  if ($category != 'tags') {
+    return;
+  }
+  //delete current tags and replace them with the new submitted ones
+  user_tags_delete_tags($account);
+
+  if (is_array($edit['taxonomy'])) {
+    if (isset($edit['taxonomy']['freetags'])) {
+      foreach ($edit['taxonomy']['freetags'] as $key => $value) {
+        $vid = $key;
+        $regexp = '%(?:^|,\ *)("(?>[^"]*)(?>""[^"]* )*"|(?: [^",]*))%x';
+        preg_match_all($regexp, $value, $matches);
+        $typed_terms = $matches[1];
+        foreach ($typed_terms as $typed_term) {
+          $typed_term = str_replace('""', '"', preg_replace('/^"(.*)"$/', '\1', $typed_term));
+          $typed_term = trim($typed_term);
+          if ($typed_term == '') continue;
+          $possibilities = taxonomy_get_term_by_name($typed_term);
+          $typed_term_tid = NULL; // tid match if any.
+          foreach ($possibilities as $possibility) {
+            if ($possibility->vid == $vid) {
+              $typed_term_tid = $possibility->tid;
+            }
+          }
+          if (!$typed_term_tid) {
+            $save_terms = array('vid' => $vid, 'name' => $typed_term);
+            $status = taxonomy_save_term($save_terms);
+            $typed_term_tid = $save_terms['tid'];
+          }
+          db_query('INSERT INTO {term_user} (uid, tid, vid) VALUES (%d, %d, %d)', $account->uid, $typed_term_tid, $vid);
+        }
+      }
+    }
+    if (isset($edit['taxonomy']['tags'])) {
+      foreach ($edit['taxonomy']['tags'] as $vid => $term) {
+        if (is_array($term)) {
+          foreach ($term as $tid) {
+            if ($tid) {
+              db_query('INSERT INTO {term_user} (uid, tid, vid) VALUES (%d, %d, %d)', $account->uid, $tid, $vid);
+            }
+          }
+        }
+        else if ($term) {
+          db_query('INSERT INTO {term_user} (uid, tid, vid) VALUES (%d, %d, %d)', $account->uid, $term, $vid);
+        }
+      }
+    }
+  }
+  unset($edit['taxonomy']);
+}
+
+
+/**
+ * Return an array of links to user tags.
+ *
+ * @param object $account : User account object (from user_load() function)
+ * @return array : nested array
+ */
+function user_tags_view_tags($account) {
+  $list = array();
+  foreach ($account->taxonomy as $tid => $term) {
+    $list[$term->vid][] = l($term->name, "tag/user/$tid");
+  }
+
+  $vocs = taxonomy_get_vocabularies();
+  $account->content['tags'] = array(
+    '#title' => t('Tags'),
+    '#type' => 'user_profile_category'
+  );
+  foreach ($list as $key => $terms) {
+    $account->content['tags']['vid-'.$key] = array(
+      '#title' => $vocs[$key]->name,
+      '#type' => 'user_profile_item',
+      '#value' => implode(', ', $terms)
+    );
+  }
+}
+
+/**
+ * Find users with similar tags. Results are ordered so the closest matching user
+ *   is decided on number of matching terms, falling back to alphabetical on
+ *   username if matching terms are equal.
+ *
+ * @param array $terms : array of term objects with the array keys as term ID's (ie, the result of user_tags_get_terms($uid)
+ * @param int $limit : optional, limit the number of results returned. Default: 5
+ * @return array : Array of output from theme_username.
+ */
+function user_tags_get_similar_users($terms, $limit = 5) {
+  if (empty($terms)) {
+    return array();
+  }
+
+  $args = implode(',', array_keys($terms));
+  $result = db_query('SELECT
+                        u.uid AS uid,
+                        COUNT(*) AS cnt
+                      FROM {users} u
+                      LEFT JOIN {term_user} tu ON tu.uid = u.uid AND tu.tid IN (%s)
+                      WHERE u.status = 1 AND tu.tid IS NOT NULL
+                      GROUP BY u.uid
+                      ORDER BY cnt DESC, u.name ASC
+                      LIMIT %d', $args, $limit);
+  if (db_num_rows($result)) {
+    $items = array();
+
+    while ($item = db_fetch_object($result)) {
+      $items[] = theme('username', user_load(array('uid' => $item->uid)));
+    }
+
+    return $items;
+  }
+  else {
+    return array();
+  }
+}
+

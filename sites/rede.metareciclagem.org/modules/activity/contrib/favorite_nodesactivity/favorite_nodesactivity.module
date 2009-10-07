@@ -1,0 +1,113 @@
+<?php
+// $Id: favorite_nodesactivity.module,v 1.1.4.8 2009/04/21 08:51:21 jaydub Exp $
+
+/**
+ * Activity definition file
+ *
+ * This defines what hooks activity module should use
+ */
+function favorite_nodesactivity_activity_info() {
+  return array(
+    'ops' => array('add' => t('Add'), 'delete' => t('Delete')),
+    'types' => array('favorites' => t('Favorites')),
+    'roles' => array(
+      'author' => array(
+        '#name' => t('Author'),
+        '#description' => t('The person who added the node to favorites.'),
+        '#default' => array(
+          'add' => t('[author] [operation]ed the [node-type] [node-link] to [possessive] [favorites-link]'),
+          'delete' => t('[author] [operation]d the [node-type] [node-link] from [possessive] [favorites-link]'),
+        ),
+      ),
+      'all' => array(
+        '#name' => t('All'),
+        '#description' => t('The general public.'),
+        '#default' => array(
+          'add' => t('[author-all] [operation]ed the [node-type] [node-link] to their [favorites-link]'),
+          'delete' => t('[author-all] [operation]d the [node-type] [node-link] from their [favorites-link]'),
+        ),
+      ),
+    ),
+  );
+}
+
+/** 
+ * Implementation of hook_activityapi().
+ */
+function favorite_nodesactivity_activityapi(&$activity, $op) {
+  if ($op == 'load') {
+    if ($activity['data']['module'] == 'favorite_nodesactivity' && !node_access('view', node_load($activity['data']['node-id']))) {
+      $activity = array();
+    }
+  }
+}
+
+/**
+ * Token module integration. Defines available default tokens.
+ */
+function favorite_nodesactivity_token_list($type = 'all') {
+  if ($type == 'favorite_nodesactivity') {
+    $tokens['favorite_nodesactivity'] = array(
+      'possessive'  => t('Possessive pronoun indicating whose favorites list ("yours" or "theirs")'),
+      'favorites-link' => t("Link to the user's favorites list"),
+      'node-type' 	=> t('The type of the node that was favorited'),
+      'node-id'  	=> t('Id of the node that was favorited'),
+      'node-title' 	=> t('Title of the node that was favorited'),
+      'node-link' 	=> t('Link to the node that was favorited'),
+    );
+    return $tokens;
+  }
+}
+
+/**
+ * Token module integration. Defines available default token values.
+ */
+function favorite_nodesactivity_token_values($type, $data = NULL, $options = array()) {
+  global $user;
+  if ($type == 'favorite_nodesactivity' && !empty($data)) {
+    $data['possessive'] = ($user->uid == $data['uid']) ? t('your') : t('their');
+    $data['favorites-link'] = l(t('favorites'), 'user/'. $data['uid'] .'/favorites');
+    $data['node-type'] = theme('activity_node_type', $data['node-type']);
+    $data['node-link'] = l($data['node-title'], 'node/'. $data['node-id']);
+    return $data;
+  }
+}
+
+/**
+ * Implementation of hook_favorite_nodes().
+ */
+function favorite_nodesactivity_favorite_nodes($operation, $node) {
+  global $user;
+  $type = 'favorites';
+
+  // Check if both type and operation are
+  // enabled for activity. If not then stop here
+  if (!in_array($type, variable_get('favorite_nodesactivity_token_types', array($type)), TRUE) || 
+    !in_array($operation, variable_get('favorite_nodesactivity_op_types', array($operation)), TRUE)) {
+    return FALSE;
+  }
+
+  // Privacy setting check
+  if (activity_user_privacy_optout($user)) {
+    return FALSE;
+  }
+
+  // User hide activity permission check
+  if (user_access('hide activity', $user)) {
+    return FALSE;
+  }
+
+  $data = array(
+    'operation' 	=> $operation,
+    'node-id' 		=> $node->nid,
+    'node-title' 	=> $node->title,
+    'node-type' 	=> $node->type,
+  );
+
+  $target_users_roles = array(
+    ACTIVITY_ALL => 'all',
+    $user->uid => 'author' 
+  );
+
+  activity_insert($user->uid, 'favorite_nodesactivity', $type, $operation, $data, $target_users_roles);
+}

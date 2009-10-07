@@ -1,0 +1,14 @@
+; $Id: favorite_nodesactivity.info,v 1.1.4.3 2008/11/30 13:54:10 jaydub Exp $ 
+name = Favorite Nodes activity
+description = "Enable activity notifications for Favorite Nodes."
+core = 6.x
+dependencies[] = activity 
+dependencies[] = favorite_nodes 
+package = Activity
+
+; Information added by drupal.org packaging script on 2009-04-27
+version = "6.x-1.2"
+core = "6.x"
+project = "activity"
+datestamp = "1240798502"
+

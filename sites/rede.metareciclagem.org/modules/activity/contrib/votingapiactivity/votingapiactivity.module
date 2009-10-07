@@ -1,0 +1,148 @@
+<?php
+// $Id: votingapiactivity.module,v 1.1.2.5.2.5 2009/04/21 08:51:21 jaydub Exp $
+
+/**
+ * Activity definition file
+ *
+ * This defines what hooks activity module should use
+ */
+function votingapiactivity_activity_info() {
+  $tags = array();
+  $query = db_query("SELECT DISTINCT tag FROM {votingapi_cache}");
+  while ($result = db_fetch_array($query)) {
+    $tags[$result['tag']] = $result['tag'];
+  }
+  return array(
+    'ops' => array('vote' => t('Vote')),
+    'types' => $tags,
+    'roles' => array(
+      'author' => array(
+        '#name' => t('Author'),
+        '#description' => t('The person who voted'),
+        '#default' => t('[author] voted on the [content-type] [content-link]'),
+      ),
+      'all' => array(
+        '#name' => t('All'),
+        '#description' => t('The general public.'),
+        '#default' => t('[author-all] voted on the [content-type] [content-link]'),
+      ),
+    ),
+  );
+}
+
+/** 
+ * Implementation of hook_activityapi().
+ */
+function votingapiactivity_activityapi(&$activity, $op) {
+  if ($op == 'load') {
+    if ($activity['data']['module'] == 'votingapiactivity' && !node_access('view', node_load($activity['data']['content-nid']))) {
+      $activity = array();
+    }
+  }
+}
+
+/**
+ * Token module integration. Defines available default tokens.
+ */
+function votingapiactivity_token_list($type = 'all') {
+  if ($type == 'votingapiactivity') {
+    $tokens['votingapiactivity'] = array(
+      'author-vote' 	=> t('Value of the author\'s vote'),
+      'content-type' 	=> t('Content type that was voted on such as "story" or "image" or "comment"'),
+      'content-id'  	=> t('Id of the content that was voted upon (could be node Id or comment Id)'),
+      'content-nid'  	=> t('Id of the node that was voted upon'),
+      'content-cid'  	=> t('Id of the comment that was voted upon'),
+      'content-title'  	=> t('Title of the content that was voted upon'),
+      'content-link' 	=> t('Link to the content that was voted upon'),
+      'content-vote-avg' => t('Average of all votes for this content'),
+      'content-vote-count' => t('Count of all votes for this content'),
+    );
+    return $tokens;
+  }
+}
+
+/**
+ * Token module integration. Defines available default token values.
+ */
+function votingapiactivity_token_values($type, $data = NULL, $options = array()) {
+  if ($type == 'votingapiactivity' && !empty($data)) {
+    $author_vote = db_fetch_object(db_query('SELECT value FROM {votingapi_vote} WHERE uid = %d AND content_id = %d', $data['uid'], $data['content-id']));
+    $data['author-vote'] = $author_vote->value;
+    $content_votes = db_query('SELECT value, function FROM {votingapi_cache} WHERE content_id = %d', $data['content-id']);
+    while ($row = db_fetch_object($content_votes)) {
+      $content_vote[$row->function] = $row->value;
+    }
+    $data['content-vote-avg'] = $content_vote['average'];
+    $data['content-vote-count'] = $content_vote['count'];
+    $data['content-type'] = ($data['content-type'] == t('comment')) ? $data['content-type'] : theme('activity_node_type', $data['content-type']);
+
+    $link_attributes = array();
+    if ($data['content-type'] == t('comment')) {
+      $link_attributes['fragment'] = 'comment-'. $data['content_id'];
+    }
+    $data['content-link'] = l($data['content-title'], 'node/'. $data['content-nid'], $link_attributes);
+    return $data;
+  }
+}
+
+/**
+ * Implementation of hook_votingapi_insert()
+ */
+function votingapiactivity_votingapi_insert($votes) {
+  foreach ($votes as $vote) {
+
+    // Check if both type and operation are
+    // enabled for activity. If not then stop here
+    if (!in_array($vote['tag'], variable_get('votingapiactivity_token_types', array($vote['tag'])), TRUE) || 
+      !in_array('vote', variable_get('votingapiactivity_op_types', array('vote')), TRUE)) {
+      return FALSE;
+    }
+    
+    // let's not write a record if the voter is
+    // anonymous or otherwise not valid
+    if ($vote['uid'] == 0 || (!$user = user_load(array('uid' => $vote['uid'])))) {
+      return FALSE;
+    }
+    
+    // Privacy setting check
+    if (activity_user_privacy_optout($user)) {
+      return FALSE;
+    }
+    
+    // User hide activity permission check
+    if (user_access('hide activity', $user)) {
+      return FALSE;
+    }
+
+    // Only handle votes on nodes or comments for now
+    if ($vote['content_type'] == 'node') {
+      $content = node_load($vote['content_id']);
+    }
+    else if ($vote['content_type'] == 'comment') {
+      $content = _comment_load($vote['content_id']);
+      $content->type = t('comment');
+      $content->title = $content->subject;
+    }
+    else {
+      return FALSE;
+    }
+
+    $data = array(
+      'content-id' 		=> $vote['content_id'],
+      'content-nid'		=> $content->nid,
+      'content-type' 	=> $content->type,
+      'content-title' 	=> $content->title,
+    );
+    
+    if ($vote['content_type'] == 'comment') {
+      $data['content-cid'] = $content->cid;
+    }
+    
+    $target_users_roles = array(
+      ACTIVITY_ALL => 'all',
+      $user->uid => 'author'
+    );
+    
+    activity_insert($user->uid, 'votingapiactivity', 'vote', 'vote', $data, $target_users_roles);
+  }
+}

@@ -1,0 +1,220 @@
+<?php
+
+  /*  $Id: ed_readmore.module,v 1.5.8.2.2.1 2008/08/13 15:13:11 inactivist Exp $ */
+
+  /**
+   * Customize the 'read more' link shown in drupal teasers.
+   *
+   * This provides the customization described at:
+   *
+   * http://www.angrydonuts.com/the_nuisance_of_the_read_more_fl
+   *
+   * Copyright (c) 2006-2008 Exodus Development, Inc.  All Rights Reserved. 
+   * Licensed under the terms of the GNU Public License (GPL) version 2.  Please see LICENSE.txt for
+   * license terms.  Posession and use of this code signifies acceptance of license
+   * terms.
+   *
+   * Visit Exodus Development at
+   * http://exodusdev.com exodusdev@gmail.com
+   *
+   * Project homepage: 
+   * http://exodusdev.com/drupal/modules/ed_readmore.module
+   *
+   * Conversion from 4.7 to 5.x done by themoebius (zacwitte@gmail.com)
+   * Conversion from 5.x to 6.x done by Exodus Development and tomaszx (tomaszx provided initial conversion and patches -- thanks!)
+   */
+
+define('ED_READMORE_TEXT_DEFAULT', 'Read more');
+
+/**
+ * Place the teaser in the correct location in $thing
+ * @param $thing The thing to place the read more link into
+ * @param $link The link HTML to place
+ * @param $inlineflag if true, try to place at end of text; otherwise, just append
+ */
+
+function _ed_readmore_place_readmore_link($thing, $link, $inlineflag) {
+  $read_more = '<span class="read-more">'. $link .'</span>';
+  if ($inlineflag) {
+    // deal with broken strrpos on php4
+    if (_ed_readmore_is_php4()) {
+      $find_last = '_ed_readmore_strrpos_string';
+    }
+    else {
+      $find_last = 'strrpos';
+    }
+    // int strrpos ( string haystack, string needle [, int offset] )
+    // substr_replace ( mixed string, string replacement, int start [, int length] )
+    // this is lame - need to look for any tag allowed by the current filter
+    $marker_to_insert_at = '</p>';
+   
+    // php4 gotcha - will search only for first char of marker!  (supports only single char search)
+    $final_p_pos = $find_last($thing, $marker_to_insert_at);
+    if (!($final_p_pos === FALSE)) {
+      $thing = substr_replace($thing, $read_more, $final_p_pos, 0); // account for length of </p> string
+    }
+    else {
+      $thing .= $read_more; // not found, so just append it
+    }
+  }
+  else {
+    $thing .= $read_more; // just append it at bottom
+  }
+  return $thing;
+}
+
+
+
+function ed_readmore_nodeapi(&$node, $op, $teaser, $page) {
+  $enabled = variable_get('ed_readmore_readmore_tweak', 1);
+  $inlineflag = variable_get('ed_readmore_readmore_inline', 1);
+  $strong = variable_get('ed_readmore_readmore_strong', 1);
+ 
+  if ($strong) {
+    $strong_l = '<strong>';
+    $strong_r = '</strong>';
+  }
+  else {
+    $strong_l = '';
+    $strong_r = '';
+  }
+  $link_text = $strong_l . t(variable_get('ed_readmore_text', ED_READMORE_TEXT_DEFAULT)) . $strong_r;
+  $options = array('html' => true);
+  $readmore_url = l($link_text, "node/$node->nid", $options);
+  if ($enabled) {
+    if ($op == 'rss item') {
+      // Since this is an RSS item, we need an absolute URL.
+      // And, while we're at it, we make it a _blank target as does node.module node_feed() function.
+      $options['absolute'] =  true;
+      $options['attributes'] =  array('target' => '_blank');
+      $readmore_url = l($link_text, "node/$node->nid", $options);
+      $item_length = variable_get('feed_item_length', 'teaser'); // from node.module node_feed() code
+      switch ($item_length) {
+        case 'teaser':
+          if (strlen($node->teaser) < strlen($node->body)) {
+            $node->teaser = _ed_readmore_place_readmore_link($node->teaser, $readmore_url, $inlineflag);
+          }
+          break;
+      }
+      return;
+    }
+   
+    if ($op == 'view' ) {
+      if ($teaser && $node->readmore) {
+        $node->readmore = false;
+        //
+        // since we are blowing away some of the implicit info ($node->readmore) let's remember that this was a teaser
+        $node->is_teaser = TRUE;
+        $node->content['body']['#value'] = _ed_readmore_place_readmore_link($node->content['body']['#value'], $readmore_url, $inlineflag);
+      }
+    }
+  }
+}
+
+/*
+  *
+  * DESCRIPTION:
+  * This function returns the last occurance of a string, rather than the last occurance
+  * of a single character like strrpos does. It also supports an offset from where to
+  * start the searching in the haystack string.
+  *
+  * ARGS:
+  * $haystack (required) -- the string to search upon
+  * $needle (required) -- the string you are looking for
+  * $offset (optional) -- the offset to start from
+  *
+  * RETURN VALS:
+  * returns integer on success
+  * returns false on failure to find the string at all
+  *
+  * lifted from http://us3.php.net/manual/en/function.strrpos.php#67559
+ */
+
+
+function _ed_readmore_strrpos_string($haystack, $needle, $offset = 0) {
+  if (trim($haystack) != "" && trim($needle) != "" && $offset <= strlen($haystack)) {
+    $last_pos = $offset;
+    $found = false;
+    while (($curr_pos = strpos($haystack, $needle, $last_pos)) !== false) {
+      $found = true;
+      $last_pos = $curr_pos + 1;
+    }
+    if ($found) {
+      return $last_pos - 1;
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    return false;
+  }
+}
+
+function _ed_readmore_php_ver_major() {
+  return substr(PHP_VERSION, 0, 1);
+}
+function _ed_readmore_is_php4() {
+  return _ed_readmore_php_ver_major() == '4';
+}
+
+
+/**
+ * Implementation of hook_menu
+ */
+function ed_readmore_menu() {
+  $items['admin/settings/ed_readmore'] = array(
+    'title' => t('Read More Tweak'),
+    'description' => t('Relocate the teaser "read more" link from links section?'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ed_readmore_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    );
+  return $items;
+}
+
+
+/**
+ * Displays the settings form
+ */
+function ed_readmore_admin_settings() {
+  $form = array();
+  $form['readmore'] = array(
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#title' => t('Teaser "Read more" handling'),
+  );
+
+  $form['readmore']['ed_readmore_readmore_tweak'] =
+    array('#type' => 'checkbox',
+          '#title' =>  t('Relocate <strong>Read more</strong> link from links section?'),
+          '#default_value' => variable_get('ed_readmore_readmore_tweak', 1),
+          '#description' => t('Move Read More from links to end of teaser?  See <a target="_blank" href="http://www.angrydonuts.com/the_nuisance_of_the_read_more_fl">AngryDonuts.com</a> for details.'),
+          '#required' => FALSE);
+
+  $form['readmore']['ed_readmore_readmore_inline'] =
+    array('#type' => 'checkbox',
+          '#title' =>  t('Put <strong>Read more</strong> inline in teaser?'),
+          '#default_value' => variable_get('ed_readmore_readmore_inline', 1),
+          '#description' => t('If relocation is enabled, and this option is set, place "read more" text on last line of teaser text using a &lt;span&gt; element.'),
+          '#required' => FALSE);
+
+  $form['readmore']['ed_readmore_text'] =
+    array('#type' => 'textfield',
+          '#title' =>  t('The "read more" text to display in the teaser'),
+          '#default_value' => variable_get('ed_readmore_text', t(ED_READMORE_TEXT_DEFAULT)),
+          '#description' => t('Enter the text you wish to display in the read more link.  May contain HTML.'),
+          '#required' => TRUE);
+
+  $form['readmore']['ed_readmore_readmore_strong'] =
+    array('#type' => 'checkbox',
+          '#title' =>  t('bold this text'),
+          '#default_value' => variable_get('ed_readmore_readmore_strong', 1),
+          '#required' => FALSE);
+
+
+  return system_settings_form($form);
+}
+

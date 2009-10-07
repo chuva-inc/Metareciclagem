@@ -1,0 +1,10 @@
+# CHANGELOG.txt for freelinking.module for Drupal 6, version 1.x.
+
+## freelinking-6.x-1.5
+  * Implemented a version of spiderman's delete function. Fixes #266932.
+
+## freelinking-6.x-1.3
+  * Implemented bneijt's fix for #231386.
+  * Removed 'https' from the regex. Superfluous.
+  * Fix for #145352.
+  * Fix for #123015.

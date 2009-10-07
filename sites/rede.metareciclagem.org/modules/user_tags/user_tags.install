@@ -1,0 +1,31 @@
+<?php
+
+function user_tags_install() {
+  drupal_set_message('Installing user_tags.....');
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $query1 = db_query("CREATE TABLE {term_user} (
+                  vid int(10) unsigned NOT NULL default '0',
+                  tid int(10) unsigned NOT NULL default '0',
+                  uid int(10) unsigned NOT NULL default '0'
+                ) TYPE=MyISAM /*!40100 DEFAULT CHARACTER SET utf8 */;");
+                
+      $query2 = db_query("CREATE TABLE {user_tags_vocabulary} (
+                  vid INT NOT NULL
+                ) TYPE=MyISAM /*!40100 DEFAULT CHARACTER SET utf8 */;");
+  
+      if ($query1 && $query2) {
+        $success = TRUE;
+      }
+      break;
+  }
+  
+  //if all the tables were installed give confirmation, otherwise display error.
+  if ($success) {
+		drupal_set_message(t("user_tags module installed successfully."));	
+	}
+  else {
+		drupal_set_message(t("user_tags module was not installed. Please view the user_tags module folder and read the INSTALL.txt"), 'error');		
+	}
+}

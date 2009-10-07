@@ -1,0 +1,224 @@
+# $Id: image_gallery.pot,v 1.4 2008/12/27 11:10:03 hass Exp $
+#
+# LANGUAGE translation of Drupal (contrib-image_gallery)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  image_gallery.module,v 1.29 2008/12/27 06:58:41 drewish
+#  image_gallery.install,v 1.9 2008/12/27 06:58:41 drewish
+#  image_gallery.info,v 1.5 2008/01/06 22:15:25 drewish
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2008-12-27 12:04+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: contrib/image_gallery/image_gallery.module:12
+msgid "Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the \"add gallery\" tab."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:72
+msgid "Gallery settings"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:76
+msgid "Images per page"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:79
+msgid "Sets the number of images to be displayed in a gallery page."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:83
+msgid "Display node info"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:85
+msgid "Checking this will display the \"Posted by\" node information on the gallery pages."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:89
+msgid "Image display sort order"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:92
+msgid "Create date, newest first"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:93
+msgid "Create date, oldest first"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:94
+msgid "File name"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:130;198
+msgid "Home"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:199;24;30
+msgid "Image galleries"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:217
+msgid "Operations"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:219
+msgid "edit gallery"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:224
+msgid "No galleries available"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:229;286;320
+msgid "Delete"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:251
+msgid "Gallery name"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:255
+msgid "The name is used to identify the gallery."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:260
+msgid "Description"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:264
+msgid "The description can be used to provide more information about the image gallery."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:267
+msgid "Parent"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:270
+msgid "Weight"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:273
+msgid "When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:281
+msgid "Submit"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:302
+msgid "Created new gallery %term."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:305
+msgid "The gallery %term has been updated."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:308
+msgid "The gallery %term has been deleted."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:320
+msgid "Are you sure you want to delete the image gallery %name?"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:320
+msgid "Deleting an image gallery will delete all sub-galleries. This action cannot be undone."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:320
+msgid "Cancel"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:325
+msgid "The image gallery %term and all sub-galleries have been deleted."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:349
+msgid "root"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:363
+msgid "Image galleries may be nested below other galleries."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:402
+msgid "Last updated: %date"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:441
+msgid "Posted by: !name"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:460
+msgid "Image Galleries"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:400;422
+msgid "There is 1 image in this gallery."
+msgid_plural "There are @count images in this gallery."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/image_gallery/image_gallery.module:17
+msgid "administer images"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:33
+msgid "Create and manage image galleries."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:36
+msgid "List"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:42
+msgid "Add gallery"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:48
+msgid "Edit image gallery"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:56 contrib/image_gallery/image_gallery.install:16
+msgid "Image gallery"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:60
+msgid "Configure appearance of image galleries."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.module:0
+msgid "image_gallery"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.install:18
+msgid "Galleries defined"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.install:22
+msgid "No galleries defined"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.install:24
+msgid "The Image gallery module is enabled, but no galleries have been created. You should <a href=\"@create\">create</a> at least one image gallery."
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.info:0
+msgid "Image Gallery"
+msgstr ""
+
+#: contrib/image_gallery/image_gallery.info:0
+msgid "Allows sorting and displaying of image galleries based on categories."
+msgstr ""
+

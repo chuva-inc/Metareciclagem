@@ -1,0 +1,55 @@
+<?php
+// $Id: activityhistory.install,v 1.1.2.2.2.2 2009/04/11 01:51:18 jaydub Exp $
+
+/**
+ * Implementation of hook_schema().
+ */
+function activityhistory_schema() {
+  $schema['activity_history'] = array(
+    'description' => 'The {activity_history} table stores activity history data',
+    'fields' => array(
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'aid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'timestamp' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('uid', 'aid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function activityhistory_install() {
+  drupal_install_schema('activityhistory');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function activityhistory_uninstall() {
+  drupal_uninstall_schema('activityhistory');
+}
+
+/**
+ * The primary key defined in the schema was defined incorrectly.
+ * This update resets the PRIMARY KEY to the correct value.
+ */
+function activityhistory_update_6101() {
+  $ret = array();
+  db_drop_primary_key($ret, 'activity_history');
+  db_add_primary_key($ret, 'activity_history', array('uid', 'aid'));
+  return $ret;
+}
