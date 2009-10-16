@@ -1,0 +1,87 @@
+a:link, a:visited, a:active{
+  color: #9f9f9f;
+  text-decoration: none;
+}
+ul, .block ul, li, li.leaf{
+  list-style-position: inside;
+  list-style-type: square;
+  list-style-image: url('img/marker.png');
+}
+.header{
+  text-align: left;
+  height: 80px;
+}
+.header .navigation{
+  background-color: #ecf2d1;
+  width: 600px;
+  float: right;
+  height: 28px;
+  display: block;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  margin-top:27px;
+}
+.header .navigation .navigation-primary{
+  width: 500px;
+  margin-top: 1%;
+  font-size: 0.8em;
+}
+.header .navigation .navigation-primary a{
+  color: black;
+  text-decoration: none;
+  padding: 2px;
+  -moz-border-radius: 1px;
+  -webkit-border-radius: 1px;
+}
+.header .navigation .navigation-primary a:hover{
+  background-color: #cddf87;
+}
+
+/* TEORICAMENTE, ESTE PEDAÇO NÃO SE APLICA MAIS 
+   DESDE QUE O BLOCO DE BUSCA SE MUDOU PARA A 
+   BARRA LATERAL DIREITA. de qualquer jeito, 
+   não funciona mais (e eu não tenho com o que 
+   comparar para re-implementar)
+   
+ .header form.search{
+  float: right;
+  margin-top: 0;
+}
+.header form.search input{
+  width: 120px;
+  border: none;
+  margin: 4px 4px;
+  padding: 2px;
+  -moz-border-radius: 1px;
+  -webkit-border-radius: 1px;
+} *****/
+
+.block .title{
+  background-color: #ecf2d1;
+  padding: 4px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+#block-views-ultimos_comentarios{
+  padding-left: 5px;
+  font-size: 90%;
+  width: 80%;
+  margin-bottom: 20px;
+  margin-left: 15px;
+}
+#block-views-ultimos_comentarios ul,
+#block-views-ultimos_comentarios li {
+	list-style-type:none; padding:0; margin:0
+}
+#block-views-ultimos_comentarios .title{
+  background-color:transparent;
+}
+#block-views-ultimos_comentarios .content{
+background-color: #ecf2d1;
+padding: 10px;
+}
+.header, .body-left .header, .body-right .header, .body-both .header, .body-none .header{
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
