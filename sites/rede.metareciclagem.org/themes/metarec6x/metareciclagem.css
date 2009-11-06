@@ -85,3 +85,9 @@ padding: 10px;
   margin-right: auto;
   width: 100%;
 }
+.view-id-lista_esporos .views-row{
+  margin: 16px 0;
+}
+.node .content{
+  line-height: 150%;
+}
