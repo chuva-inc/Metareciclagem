@@ -1,0 +1,13 @@
+; $Id: gmap_overlays.info,v 1.3 2008/09/30 20:54:07 bdragon Exp $
+name = GMap Overlays
+description = Misc. overlays for gmap.
+package = Location
+core = 6.x
+dependencies[] = gmap
+
+; Information added by drupal.org packaging script on 2009-03-14
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "gmap_addons"
+datestamp = "1236989342"
+
