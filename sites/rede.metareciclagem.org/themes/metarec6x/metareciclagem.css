@@ -99,3 +99,6 @@ padding: 10px;
   color: #3366FF;
   font-size: 1.2em;
 }
+.block .content {
+  padding: 8px 0;
+}
