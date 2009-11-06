@@ -37,12 +37,12 @@ ul, .block ul, li, li.leaf{
   background-color: #cddf87;
 }
 
-/* TEORICAMENTE, ESTE PEDAÇO NÃO SE APLICA MAIS 
-   DESDE QUE O BLOCO DE BUSCA SE MUDOU PARA A 
-   BARRA LATERAL DIREITA. de qualquer jeito, 
-   não funciona mais (e eu não tenho com o que 
+/* TEORICAMENTE, ESTE PEDAÇO NÃO SE APLICA MAIS
+   DESDE QUE O BLOCO DE BUSCA SE MUDOU PARA A
+   BARRA LATERAL DIREITA. de qualquer jeito,
+   não funciona mais (e eu não tenho com o que
    comparar para re-implementar)
-   
+
  .header form.search{
   float: right;
   margin-top: 0;
@@ -90,4 +90,8 @@ padding: 10px;
 }
 .node .content{
   line-height: 150%;
+}
+#page > h2 {
+  font-size: 150%;
+  margin-bottom: 15px;
 }
