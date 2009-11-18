@@ -123,3 +123,4 @@ FCKConfig.JustifyClasses = ['rteleft','rtecenter','rteright','rtejustify'] ;
 FCKConfig.EMailProtection = 'none' ;
 // #330286 remove "Red Title" from Styles list.
 FCKConfig.CustomStyles = {};
+FCKConfig.ImageBrowser = true ;
