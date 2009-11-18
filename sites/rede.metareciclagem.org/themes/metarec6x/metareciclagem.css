@@ -77,16 +77,21 @@ ul, .block ul, li, li.leaf{
   background-color:transparent;
 }
 #block-views-ultimos_comentarios .content{
-background-color: #ecf2d1;
-padding: 10px;
+  background-color: #ecf2d1;
+  padding: 10px;
 }
 .header, .body-left .header, .body-right .header, .body-both .header, .body-none .header{
   margin-left: auto;
   margin-right: auto;
   width: 100%;
 }
-.view-id-lista_esporos .views-row{
-  margin: 16px 0;
+.view-id-lista_conectazes .views-table tbody tr,
+.view-id-lista_esporos .views-table tbody tr{
+  height: 3em;
+}
+.view-id-lista_conectazes .views-table thead tr,
+.view-id-lista_esporos .views-table thead tr{
+  height: 1em;
 }
 .node .content{
   line-height: 150%;
