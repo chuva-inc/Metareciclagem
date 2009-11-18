@@ -37,6 +37,7 @@ $Config['UserFilesPath'] = '/userfiles/' ;
 // link or alias. Examples: 'C:\\MySite\\userfiles\\' or '/root/mysite/userfiles/'.
 // Attention: The above 'UserFilesPath' must point to the same directory.
 $Config['UserFilesAbsolutePath'] = '' ;
+require_once "../../../../../filemanager.config.php";
 
 // Due to security issues with Apache modules, it is recommended to leave the
 // following setting enabled.
