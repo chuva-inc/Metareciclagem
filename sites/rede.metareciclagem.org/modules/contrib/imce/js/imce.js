@@ -1,7 +1,7 @@
-// $Id: imce.js,v 1.15.2.9 2008/07/13 11:34:49 ufku Exp $
+// $Id: imce.js,v 1.15.2.10 2009/07/09 19:29:09 ufku Exp $
 
 //Global container.
-var imce = {tree: {}, findex: [], fids: {}, selected: {}, selcount: 0, ops: {}, cache: {},
+var imce = {tree: {}, findex: [], fids: {}, selected: {}, selcount: 0, ops: {}, cache: {}, urlId: {},
 vars: {previewImages: 1, cache: 1},
 hooks: {load: [], list: [], navigate: [], cache: []},
 
@@ -145,6 +145,7 @@ fileAdd: function(file) {
   row.cells[4].innerHTML = file.fdate; row.cells[4].id = file.date;
   imce.invoke('list', row);
   if (imce.vars.prvfid == fid) imce.setPreview(fid);
+  if (file.id) imce.urlId[imce.getURL(fid)] = file.id;
 },
 
 //remove a file from the list
@@ -160,15 +161,18 @@ fileRemove: function(fid) {
 //return a file object containing all properties.
 fileGet: function (fid) {
   var row = imce.fids[fid];
+  var url = imce.getURL(fid);
   return row ? {
     name: imce.decode(fid),
-    url: imce.getURL(fid),
+    url: url,
     size: row.cells[1].innerHTML,
     bytes: row.cells[1].id * 1,
     width: row.cells[2].innerHTML * 1,
     height: row.cells[3].innerHTML * 1,
     date: row.cells[4].innerHTML,
-    time: row.cells[4].id * 1
+    time: row.cells[4].id * 1,
+    id: imce.urlId[url] || 0, //file id for newly uploaded files
+    relpath: (imce.conf.dir == '.' ? '' : imce.conf.dir +'/') + fid //rawurlencoded path relative to file directory path.
   } : null;
 },
 

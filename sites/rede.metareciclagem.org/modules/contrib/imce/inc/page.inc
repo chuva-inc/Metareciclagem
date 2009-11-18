@@ -1,10 +1,11 @@
 <?php
-// $Id: page.inc,v 1.10.2.21 2009/02/20 00:44:05 ufku Exp $
+// $Id: page.inc,v 1.10.2.23 2009/07/09 19:56:54 ufku Exp $
 
 /**
  * q = imce.
  */
 function imce_page() {
+  module_invoke('admin_menu', 'suppress');//suppress admin_menu
   $jsop = isset($_GET['jsop']) ? $_GET['jsop'] : NULL;
   print theme('imce_page', imce_content($GLOBALS['user'], $jsop));
   exit();
@@ -539,6 +540,7 @@ function imce_add_file($file, &$imce) {
     $add['name'] = rawurlencode($file->filename);
     $add['fsize'] = format_size($file->filesize);
     $add['fdate'] = format_date($file->timestamp, 'small');
+    $add['id'] = $file->fid;
     $imce['added'][] = $add;
   }
 }

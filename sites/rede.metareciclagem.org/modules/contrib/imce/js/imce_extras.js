@@ -1,4 +1,4 @@
-// $Id: imce_extras.js,v 1.2.2.3 2009/01/29 20:02:57 ufku Exp $
+// $Id: imce_extras.js,v 1.2.2.4 2009/06/24 12:18:48 ufku Exp $
 //This pack implemets: keyboard shortcuts, file sorting, resize bars, and inline thumbnail preview.
 
 //add onload hook. unshift to make sure it runs first after imce loads.
@@ -148,7 +148,7 @@ imce.updateSortState = function(cid, dsc) {
 };
 
 //sorters
-imce.sortStrAsc = function(a, b) {return a.charAt(0).toLowerCase() < b.charAt(0).toLowerCase() ? -1 : b < a;};
+imce.sortStrAsc = function(a, b) {return a.toLowerCase() < b.toLowerCase() ? -1 : 1;};
 imce.sortStrDsc = function(a, b) {return imce.sortStrAsc(b, a);};
 imce.sortNumAsc = function(a, b) {return a-b;};
 imce.sortNumDsc = function(a, b) {return b-a};

@@ -1,4 +1,4 @@
-// $Id: README.txt,v 1.11.2.6 2009/02/21 00:03:15 ufku Exp $
+// $Id: README.txt,v 1.11.2.8 2009/09/25 13:30:57 ufku Exp $
 
 IMCE is an image/file uploader and browser that supports personal directories and quota.
 IMCE can easily be integrated into any WYSIWYG editor or any web application that needs a file browser.
@@ -45,6 +45,7 @@ Notes:
  - When you configure IMCE for inline image/file insertion into textareas there should appear an IMCE link under each textarea you specified.
  - If you are uploading files containing unicode characters, it is strongly recommended to use the transliteration module that sanitizes filenames by converting characters from unicode to us-ascii. http://drupal.org/project/transliteration
  - If you are using CCK, you may want to check the Imce CCK Image module at http://drupal.org/project/imceimage
+ or the File field sources module at http://drupal.org/project/filefield_sources
 
 
 ~~~~~~FREQUENTLY FACED ISSUES~~~~~~
@@ -61,17 +62,20 @@ Having nothing to do with IMCE, it appeared many times in issue queues. This is 
 Probably talking about tinyMCE or FCKeditor. See INTEGRATION METHODS to learn to integrate it by yourself.
 
 - Upload does not work in Opera
-Jquery form plugin before version 2.09 has problems with Opera 9.2+. Replace Drupal's misc/jquery.form.js with http://jqueryjs.googlecode.com/svn/trunk/plugins/form/jquery.form.js
+Jquery form plugin before version 2.09 has problems with Opera 9.2+. Replace Drupal's misc/jquery.form.js with the one at http://jquery.malsup.com/form/#download
 
 - IMCE may have problem working with Google Analytics and Secure pages modules. Just make sure to add imce* path to the exceptions list of these modules.
 
+
 ~~~~~~~INTEGRATION METHODS~~~~~~~
+
+If you are using WYSIWYG module, you must also download and install http://drupal.org/project/imce_wysiwyg bridge module and enable IMCE as a plug-in in WYSIWYG settings.
 
 Here are the applications whose users are lucky that they don't have to read the details of integration methods.
 
 BUEditor: Obviously, the author knows how to integrate IMCE to his application:). Users need nothing to do.
 
-FCKeditor: Another module from another blessed author, which makes IMCE integration as simple as a single click. Fckeditor profile->File browser settings->IMCE integration
+FCKeditor(without WYSIWYG): Another module from another blessed author, which makes IMCE integration as simple as a single click. Fckeditor profile->File browser settings->IMCE integration
 Note: One can also override the settings at advanced settings->custom javascript configuration.
 Here are the lines that force imce integration (don't force unless you need to):
 LinkBrowser= true;
@@ -80,8 +84,6 @@ FlashBrowser= true;
 LinkBrowserURL= '/?q=imce&app=FCKEditor|url@txtUrl';
 ImageBrowserURL= '/?q=imce&app=FCKEditor|url@txtUrl|width@txtWidth|height@txtHeight';
 FlashBrowserURL= '/?q=imce&app=FCKEditor|url@txtUrl';
-
-TinyMCE: See http://drupal.org/node/241753#comment-792305
 
 There may be other applications that integrated IMCE already. If your application is not one of them, please keep reading.
 
@@ -101,7 +103,7 @@ Now let's go through the integration methods and define the openFileBrowser func
 When IMCE is opened using an url that contains &app=applicationName|fileProperty1@FieldId1|fileProperty2@FieldId2|...
 the specified fields are filled with the specified properties of the selected file.
 
-Avaliable file properties are: url, name, size(formatted), width, height, date(formatted), bytes(integer size in bytes), time(integer date timestamp)
+Avaliable file properties are: url, name, size(formatted), width, height, date(formatted), bytes(integer size in bytes), time(integer date timestamp), id(file id for newly uploaded files, 0 or integer), relpath(rawurlencoded path relative to file directory path.)
 
 In our CASE, we should open IMCE using this URL: /?q=imce&app=myApp|url@urlField which contains our application name and our url field id
 
@@ -116,62 +118,22 @@ Clicking the files in preview do the same thing as well.
 - What if we had another field for another file property e.g, Size: <input type="text" id="file-size"> ?
 - We should have opened imce using this URL: /?q=imce&app=myApp|url@urlField|size@file-size
 
-IMCE 6.x-1.2 brought two other special properties(onload and sendto) allowing more flexibility.
-- onload:
+
+- USING imceload:
 You can point a predefined function to be executed when IMCE loads.
-When the URL is like ...&app=myApp|onload@myOnloadFunc, IMCE looks for myOnloadFunc in the parent window and executes it with the window parameter referring to IMCE window.
+When the URL is like "app=myApp|imceload@myOnloadFunc", IMCE looks for "myOnloadFunc" in the parent window and executes it with the window parameter referring to IMCE window.
 function myOnloadFunc (win) {//any method of imce is available through win.imce
   win.imce.setSendTo('Give it to myApplication baby', myFileHandler);//you should also define myFileHandler
 }
-- sendto:
+
+- USING sendto:
 You can point a predefined function to which the selected files are sent.
-When the URL is like ...&app=myApp|sendto@myFileHandler, IMCE calls myFileHandler function of the parent window with file and window parameters.
+When the URL is like "app=myApp|sendto@myFileHandler", IMCE calls "myFileHandler" function of the parent window with file and window parameters.
 function myFileHandler (file, win) {
   $('#urlFieldId').val(file.url);//insert file url into the url field
   win.close();//close IMCE
 }
-Usually sendto method is easier to implement, on the other hand onload method is more flexible as you manually add your sento operator and also can do any modification before IMCE shows up.
-
-
-~~~~~~INTEGRATION BY ONLOAD~~~~~~
-
-A more flexible method that gives a finer control over IMCE.
-Note: This could be extended to alter the content or the interface of IMCE by using its javascript methods.
-
-var imcePopup;// this is our global variable referring to IMCE window. We use it for tracking its open/closed state
-
-function openFileBrowser() {
-
-  // if IMCE is closed or not opened yet.
-  if (typeof imcePopup == 'undefined' || imcePopup.closed) {
-
-    //open IMCE
-    imcePopup = window.open('/?q=imce', '', 'width=760,height=560,resizable=1');
-    
-    //we create a function that runs when IMCE loads, by setting the imceOnLoad property of the window
-    //It is automatically called by IMCE with a single parameter(win) referring to IMCE window.
-    //We can access all methods of IMCE using win.imce
-    imcePopup['imceOnLoad'] = function (win) {
-      //we use IMCE's setSendTo method to make a selected file sent to our imceFinish function
-      //setSendTo(title, function) creates an operation tab that has the "title" and runs the "function" on click.
-      win.imce.setSendTo('Give it to myApplication baby', imceFinish);
-    }
-  }
-
-  //knowing the popup is opened, we bring it into view.
-  imcePopup.focus();
-}
-
-//Finalizing function that is executed when the user selects a file for our application.
-//This function is called with two parameters.
-//file is the file object having the properties: url, name, size, width, height, date, bytes, time
-//win is the reference to IMCE window. We can access all IMCE methods using win.imce
-function imceFinish(file, win) {
-  //We set the value of our url field using file.url
-  document.getElementById('urlField').value = file.url
-  //hide the popup. We don't close it in order to save time for later use.
-  win.blur();
-}
+Usually sendto method is easier to implement, on the other hand imceload method is more flexible as you manually add your sento operator and also can do any modification before IMCE shows up.
 
 
 ~~~~~~~ADVANCED INTEGRATION~~~~~~~~~
@@ -182,12 +144,11 @@ In case:
 - Your application wants to gain total control over IMCE.
 Then you should consider applying advanced integration.
 
-The initial step of advanced integration is the same as onload-integration above.
+The initial step of advanced integration is the same as imceload-integration above.
 
 We open IMCE and set its imceOnLoad function:
 
-imcePopup = window.open('/?q=imce', '', 'width=760,height=560,resizable=1');
-imcePopup['imceOnLoad'] = initiateMyApp;//initiateMyApp(win) will run when imce loads
+window.open('/?q=imce&app=myApp|imceload@initiateMyApp', '', 'width=760,height=560,resizable=1'); //initiateMyApp(win) will run when imce loads
 
 Now we define our initiator function in which we do the necessary manipulations to IMCE interface:
 
@@ -220,7 +181,7 @@ imce.selected: object containing currently selected file_id(file name)-file(row)
 File related methods
 imce.fileAdd(file): adds the file object to the list. file object has the properties; name, size(bytes), width, height, date(timestamp), fsize(formatted), fdate(formatted)
 imce.fileRemove(fiile_id): removes the file having the file_id from the list.
-imce.fileGet(file_id). returns the file object having the file_id. file object contains name, url, size, bytes, width, height, date, timestamp
+imce.fileGet(file_id). returns the file object having the file_id. file object contains name, url, size, bytes, width, height, date, time, id(file id for newly uploaded files, 0 or integer), relpath(rawurlencoded path relative to file directory path.)
 
 File operations
 imce.opAdd(op): adds an operation tab to the interface. op contains name, title, content(optional), func(optional onclick function)
@@ -232,5 +193,5 @@ imce.setMessage(msg, type): logs a message of the type(status, warning, error)
 NOTE:
 - All URL strings in the examples start with "/" considering the base path is "/".
 In case your drupal is running on a sub directory e.g, http://localhost/drupal, these URLs should start with "/drupal/".
-There is a safer solution that does not require manual URL fixing: If the Drupal javascript object is avaliable in your page you can use Drupal.settings.basePath at the beginning of URLs (Drupal.settings.basePath+'?q=imce....')
+There is a safer solution that does not require manual URL fixing: If the Drupal javascript object is avaliable in your page you can use Drupal.settings.basePath at the beginning of URLs (Drupal.settings.basePath+'?q=imce....'). This won't work multilingual paths with language prefixes.
 - file and directory ids(names) used in imce.js are url encoded forms of original names. They are decoded using imce.decode and displayed in the lists.

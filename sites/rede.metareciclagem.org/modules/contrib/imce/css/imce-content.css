@@ -1,4 +1,4 @@
-/* $Id: imce-content.css,v 1.1.2.2 2009/01/29 11:34:21 ufku Exp $ */
+/* $Id: imce-content.css,v 1.1.2.3 2009/09/21 12:11:09 ufku Exp $ */
 
 /*Main container*/
 #imce-content {
@@ -6,6 +6,7 @@
   font-family: Verdana, Tahoma;
   margin: 0.1em;
   padding: 0.1em;
+  text-align: left;
 }
 
 /*Main sections under imce-content*/

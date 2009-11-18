@@ -1,23 +1,23 @@
-# Hungarian translation of imce (6.x-1.1)
+# Hungarian translation of imce (6.x-1.2)
 # Copyright (c) 2009 by the Hungarian translation team
 # Generated from files:
-#  admin.inc,v 1.5.2.5 2008/06/10 08:39:09 ufku
-#  page.inc,v 1.10.2.13 2008/07/19 13:27:27 ufku
+#  admin.inc,v 1.5.2.6 2009/02/09 18:24:36 ufku
+#  page.inc,v 1.10.2.21 2009/02/20 00:44:05 ufku
 #  imce.js,v 1.15.2.9 2008/07/13 11:34:49 ufku
 #  js.inc,v 1.6.2.1 2008/05/04 15:29:15 ufku
 #  imce.module,v 1.23.2.5 2008/07/19 13:21:02 ufku
 #  imce-content.tpl.php,v 1.8.2.4 2008/06/23 22:18:27 ufku
 #  subdir.inc,v 1.3 2008/02/29 16:57:12 ufku
 #  imce.info,v 1.6 2008/02/27 18:03:46 ufku
-#  imce_set_inline.js,v 1.3.2.2 2008/06/17 16:24:01 ufku
-#  imce_set_app.js,v 1.3.2.3 2008/07/13 11:23:51 ufku
+#  imce_set_app.js,v 1.3.2.6 2009/02/20 21:17:25 ufku
+#  imce_set_inline.js,v 1.3.2.4 2009/02/20 21:17:58 ufku
 #  imce-page.tpl.php,v 1.8.2.2 2008/04/21 18:36:22 ufku
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: imce (6.x-1.1)\n"
-"POT-Creation-Date: 2009-02-15 07:10-0600\n"
-"PO-Revision-Date: 2009-02-12 07:48-0600\n"
+"Project-Id-Version: imce (6.x-1.2)\n"
+"POT-Creation-Date: 2009-02-25 20:32-0600\n"
+"PO-Revision-Date: 2009-02-23 02:22-0600\n"
 "Last-Translator: Balogh Zoltán\n"
 "Language-Team: Hungarian http://forditas.mindworks.hu\n"
 "MIME-Version: 1.0\n"
@@ -25,27 +25,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
-#: inc/admin.inc:204,197,190
+#: inc/admin.inc:200,207,214
 msgid "MB"
 msgstr "MB"
 
-#: inc/page.inc:484
+#: inc/page.inc:486
 msgid "The selected file %file could not be copied."
 msgstr "%file nem másolható."
 
-#: js/imce.js:0; inc/page.inc:578
+#: inc/page.inc:580; js/imce.js:0
 msgid "Only files with the following extensions are allowed: %files-allowed."
 msgstr ""
 "Csak a következő kiterjesztések egyikével rendelkező fájlok "
 "tölthetőek fel: %files-allowed."
 
-#: inc/page.inc:592
+#: inc/page.inc:594
 msgid "The file is %filesize exceeding the maximum file size of %maxsize."
 msgstr ""
 "A feltöltött fájl mérete (%filesize) túllépi a megengedett fájl "
 "méretet (%maxsize)."
 
-#: inc/page.inc:251
+#: inc/page.inc:253
 msgid ""
 "An illegal choice has been detected. Please contact the site "
 "administrator."
@@ -53,15 +53,15 @@ msgstr ""
 "Nem érvényes választást talált a rendszer. Javasolt a webhely "
 "gazdájával felvenni a kapcsolatot."
 
-#: inc/page.inc:250
+#: inc/page.inc:252
 msgid "Illegal choice %choice in !name element."
 msgstr "!name mezőben érvénytelen a kiválasztott érték (%choice)."
 
-#: inc/admin.inc:247,78
+#: inc/admin.inc:87,257
 msgid "Save configuration"
 msgstr "Beállítások mentése"
 
-#: inc/admin.inc:95
+#: inc/admin.inc:104
 msgid "Weight"
 msgstr "Súly"
 
@@ -69,19 +69,19 @@ msgstr "Súly"
 msgid "Operations"
 msgstr "Műveletek"
 
-#: inc/js.inc:42; inc/page.inc:190,151; inc/admin.inc:460,306,20
+#: inc/admin.inc:20,316,470; inc/js.inc:42; inc/page.inc:153,192
 msgid "Delete"
 msgstr "Törlés"
 
-#: inc/admin.inc:461
+#: inc/admin.inc:471
 msgid "Cancel"
 msgstr "Mégsem"
 
-#: inc/admin.inc:97
+#: inc/admin.inc:106
 msgid "n/a"
 msgstr "-"
 
-#: inc/admin.inc:480
+#: inc/admin.inc:490
 msgid "none"
 msgstr "nincs"
 
@@ -89,17 +89,17 @@ msgstr "nincs"
 msgid "Settings"
 msgstr "Beállítások"
 
-#: inc/admin.inc:189
+#: inc/admin.inc:199
 msgid "Your PHP settings limit the maximum file size per upload to %size."
 msgstr ""
 "A PHP beállítások %size méretre korlátozzák a "
 "feltöltésenkénti maximális fájlméretét."
 
-#: tpl/imce-content.tpl.php:45; inc/admin.inc:208
+#: inc/admin.inc:218; tpl/imce-content.tpl.php:45
 msgid "Permitted file extensions"
 msgstr "Engedélyezett fájl kiterjesztések"
 
-#: inc/admin.inc:211
+#: inc/admin.inc:221
 msgid ""
 "Extensions that users in this role can upload. Separate extensions "
 "with a space and do not include the leading dot."
@@ -109,7 +109,7 @@ msgstr ""
 "szóközzel kell elválasztani, és nem szabad kiírni a kezdő "
 "pontot."
 
-#: tpl/imce-content.tpl.php:44; inc/admin.inc:187
+#: inc/admin.inc:197; tpl/imce-content.tpl.php:44
 msgid "Maximum file size per upload"
 msgstr "Egy feltöltés maximális mérete"
 
@@ -117,7 +117,7 @@ msgstr "Egy feltöltés maximális mérete"
 msgid "Date"
 msgstr "Dátum"
 
-#: inc/admin.inc:395
+#: inc/admin.inc:405
 msgid "Name"
 msgstr "Név"
 
@@ -137,7 +137,7 @@ msgstr "Navigáció"
 msgid "Create"
 msgstr "Létrehozás"
 
-#: inc/admin.inc:217
+#: inc/admin.inc:227
 msgid ""
 "The maximum allowed image size (e.g. 640x480). Set to 0 for no "
 "restriction. If an <a href=\"!image-toolkit-link\">image toolkit</a> "
@@ -149,7 +149,7 @@ msgstr ""
 "állítva, a megadott méretnél nagyobb képek átméreteződnek, "
 "hogy illeszkedjenek a beállításhoz."
 
-#: inc/admin.inc:218
+#: inc/admin.inc:228
 msgid "WIDTHxHEIGHT"
 msgstr "SZÉLESSÉGxMAGASSÁG"
 
@@ -157,11 +157,11 @@ msgstr "SZÉLESSÉGxMAGASSÁG"
 msgid "Size"
 msgstr "Méret"
 
-#: js/imce.js:0; inc/js.inc:21; inc/page.inc:111; inc/admin.inc:296
+#: inc/admin.inc:306; inc/js.inc:21; inc/page.inc:113; js/imce.js:0
 msgid "Upload"
 msgstr "Feltöltés"
 
-#: inc/admin.inc:259
+#: inc/admin.inc:269
 msgid "The changes have been saved."
 msgstr "A változtatások mentése megtörtént."
 
@@ -177,15 +177,15 @@ msgstr "Szélesség"
 msgid "Height"
 msgstr "Magasság"
 
-#: inc/admin.inc:395
+#: inc/admin.inc:405
 msgid "Prefix"
 msgstr "Előtag"
 
-#: inc/admin.inc:395
+#: inc/admin.inc:405
 msgid "Suffix"
 msgstr "Toldalék"
 
-#: inc/page.inc:105
+#: inc/page.inc:107
 msgid "File"
 msgstr "Fájl"
 
@@ -197,15 +197,15 @@ msgstr "kép"
 msgid "File name"
 msgstr "Fájlnév"
 
-#: inc/admin.inc:395
+#: inc/admin.inc:405
 msgid "Dimensions"
 msgstr "Méretek"
 
-#: imce.info:0; imce.module:18
+#: imce.module:18; imce.info:0
 msgid "IMCE"
 msgstr "IMCE"
 
-#: inc/admin.inc:176,14
+#: inc/admin.inc:14,186
 msgid "Profile name"
 msgstr "Profilnév"
 
@@ -217,7 +217,7 @@ msgstr "!image vagy !link beszúrása"
 msgid "link"
 msgstr "hivatkozás"
 
-#: imce.module:45,11
+#: imce.module:11,45
 msgid "File browser"
 msgstr "Fájlböngésző"
 
@@ -229,11 +229,11 @@ msgstr "A kép/fájl böngésző működésének beállítása."
 msgid "Directory creation tool"
 msgstr "Könyvtár létrehozó eszköz"
 
-#: inc/admin.inc:24; imce.module:38
+#: imce.module:38; inc/admin.inc:24
 msgid "Add new profile"
 msgstr "Új profil hozzáadása"
 
-#: inc/page.inc:250; imce.module:0
+#: imce.module:0; inc/page.inc:252
 msgid "imce"
 msgstr "imce"
 
@@ -299,19 +299,19 @@ msgstr "Tartsa meg a létező fájlt, az újat dobja el"
 msgid "Replace the existing file with the new one"
 msgstr "Cserélje a létező fájlt az újra"
 
-#: inc/admin.inc:89
+#: inc/admin.inc:98
 msgid "User role"
 msgstr "Felhasználói csoport"
 
-#: inc/admin.inc:89
+#: inc/admin.inc:98
 msgid "Assigned profile"
 msgstr "Hozzárendelt profil"
 
-#: inc/admin.inc:91
+#: inc/admin.inc:100
 msgid "user #1"
 msgstr "felhasználó #1"
 
-#: inc/admin.inc:98
+#: inc/admin.inc:107
 msgid ""
 "For users who have <strong>multiple roles</strong>, "
 "<strong>weight</strong> property will determine the assigned profile. "
@@ -325,35 +325,35 @@ msgstr ""
 "felsorolásban. Tehát egy admin csoport a többi szerep fölé fog "
 "kerülni, ha kisebb súlyozású (pl. -10)."
 
-#: inc/admin.inc:109
+#: inc/admin.inc:118
 msgid "Role-profile assignments"
 msgstr "Csoport-profil összerendelések"
 
-#: inc/admin.inc:111
+#: inc/admin.inc:120
 msgid "Assign profiles to user roles."
 msgstr "Profilok felhasználói csoportokhoz rendelése."
 
-#: inc/admin.inc:129
+#: inc/admin.inc:139
 msgid "Changes have been saved."
 msgstr "A változtatások elmentve."
 
-#: inc/admin.inc:165
+#: inc/admin.inc:175
 msgid "Settings were imported from the profile %name"
 msgstr "%name profilból a beállítások átvéve."
 
-#: inc/admin.inc:178
+#: inc/admin.inc:188
 msgid "Give a name to this profile."
 msgstr "Nevet kell adni a profilnak."
 
-#: inc/admin.inc:196,189
+#: inc/admin.inc:199,206
 msgid "Set to 0 to use the maximum value avaliable."
 msgstr "Nullára állítva a legnagyobb elérhető értéket fogja használni."
 
-#: inc/admin.inc:194
+#: inc/admin.inc:204
 msgid "Directory quota"
 msgstr "Könyvtár kvóta"
 
-#: inc/admin.inc:196
+#: inc/admin.inc:206
 msgid ""
 "Define the upload quota per directory. Total user quota is "
 "proportional to the number of directories that the user has upload "
@@ -363,11 +363,11 @@ msgstr ""
 "felhasználói kvóta arányos a könyvtárak számával, amelyekhez a "
 "felhasználó feltöltési joggal bír."
 
-#: inc/admin.inc:201
+#: inc/admin.inc:211
 msgid "Total user quota"
 msgstr "Teljes felhasználói kvóta"
 
-#: inc/admin.inc:203
+#: inc/admin.inc:213
 msgid ""
 "You can force total user quota to be a value independent of directory "
 "quota. <strong>This quota is calculated using the files table in the "
@@ -385,19 +385,19 @@ msgstr ""
 "alkalmazható, vagy biztonságosan mellőzhető az érték nullára "
 "állításával."
 
-#: inc/admin.inc:211
+#: inc/admin.inc:221
 msgid "Set to * to remove the restriction."
 msgstr "*-ra állítva megszűnik a korlátozás."
 
-#: tpl/imce-content.tpl.php:46; inc/admin.inc:215
+#: inc/admin.inc:225; tpl/imce-content.tpl.php:46
 msgid "Maximum image resolution"
 msgstr "Maximális képfelbontás"
 
-#: tpl/imce-content.tpl.php:47; inc/admin.inc:222
+#: inc/admin.inc:232; tpl/imce-content.tpl.php:47
 msgid "Maximum number of files per operation"
 msgstr "Egy művelethez a fájlok maximális száma"
 
-#: inc/admin.inc:224
+#: inc/admin.inc:234
 msgid ""
 "You can allow users to select multiple files for operations such as "
 "delete, resize, etc. Entire batch file operation is executed in a "
@@ -415,35 +415,35 @@ msgstr ""
 "ami már nem annyira jó. Korlátlan számú fájlkezeléshez nullára "
 "kell állítani."
 
-#: inc/admin.inc:259
+#: inc/admin.inc:269
 msgid "Profile has been added."
 msgstr "A profil létrejött."
 
-#: inc/admin.inc:286
+#: inc/admin.inc:296
 msgid "Including subdirectories"
 msgstr "Alkönyvtárakkal együtt"
 
-#: inc/admin.inc:291
+#: inc/admin.inc:301
 msgid "Browse"
 msgstr "Böngészés"
 
-#: inc/page.inc:173,143; inc/admin.inc:407,301
+#: inc/admin.inc:311,417; inc/page.inc:145,175
 msgid "Thumbnails"
 msgstr "Bélyegképek"
 
-#: inc/js.inc:52; inc/page.inc:215,159; inc/admin.inc:311
+#: inc/admin.inc:321; inc/js.inc:52; inc/page.inc:161,217
 msgid "Resize"
 msgstr "Átméretezés"
 
-#: inc/subdir.inc:13; inc/admin.inc:340
+#: inc/admin.inc:350; inc/subdir.inc:13
 msgid "Directory path"
 msgstr "Könyvtár útvonal"
 
-#: inc/admin.inc:342
+#: inc/admin.inc:352
 msgid "Directories"
 msgstr "Könyvtárak"
 
-#: inc/admin.inc:344
+#: inc/admin.inc:354
 msgid ""
 "Define directories that users of this profile can access.\n"
 "<ul>\n"
@@ -514,7 +514,7 @@ msgstr ""
 "és mentése után a következő lapon újabbak állnak "
 "rendelkezésre.</p>"
 
-#: inc/admin.inc:409
+#: inc/admin.inc:419
 msgid ""
 "You may create a list of thumbnail options that users can choose "
 "from.\n"
@@ -554,75 +554,75 @@ msgstr ""
 "és mentése után a következő lapon újabbak állnak "
 "rendelkezésre.</p>"
 
-#: inc/admin.inc:456
+#: inc/admin.inc:466
 msgid "Are you sure you want to delete the profile %name?"
 msgstr "%name profil valóban törölhető?"
 
-#: inc/admin.inc:472
+#: inc/admin.inc:482
 msgid "Profile has been deleted."
 msgstr "A profil törölve."
 
-#: inc/admin.inc:501
+#: inc/admin.inc:511
 msgid "Import settings from other profiles"
 msgstr "Beállítások átvétele más profilokból"
 
-#: inc/admin.inc:570
+#: inc/admin.inc:580
 msgid "Duplicate directory paths are not allowed."
 msgstr "A könyvtár elérési út megkettőzése nem engedélyezett."
 
-#: inc/admin.inc:574
+#: inc/admin.inc:584
 msgid "%dirname is not accepted as a proper directory name."
 msgstr "%dirname nem fogadható el érvényes könyvtárnévként."
 
-#: inc/js.inc:32; inc/page.inc:178,118
+#: inc/js.inc:32; inc/page.inc:120,180
 msgid "Create thumbnails"
 msgstr "Bélyegképek létrehozása"
 
-#: inc/page.inc:122
+#: inc/page.inc:124
 msgid "Upload file"
 msgstr "Fájl feltöltése"
 
-#: inc/page.inc:135
+#: inc/page.inc:137
 msgid "Selected files"
 msgstr "Kiválasztott fájlok"
 
-#: inc/page.inc:202
+#: inc/page.inc:204
 msgid "Width x Height"
 msgstr "Szélesség x magasság"
 
-#: inc/page.inc:221
+#: inc/page.inc:223
 msgid "Create a new image"
 msgstr "Új kép létrehozása"
 
-#: js/imce.js:0; inc/page.inc:235
+#: inc/page.inc:237; js/imce.js:0
 msgid "Please select a file."
 msgstr "Ki kell választani egy fájlt."
 
-#: js/imce.js:0; inc/page.inc:243
+#: inc/page.inc:245; js/imce.js:0
 msgid "You are not allowed to operate on more than %num files."
 msgstr "Egyidejűleg maximum %num fájllal végezhető el a művelet."
 
-#: inc/page.inc:250
+#: inc/page.inc:252
 msgid "directory (%dir)"
 msgstr "könyvtár (%dir)"
 
-#: inc/page.inc:279
+#: inc/page.inc:281
 msgid "The file is renamed to %filename."
 msgstr "A fájl át lett nevezve: %filename."
 
-#: inc/page.inc:292
+#: inc/page.inc:294
 msgid "%filename is uploaded."
 msgstr "%filename feltöltve."
 
-#: inc/page.inc:306
+#: inc/page.inc:308
 msgid "Upload failed."
 msgstr "A feltöltés sikertelen."
 
-#: inc/page.inc:330
+#: inc/page.inc:332
 msgid "File deletion successful: %files."
 msgstr "Sikeres törlés: %files."
 
-#: js/imce.js:0; inc/page.inc:347
+#: inc/page.inc:349; js/imce.js:0
 msgid ""
 "Please specify dimensions within the allowed range that is from 1x1 to "
 "@dimensions."
@@ -630,41 +630,41 @@ msgstr ""
 "Méretek beállítása az engedélyezett tartományon belül (1x1 - "
 "@dimensions)."
 
-#: tpl/imce-content.tpl.php:47,46,44; js/imce.js:0; inc/page.inc:347
+#: inc/page.inc:349; js/imce.js:0; tpl/imce-content.tpl.php:44,46,47
 msgid "unlimited"
 msgstr "korlátlan"
 
-#: inc/page.inc:354
+#: inc/page.inc:356
 msgid "File resizing successful: %files."
 msgstr "Sikeres átméretezés: %files."
 
-#: inc/page.inc:401
+#: inc/page.inc:403
 msgid "Thumbnail creation (%thumbnames) successful for %filename."
 msgstr "%filename bélyegképeinek előállítása (%thumbnames) sikeres volt."
 
-#: js/imce.js:0; inc/page.inc:434
+#: inc/page.inc:436; js/imce.js:0
 msgid "%filename is not an image."
 msgstr "%filename nem kép."
 
-#: inc/page.inc:439
+#: inc/page.inc:441
 msgid "Scaling up is not allowed."
 msgstr "A nagyobbra méretezés nincs engedélyezve."
 
-#: inc/page.inc:454
+#: inc/page.inc:456
 msgid "%filename(%dimensions) already exists."
 msgstr "%filename (%dimensions) már létezik."
 
-#: inc/page.inc:471
+#: inc/page.inc:473
 msgid "%filename cannot be resized to %dimensions"
 msgstr "%filename fájlt nem lehet átméretezni %dimensions méretre"
 
-#: inc/page.inc:564
+#: inc/page.inc:566
 msgid "File browser is set to reject the upload of existing files."
 msgstr ""
 "A fájlböngésző úgy van beállítva, hogy dobja el a feltöltött "
 "fájlt, ha az már létezik."
 
-#: inc/page.inc:604
+#: inc/page.inc:606
 msgid ""
 "%filename is %filesize which would exceed your %quota_type. You are "
 "currently using %size of %quota."
@@ -673,15 +673,15 @@ msgstr ""
 "kvótát (%quota_type). Jelenleg %size van használatban a kvótábol "
 "(%quota)."
 
-#: inc/page.inc:675
+#: inc/page.inc:677
 msgid "Unable to get a working directory for the file browser!"
 msgstr "Nem lehet a munkakönyvtárat elérni a fájlböngészőhöz!"
 
-#: inc/page.inc:681
+#: inc/page.inc:683
 msgid "There is no valid directory specified for the file browser!"
 msgstr "Nincs érvényes könyvtár megadva a fájlböngésző számára!"
 
-#: inc/page.inc:684
+#: inc/page.inc:686
 msgid ""
 "You don't have access to any configuration profile to use the file "
 "browser!"
@@ -689,7 +689,7 @@ msgstr ""
 "Nincs jogosultság a fájlböngésző használatához szükséges "
 "egyetlen beállítási profilhoz sem!"
 
-#: inc/page.inc:958
+#: inc/page.inc:968
 msgid "Directory root"
 msgstr "Gyökérkönyvtár"
 
@@ -762,7 +762,7 @@ msgstr "Egy fájlt kell kiválasztani."
 msgid "You must select at least %num files."
 msgstr "Legalább %num fájlt ki kell választani."
 
-#: js/imce_set_inline.js:0; js/imce_set_app.js:0
+#: js/imce_set_app.js:0; js/imce_set_inline.js:0
 msgid "Send to @app"
 msgstr "Küldés: @app"
 
@@ -858,4 +858,18 @@ msgstr "Napló törlése"
 #: tpl/imce-page.tpl.php:7
 msgid "File Browser"
 msgstr "Fájlböngésző"
+
+#: inc/admin.inc:79
+msgid "Default method for creating thumbnails"
+msgstr "Alapértelmezés szerinti bélyegkép előállítási mód"
+
+#: inc/admin.inc:82
+msgid "Scale the image with respect to the thumbnail dimensions."
+msgstr "Arányosítsa a képet, figyelembe véve a bélyegkép dimenzióit."
+
+#: inc/admin.inc:83
+msgid "First scale then crop the image to fit the thumbnail dimensions."
+msgstr ""
+"Először arányosítsa, aztán vágja a képet, hogy illeszkedjen a "
+"bélyegkép dimenziókhoz."
 

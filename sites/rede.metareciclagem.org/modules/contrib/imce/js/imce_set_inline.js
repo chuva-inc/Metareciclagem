@@ -1,4 +1,4 @@
-// $Id: imce_set_inline.js,v 1.3.2.4 2009/02/20 21:17:58 ufku Exp $
+// $Id: imce_set_inline.js,v 1.3.2.5 2009/09/21 14:26:39 ufku Exp $
 
 var imceInline = {};
 
@@ -9,7 +9,7 @@ imceInline.initiate = function() {
     imceInline.activeType = this.name.substr(i+6);
  
     if (typeof imceInline.pop == 'undefined' || imceInline.pop.closed) {
-      imceInline.pop = window.open(this.href + (this.href.indexOf('?') < 0 ? '?' : '&') +'app=nomatter|onload@imceInlineImceLoad', '', 'width='+ 760 +',height='+ 560 +',resizable=1');
+      imceInline.pop = window.open(this.href + (this.href.indexOf('?') < 0 ? '?' : '&') +'app=nomatter|imceload@imceInlineImceLoad', '', 'width='+ 760 +',height='+ 560 +',resizable=1');
     }
 
     imceInline.pop.focus();

@@ -1,5 +1,5 @@
 <?php
-// $Id: imce-content.tpl.php,v 1.8.2.4 2008/06/23 22:18:27 ufku Exp $
+// $Id: imce-content.tpl.php,v 1.8.2.5 2009/09/21 12:10:12 ufku Exp $
 $imce =& $imce_ref['imce'];//keep this line.
 $directory = drupal_get_path('module', 'imce');
 
@@ -50,7 +50,7 @@ drupal_add_js('
 </a>
 
 <div id="ops-wrapper">
-  <div id="op-items"><ul class="tabs secondary" id="ops-list"></ul></div>
+  <div id="op-items" class="clear-block"><ul class="tabs secondary" id="ops-list"></ul></div>
   <div id="op-contents"></div>
 </div>
 
