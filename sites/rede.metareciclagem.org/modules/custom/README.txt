@@ -1,0 +1,1 @@
+Esta pasta contém módulos feitos especialmente para a rede, como importadores, etc.

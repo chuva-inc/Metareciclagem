@@ -1,0 +1,20 @@
+; $Id$
+name = Metarec Migrator
+description = "Data migrator - use from Drush"
+
+; Core version (required)
+core = 6.x
+
+; Package name (see http://drupal.org/node/101009 for a list of names)
+package = Custom
+
+; PHP version requirement (optional)
+; php = 5.2
+
+; Module dependencies
+; dependencies[] = mymodule
+; dependencies[] = theirmodule
+
+
+; For further information about configuration options, see
+; - http://drupal.org/node/231036

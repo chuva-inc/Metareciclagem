@@ -1,0 +1,10 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Custom module to migrate some data from elder modules to new options
+ *
+ * Initially, this module will migrate profile data to content_profile
+ * and also event.module data to cck+date content in a feature.
+ */
