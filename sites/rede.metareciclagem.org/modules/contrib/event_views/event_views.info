@@ -1,0 +1,13 @@
+; $Id: event_views.info,v 1.2 2007/06/18 22:53:41 dww Exp $
+name = Event Views
+description = Views-enables the event fields and creates default event views.
+package = Event
+dependencies = event views
+
+
+; Information added by drupal.org packaging script on 2009-06-28
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "event_views"
+datestamp = "1246191066"
+
