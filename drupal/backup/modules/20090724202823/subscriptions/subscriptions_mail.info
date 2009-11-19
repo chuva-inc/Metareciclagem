@@ -1,0 +1,11 @@
+; $Id: subscriptions_mail.info,v 1.1.2.4 2008/01/18 21:47:25 chx Exp $
+name = Subscriptions Mail
+description = Sends out mails with drupal_mail, relying on the separate mail_edit module.
+package = "Subscriptions"
+dependencies = mail_edit subscriptions
+
+; Information added by drupal.org packaging script on 2009-01-20
+version = "5.x-2.4"
+project = "subscriptions"
+datestamp = "1232411153"
+

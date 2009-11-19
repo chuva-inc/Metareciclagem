@@ -1,0 +1,10 @@
+; $Id: subscriptions.info,v 1.1.4.3 2008/01/18 21:47:25 chx Exp $
+name = Subscriptions
+description = The basic Subscriptions framework.
+package = "Subscriptions"
+
+; Information added by drupal.org packaging script on 2009-01-20
+version = "5.x-2.4"
+project = "subscriptions"
+datestamp = "1232411153"
+
