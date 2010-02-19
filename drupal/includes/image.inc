@@ -1,10 +1,40 @@
 <?php
-// $Id: image.inc,v 1.17.2.1 2007/12/27 08:31:24 drumm Exp $
+// $Id: image.inc,v 1.24 2008/01/28 16:05:17 goba Exp $
+
+/**
+ * @file
+ * API for manipulating images.
+ */
+
+/**
+ * @defgroup image Image toolkits
+ * @{
+ * Drupal's image toolkits provide an abstraction layer for common image file
+ * manipulations like scaling, cropping, and rotating. The abstraction frees
+ * module authors from the need to support multiple image libraries, and it
+ * allows site administrators to choose the library that's best for them.
+ *
+ * PHP includes the GD library by default so a GD toolkit is installed with
+ * Drupal. Other toolkits like ImageMagic are available from contrib modules.
+ * GD works well for small images, but using it with larger files may cause PHP
+ * to run out of memory. In contrast the ImageMagick library does not suffer
+ * from this problem, but it requires the ISP to have installed additional
+ * software.
+ *
+ * Image toolkits are installed by copying the image.ToolkitName.inc file into
+ * Drupal's includes directory. The toolkit must then be enabled using the
+ * admin/settings/image-toolkit form.
+ *
+ * Only one toolkit maybe selected at a time. If a module author wishes to call
+ * a specific toolkit they can check that it is installed by calling
+ * image_get_available_toolkits(), and then calling its functions directly.
+ */
 
 /**
  * Return a list of available toolkits.
  *
- * @return An array of toolkit name => descriptive title.
+ * @return
+ *   An array of toolkit name => descriptive title.
  */
 function image_get_available_toolkits() {
   $toolkits = file_scan_directory('includes', 'image\..*\.inc$');
@@ -18,21 +48,23 @@ function image_get_available_toolkits() {
       $output[$info['name']] = $info['title'];
     }
   }
-  $output['gd'] = t('Built-in GD2 toolkit');
+
   return $output;
 }
 
 /**
  * Retrieve the name of the currently used toolkit.
  *
- * @return String containing the name of the toolkit.
+ * @return
+ *   String containing the name of the selected toolkit, or FALSE on error.
  */
 function image_get_toolkit() {
   static $toolkit;
+
   if (!$toolkit) {
     $toolkit = variable_get('image_toolkit', 'gd');
-   $toolkit_file = './includes/image.'.$toolkit.'.inc';
-    if ($toolkit != 'gd' && file_exists($toolkit_file)) {
+    $toolkit_file = './includes/image.'. $toolkit .'.inc';
+    if (isset($toolkit) && file_exists($toolkit_file)) {
       include_once $toolkit_file;
     }
     elseif (!image_gd_check_settings()) {
@@ -46,10 +78,12 @@ function image_get_toolkit() {
 /**
  * Invokes the given method using the currently selected toolkit.
  *
- * @param $method A string containing the method to invoke.
- * @param $params An optional array of parameters to pass to the toolkit method.
- *
- * @return Mixed values (typically Boolean for successful operation).
+ * @param $method
+ *   A string containing the method to invoke.
+ * @param $params
+ *   An optional array of parameters to pass to the toolkit method.
+ * @return
+ *   Mixed values (typically Boolean indicating successful operation).
  */
 function image_toolkit_invoke($method, $params = array()) {
   if ($toolkit = image_get_toolkit()) {
@@ -58,13 +92,8 @@ function image_toolkit_invoke($method, $params = array()) {
       return call_user_func_array($function, $params);
     }
     else {
-      watchdog('php', t("The selected image handling toolkit %toolkit can not correctly process %function.", array('%toolkit' => $toolkit, '%function' => $function)), WATCHDOG_ERROR);
+      watchdog('php', 'The selected image handling toolkit %toolkit can not correctly process %function.', array('%toolkit' => $toolkit, '%function' => $function), WATCHDOG_ERROR);
       return FALSE;
-    }
-  }
-  else {
-    if ($method == 'settings') {
-      return image_gd_settings();
     }
   }
 }
@@ -73,12 +102,16 @@ function image_toolkit_invoke($method, $params = array()) {
 /**
  * Get details about an image.
  *
- * @return array containing information about the image
- *      'width': image's width in pixels
- *      'height': image's height in pixels
- *      'extension': commonly used extension for the image
- *      'mime_type': image's MIME type ('image/jpeg', 'image/gif', etc.)
- *      'file_size': image's physical size (in bytes)
+ * Drupal only supports GIF, JPG and PNG file formats.
+ *
+ * @return
+ *   FALSE, if the file could not be found or is not an image. Otherwise, a
+ *   keyed array containing information about the image:
+ *    'width'     - Width in pixels.
+ *    'height'    - Height in pixels.
+ *    'extension' - Commonly used file extension for the image.
+ *    'mime_type' - MIME type ('image/jpeg', 'image/gif', 'image/png').
+ *    'file_size' - File size in bytes.
  */
 function image_get_info($file) {
   if (!is_file($file)) {
@@ -103,20 +136,58 @@ function image_get_info($file) {
 }
 
 /**
+ * Scales an image to the exact width and height given. Achieves the
+ * target aspect ratio by cropping the original image equally on both
+ * sides, or equally on the top and bottom.  This function is, for
+ * example, useful to create uniform sized avatars from larger images.
+ *
+ * The resulting image always has the exact target dimensions.
+ *
+ * @param $source
+ *   The file path of the source image.
+ * @param $destination
+ *   The file path of the destination image.
+ * @param $width
+ *   The target width, in pixels.
+ * @param $height
+ *   The target height, in pixels.
+ * @return
+ *   TRUE or FALSE, based on success.
+ */
+function image_scale_and_crop($source, $destination, $width, $height) {
+  $info = image_get_info($source);
+
+  $scale = max($width / $info['width'], $height / $info['height']);
+  $x = round(($info['width'] * $scale - $width) / 2);
+  $y = round(($info['height'] * $scale - $height) / 2);
+
+  if (image_toolkit_invoke('resize', array($source, $destination, $info['width'] * $scale, $info['height'] * $scale))) {
+    return image_toolkit_invoke('crop', array($destination, $destination, $x, $y, $width, $height));
+  }
+  return FALSE;
+}
+
+/**
  * Scales an image to the given width and height while maintaining aspect
  * ratio.
  *
- * @param $source         The filepath of the source image
- * @param $destination    The file path of the destination image
- * @param $width          The target width
- * @param $height         The target height
+ * The resulting image can be smaller for one or both target dimensions.
  *
- * @return True or FALSE, based on success
+ * @param $source
+ *   The file path of the source image.
+ * @param $destination
+ *   The file path of the destination image.
+ * @param $width
+ *   The target width, in pixels.
+ * @param $height
+ *   The target height, in pixels.
+ * @return
+ *   TRUE or FALSE, based on success.
  */
 function image_scale($source, $destination, $width, $height) {
   $info = image_get_info($source);
 
-  // don't scale up
+  // Don't scale up.
   if ($width >= $info['width'] && $height >= $info['height']) {
     return FALSE;
   }
@@ -137,10 +208,16 @@ function image_scale($source, $destination, $width, $height) {
 /**
  * Resize an image to the given dimensions (ignoring aspect ratio).
  *
- * @param $source        The filepath of the source image.
- * @param $destination   The file path of the destination image.
- * @param $width         The target width.
- * @param $height        The target height.
+ * @param $source
+ *   The file path of the source image.
+ * @param $destination
+ *   The file path of the destination image.
+ * @param $width
+ *   The target width, in pixels.
+ * @param $height
+ *   The target height, in pixels.
+  * @return
+ *   TRUE or FALSE, based on success.
  */
 function image_resize($source, $destination, $width, $height) {
   return image_toolkit_invoke('resize', array($source, $destination, $width, $height));
@@ -149,198 +226,45 @@ function image_resize($source, $destination, $width, $height) {
 /**
  * Rotate an image by the given number of degrees.
  *
- * @param $source  The filepath of the source image
- * @param $destination    The file path of the destination image
- * @param $degrees The number of (clockwise) degrees to rotate the image
+ * @param $source
+ *   The file path of the source image.
+ * @param $destination
+ *   The file path of the destination image.
+ * @param $degrees
+ *   The number of (clockwise) degrees to rotate the image.
+ * @param $background
+ *   An hexidecimal integer specifying the background color to use for the
+ *   uncovered area of the image after the rotation. E.g. 0x000000 for black,
+ *   0xff00ff for magenta, and 0xffffff for white.
+ * @return
+ *   TRUE or FALSE, based on success.
  */
-function image_rotate($source, $destination, $degrees) {
-  return image_toolkit_invoke('rotate', array($source, $destination, $degrees));
+function image_rotate($source, $destination, $degrees, $background = 0x000000) {
+  return image_toolkit_invoke('rotate', array($source, $destination, $degrees, $background));
 }
 
 /**
  * Crop an image to the rectangle specified by the given rectangle.
  *
- * @param $source        The filepath of the source image
- * @param $destination   The file path of the destination image
- * @param $x             The top left co-ordinate of the crop area (x axis value)
- * @param $y             The top left co-ordinate of the crop area (y axis value)
- * @param $width         The target width
- * @param $height        The target height
+ * @param $source
+ *   The file path of the source image.
+ * @param $destination
+ *   The file path of the destination image.
+ * @param $x
+ *   The top left co-ordinate, in pixels, of the crop area (x axis value).
+ * @param $y
+ *   The top left co-ordinate, in pixels, of the crop area (y axis value).
+ * @param $width
+ *   The target width, in pixels.
+ * @param $height
+ *   The target height, in pixels.
+ * @return
+ *   TRUE or FALSE, based on success.
  */
 function image_crop($source, $destination, $x, $y, $width, $height) {
   return image_toolkit_invoke('crop', array($source, $destination, $x, $y, $width, $height));
 }
 
 /**
- * GD2 toolkit functions
- * With the minimal requirements of PHP 4.3 for Drupal, we use the built-in version of GD.
+ * @} End of "defgroup image".
  */
-
-/**
- * Retrieve settings for the GD2 toolkit.
- */
-function image_gd_settings() {
-  if (image_gd_check_settings()) {
-    $form = array();
-    $form['status'] = array('#value' => t('The built-in GD2 toolkit is installed and working properly.'));
-
-    $form['image_jpeg_quality'] = array(
-      '#type' => 'textfield',
-      '#title' => t('JPEG quality'),
-      '#description' => t('Define the image quality for JPEG manipulations. Ranges from 0 to 100. Higher values mean better image quality but bigger files.'),
-      '#size' => 10,
-      '#maxlength' => 3,
-      '#default_value' => variable_get('image_jpeg_quality', 75),
-      '#field_suffix' => t('%'),
-    );
-
-    return $form;
-  }
-  else {
-    form_set_error('image_toolkit', t('The built-in GD image toolkit requires that the GD module for PHP be installed and configured properly. For more information see <a href="@url">PHP\'s image documentation</a>.', array('@url' => 'http://php.net/image')));
-    return FALSE;
-  }
-}
-
-/**
- * Verify GD2 settings (that the right version is actually installed).
- *
- * @return boolean
- */
-function image_gd_check_settings() {
-  if ($check = get_extension_funcs('gd')) {
-    if (in_array('imagegd2', $check)) {
-      // GD2 support is available.
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-/**
- * Scale an image to the specified size using GD.
- */
-function image_gd_resize($source, $destination, $width, $height) {
-  if (!file_exists($source)) {
-    return FALSE;
-  }
-
-  $info = image_get_info($source);
-  if (!$info) {
-    return FALSE;
-  }
-
-  $im = image_gd_open($source, $info['extension']);
-  if (!$im) {
-    return FALSE;
-  }
-
-  $res = imagecreatetruecolor($width, $height);
-  if ($info['extension'] == 'png') {
-    $transparency = imagecolorallocatealpha($res, 0, 0, 0, 127);
-    imagealphablending($res, FALSE);
-    imagefilledrectangle($res, 0, 0, $width, $height, $transparency);
-    imagealphablending($res, TRUE);
-    imagesavealpha($res, TRUE);
-  }
-  elseif ($info['extension'] == 'gif') {
-    // If we have a specific transparent color.
-    $transparency_index = imagecolortransparent($im);
-    if ($transparency_index >= 0) {
-      // Get the original image's transparent color's RGB values.
-      $transparent_color = imagecolorsforindex($im, $transparency_index);
-      // Allocate the same color in the new image resource.
-      $transparency_index = imagecolorallocate($res, $transparent_color['red'], $transparent_color['green'], $transparent_color['blue']);
-      // Completely fill the background of the new image with allocated color.
-      imagefill($res, 0, 0, $transparency_index);
-      // Set the background color for new image to transparent.
-      imagecolortransparent($res, $transparency_index);
-      // Find number of colors in the images palette.
-      $number_colors = imagecolorstotal($im);
-      // Convert from true color to palette to fix transparency issues.
-      imagetruecolortopalette($res, TRUE, $number_colors);
-    }
-  }
-  imagecopyresampled($res, $im, 0, 0, 0, 0, $width, $height, $info['width'], $info['height']);
-  $result = image_gd_close($res, $destination, $info['extension']);
-
-  imagedestroy($res);
-  imagedestroy($im);
-
-  return $result;
-}
-
-/**
- * Rotate an image the given number of degrees.
- */
-function image_gd_rotate($source, $destination, $degrees, $bg_color = 0) {
-  if (!function_exists('imageRotate')) {
-    return FALSE;
-  }
-
-  $info = image_get_info($source);
-  if (!$info) {
-    return FALSE;
-  }
-
-  $im = image_gd_open($source, $info['extension']);
-  if (!$im) {
-    return FALSE;
-  }
-
-  $res = imageRotate($im, $degrees, $bg_color);
-  $result = image_gd_close($res, $destination, $info['extension']);
-
-  return $result;
-}
-
-/**
- * Crop an image using the GD toolkit.
- */
-function image_gd_crop($source, $destination, $x, $y, $width, $height) {
-  $info = image_get_info($source);
-  if (!$info) {
-    return FALSE;
-  }
-
-  $im = image_gd_open($source, $info['extension']);
-  $res = imageCreateTrueColor($width, $height);
-  imageCopy($res, $im, 0, 0, $x, $y, $width, $height);
-  $result = image_gd_close($res, $destination, $info['extension']);
-
-  imageDestroy($res);
-  imageDestroy($im);
-
-  return $result;
-}
-
-/**
- * GD helper function to create an image resource from a file.
- */
-function image_gd_open($file, $extension) {
-  $extension = str_replace('jpg', 'jpeg', $extension);
-  $open_func = 'imageCreateFrom'. $extension;
-  if (!function_exists($open_func)) {
-    return FALSE;
-  }
-  return $open_func($file);
-}
-
-/**
- * GD helper to write an image resource to a destination file.
- */
-function image_gd_close($res, $destination, $extension) {
-  $extension = str_replace('jpg', 'jpeg', $extension);
-  $close_func = 'image'. $extension;
-  if (!function_exists($close_func)) {
-    return FALSE;
-  }
-  if ($extension == 'jpeg') {
-    return $close_func($res, $destination, variable_get('image_jpeg_quality', 75));
-  }
-  else {
-    return $close_func($res, $destination);
-  }
-}
-
-

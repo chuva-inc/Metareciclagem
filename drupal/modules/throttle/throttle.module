@@ -1,26 +1,20 @@
 <?php
-// $Id: throttle.module,v 1.72 2006/12/20 10:29:31 dries Exp $
+// $Id: throttle.module,v 1.83 2007/12/14 18:08:49 goba Exp $
 
 /**
  * @file
  * Allows configuration of congestion control auto-throttle mechanism.
  */
 
-function throttle_menu($may_cache) {
-  $items = array();
-
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/settings/throttle',
-      'description' => t('Control how your site cuts out content during heavy load.'),
-      'title' => t('Throttle'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('throttle_admin_settings'),
-      'access' => user_access('administer site configuration'),
-      'type' => MENU_NORMAL_ITEM
-    );
-  }
-
+function throttle_menu() {
+  $items['admin/settings/throttle'] = array(
+    'title' => 'Throttle',
+    'description' => 'Control how your site cuts out content during heavy load.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('throttle_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'throttle.admin.inc',
+  );
   return $items;
 }
 
@@ -113,7 +107,7 @@ function throttle_exit() {
     }
     if ($message) {
       cache_clear_all();
-      watchdog('throttle', t('Throttle') .': '. $message);
+      watchdog('throttle', 'Throttle: %message', array('%message' => $message));
     }
   }
 }
@@ -121,53 +115,14 @@ function throttle_exit() {
 /**
  * Implementation of hook_help().
  */
-function throttle_help($section) {
-  switch ($section) {
+function throttle_help($path, $arg) {
+  switch ($path) {
     case 'admin/help#throttle':
-      $output = '<p>'. t('The throttle module provides a congestion control throttling mechanism for automatically detecting a surge in incoming traffic. If the site gets linked to by a popular website, or otherwise comes under a "Denial of Service" (DoS) attack, your webserver might become overwhelmed. This mechanism is utilized by other modules to automatically optimize their performance by temporarily disabling CPU-intensive functionality. For example, in the site theme, you might choose to disable pictures when the site is too busy (reducing bandwidth), or in modules, you might choose to disable some complicated logic (reducing CPU utilization).') .'</p>';
-      $output .= '<p>'. t('The congestion control throttle can be automatically enabled when the number of anonymous or authenticated users currently visiting the site exceeds the specified threshold. ') .'</p>';
-      $output .= '<p>'. t('For more information please read the configuration and customization handbook <a href="@throttle">Throttle page</a>.', array('@throttle' => 'http://drupal.org/handbook/modules/throttle/')) .'</p>';
+      $output = '<p>'. t('The throttle module provides a congestion control mechanism that automatically adjusts to a surge in incoming traffic. If your site is referenced by a popular website, or experiences a "Denial of Service" (DoS) attack, your webserver might become overwhelmed. The throttle mechanism is utilized by modules to temporarily disable CPU-intensive functionality, increasing performance. For instance, via the throttle module, modules may choose to disable resource-intensive blocks or the code within the site theme may temporarily disable user pictures in posts.') .'</p>';
+      $output .= '<p>'. t('The congestion control throttle can be automatically enabled when the number of anonymous or authenticated users currently visiting the site exceeds a specified threshold.') .'</p>';
+      $output .= '<p>'. t('For more information, see the online handbook entry for <a href="@throttle">Throttle module</a>.', array('@throttle' => 'http://drupal.org/handbook/modules/throttle/')) .'</p>';
       return $output;
     case 'admin/settings/throttle':
-      return '<p>'. t('If your site gets linked to by a popular website, or otherwise comes under a "Denial of Service" (DoS) attack, your webserver might become overwhelmed. This module provides a congestion control throttling mechanism for automatically detecting a surge in incoming traffic. This mechanism is utilized by other Drupal modules to automatically optimize their performance by temporarily disabling CPU-intensive functionality.') .'</p>';
-  }
-}
-
-function throttle_admin_settings() {
-  $probabilities = array(0 => '100%', 1 => '50%', 2 => '33.3%', 3 => '25%', 4 => '20%', 5 => '16.6%', 7 => '12.5%', 9 => '10%', 19 => '5%', 99 => '1%', 199 => '.5%', 399 => '.25%', 989 => '.1%');
-
-  $form['throttle_anonymous'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Auto-throttle on anonymous users'),
-    '#default_value' => variable_get('throttle_anonymous', 0),
-    '#size' => 5,
-    '#maxlength' => 6,
-    '#description' => t('The congestion control throttle can be automatically enabled when the number of anonymous users currently visiting your site exceeds the specified threshold. For example, to start the throttle when your site has 250 anonymous users online at once, enter \'250\' in this field. Leave this value blank or set to "0" if you do not wish to auto-throttle on anonymous users. You can inspect the current number of anonymous users using the "Who\'s online" block.')
-  );
-  $form['throttle_user'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Auto-throttle on authenticated users'),
-    '#default_value' => variable_get('throttle_user', 0),
-    '#size' => 5,
-    '#maxlength' => 6,
-    '#description' => t('The congestion control throttle can be automatically enabled when the number of authenticated users currently visiting your site exceeds the specified threshold. For example, to start the throttle when your site has 50 registered users online at once, enter \'50\' in this field. Leave this value blank or set to "0" if you do not wish to auto-throttle on authenticated users. You can inspect the current number of authenticated users using the "Who\'s online" block.')
-  );
-  $form['throttle_probability_limiter'] = array(
-    '#type' => 'select',
-    '#title' => t('Auto-throttle probability limiter'),
-    '#default_value' => variable_get('throttle_probability_limiter', 9),
-    '#options' => $probabilities,
-    '#description' => t('The auto-throttle probability limiter is an efficiency mechanism to statistically reduce the overhead of the auto-throttle. The limiter is expressed as a percentage of page views, so for example if set to the default of 10% we only perform the extra database queries to update the throttle status 1 out of every 10 page views. The busier your site, the lower you should set the limiter value.')
-  );
-
-  return system_settings_form($form);
-}
-
-function throttle_admin_settings_validate($form_id, $form_values) {
-  if (!is_numeric($form_values['throttle_anonymous']) || $form_values['throttle_anonymous'] < 0) {
-    form_set_error('throttle_anonymous', t("%value is not a valid auto-throttle setting. Please enter a positive numeric value.", array('%value' => $form_values['throttle_anonymous'])));
-  }
-  if (!is_numeric($form_values['throttle_user']) || $form_values['throttle_user'] < 0) {
-    form_set_error('throttle_user', t("%value is not a valid auto-throttle setting. Please enter a positive numeric value.", array('%value' => $form_values['throttle_user'])));
+      return '<p>'. t('The throttle module provides a congestion control mechanism that automatically adjusts to a surge in incoming traffic. If your site is referenced by a popular website, or experiences a "Denial of Service" (DoS) attack, your webserver might become overwhelmed. The throttle mechanism is utilized by modules to temporarily disable CPU-intensive functionality, increasing performance.') .'</p>';
   }
 }

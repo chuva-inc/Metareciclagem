@@ -1,4 +1,4 @@
-/* $Id: defaults.css,v 1.2 2006/08/25 09:01:12 drumm Exp $ */
+/* $Id: defaults.css,v 1.5 2007/10/02 12:10:40 dries Exp $ */
 
 /*
 ** HTML elements
@@ -22,8 +22,8 @@ table {
   border-collapse: collapse;
 }
 th {
-  text-align: left;
-  padding-right: 1em;
+  text-align: left; /* LTR */
+  padding-right: 1em; /* LTR */
   border-bottom: 3px solid #ccc;
 }
 

@@ -1,4 +1,4 @@
-/* $Id: node.css,v 1.2.2.1 2007/07/24 18:38:58 drumm Exp $ */
+/* $Id: node.css,v 1.5 2008/01/25 21:21:44 goba Exp $ */
 
 .node-unpublished {
   background-color: #fff4f4;
@@ -13,9 +13,9 @@
   width: 100%;
 }
 #node-admin-buttons {
-  float: left;
-  margin-left: 0.5em;
-  clear: right;
+  float: left; /* LTR */
+  margin-left: 0.5em; /* LTR */
+  clear: right; /* LTR */
 }
 td.revision-current {
   background: #ffc;
@@ -38,4 +38,7 @@ td.revision-current {
 .node-form .attachments fieldset {
   float: none;
   display: block;
+}
+.terms-inline {
+  display: inline;
 }

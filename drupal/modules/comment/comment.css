@@ -1,7 +1,7 @@
-/* $Id: comment.css,v 1.1.2.2 2007/07/24 18:38:58 drumm Exp $ */
+/* $Id: comment.css,v 1.4 2007/07/24 21:33:53 goba Exp $ */
 
 .indented {
-  margin-left: 25px;
+  margin-left: 25px; /* LTR */
 }
 .comment-unpublished {
   background-color: #fff4f4;

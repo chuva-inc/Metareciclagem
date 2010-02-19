@@ -1,19 +1,21 @@
 <?php
-// $Id: database.mysqli.inc,v 1.32.2.5 2008/09/15 06:14:52 drumm Exp $
+// $Id: database.mysqli.inc,v 1.54.2.1 2009/07/21 08:52:30 goba Exp $
 
 /**
  * @file
  * Database interface code for MySQL database servers using the mysqli client libraries. mysqli is included in PHP 5 by default and allows developers to use the advanced features of MySQL 4.1.x, 5.0.x and beyond.
  */
 
-/* Maintainers of this file should consult
- * http://www.php.net/manual/en/ref.mysqli.php
- */
+ // Maintainers of this file should consult:
+ // http://www.php.net/manual/en/ref.mysqli.php
 
 /**
  * @ingroup database
  * @{
  */
+
+// Include functions shared between mysql and mysqli.
+require_once './includes/database.mysql-common.inc';
 
 /**
  * Report database status.
@@ -25,7 +27,7 @@ function db_status_report($phase) {
 
   $form['mysql'] = array(
     'title' => $t('MySQL database'),
-    'value' => ($phase == 'runtime') ? l($version, 'admin/logs/status/sql') : $version,
+    'value' => ($phase == 'runtime') ? l($version, 'admin/reports/status/sql') : $version,
   );
 
   if (version_compare($version, DRUPAL_MINIMUM_MYSQL) < 0) {
@@ -55,12 +57,7 @@ function db_version() {
 function db_connect($url) {
   // Check if MySQLi support is present in PHP
   if (!function_exists('mysqli_init') && !extension_loaded('mysqli')) {
-    drupal_maintenance_theme();
-    drupal_set_header('HTTP/1.1 503 Service Unavailable');
-    drupal_set_title('PHP MySQLi support not enabled');
-    print theme('maintenance_page', '<p>We were unable to use the MySQLi database because the MySQLi extension for PHP is not installed. Check your <code>PHP.ini</code> to see how you can enable it.</p>
-<p>For more help, see the <a href="http://drupal.org/node/258">Installation and upgrading handbook</a>. If you are unsure what these terms mean you should probably contact your hosting provider.</p>');
-    exit;
+    _db_error_page('Unable to use the MySQLi database because the MySQLi extension for PHP is not installed. Check your <code>php.ini</code> to see how you can enable it.');
   }
 
   $url = parse_url($url);
@@ -68,12 +65,7 @@ function db_connect($url) {
   // Decode url-encoded information in the db connection string
   $url['user'] = urldecode($url['user']);
   // Test if database url has a password.
-  if(isset($url['pass'])) {
-    $url['pass'] = urldecode($url['pass']);
-  }
-  else {
-    $url['pass'] = '';
-  }
+  $url['pass'] = isset($url['pass']) ? urldecode($url['pass']) : '';
   $url['host'] = urldecode($url['host']);
   $url['path'] = urldecode($url['path']);
   if (!isset($url['port'])) {
@@ -83,41 +75,11 @@ function db_connect($url) {
   $connection = mysqli_init();
   @mysqli_real_connect($connection, $url['host'], $url['user'], $url['pass'], substr($url['path'], 1), $url['port'], NULL, MYSQLI_CLIENT_FOUND_ROWS);
 
-  // Find all database connection errors and error 1045 for access denied for user account
-  if (mysqli_connect_errno() >= 2000 || mysqli_connect_errno() == 1045) {
-    drupal_maintenance_theme();
-    drupal_set_header('HTTP/1.1 503 Service Unavailable');
-    drupal_set_title('Unable to connect to database server');
-    print theme('maintenance_page', '<p>If you still have to install Drupal, proceed to the <a href="'. base_path() .'install.php">installation page</a>.</p>
-<p>If you have already finished installing Drupal, this either means that the username and password information in your <code>settings.php</code> file is incorrect or that we can\'t connect to the MySQL database server. This could mean your hosting provider\'s database server is down.</p>
-<p>The MySQL error was: '. theme('placeholder', mysqli_connect_error($connection)) .'.</p>
-<p>Currently, the username is '. theme('placeholder', $url['user']) .' and the database server is '. theme('placeholder', $url['host']) .'.</p>
-<ul>
-  <li>Are you sure you have the correct username and password?</li>
-  <li>Are you sure that you have typed the correct hostname?</li>
-  <li>Are you sure that the database server is running?</li>
-  <li>Are you sure that the mysqli libraries are compiled in your PHP installation? Try using the mysql library instead by editing your <code>settings.php</code> configuration file in Drupal.</li>
-</ul>
-<p>For more help, see the <a href="http://drupal.org/node/258">Installation and upgrading handbook</a>. If you are unsure what these terms mean you should probably contact your hosting provider.</p>');
-    exit;
-  }
-  else if (mysqli_connect_errno() > 0) {
-    drupal_maintenance_theme();
-    drupal_set_header('HTTP/1.1 503 Service Unavailable');
-    drupal_set_title('Unable to select database');
-    print theme('maintenance_page', '<p>We were able to connect to the MySQL database server (which means your username and password are okay) but not able to select the database.</p>
-<p>The MySQL error was: '. theme('placeholder', mysqli_connect_error($connection)) .'.</p>
-<p>Currently, the database is '. theme('placeholder', substr($url['path'], 1)) .'. The username is '. theme('placeholder', $url['user']) .' and the database server is '. theme('placeholder', $url['host']) .'.</p>
-<ul>
-  <li>Are you sure you have the correct database name?</li>
-  <li>Are you sure the database exists?</li>
-  <li>Are you sure the username has permission to access the database?</li>
-</ul>
-<p>For more help, see the <a href="http://drupal.org/node/258">Installation and upgrading handbook</a>. If you are unsure what these terms mean you should probably contact your hosting provider.</p>');
-    exit;
+  if (mysqli_connect_errno() > 0) {
+    _db_error_page(mysqli_connect_error());
   }
 
-  /* Force UTF-8 */
+  // Force UTF-8.
   mysqli_query($connection, 'SET NAMES "utf8"');
 
   return $connection;
@@ -127,18 +89,26 @@ function db_connect($url) {
  * Helper function for db_query().
  */
 function _db_query($query, $debug = 0) {
-  global $active_db, $queries;
+  global $active_db, $queries, $user;
 
   if (variable_get('dev_query', 0)) {
     list($usec, $sec) = explode(' ', microtime());
     $timer = (float)$usec + (float)$sec;
+    // If devel.module query logging is enabled, prepend a comment with the username and calling function
+    // to the SQL string. This is useful when running mysql's SHOW PROCESSLIST to learn what exact
+    // code is issueing the slow query.
+    $bt = debug_backtrace();
+    // t() may not be available yet so we don't wrap 'Anonymous'
+    $name = $user->uid ? $user->name : variable_get('anonymous', 'Anonymous');
+    // str_replace() to prevent SQL injection via username or anonymous name.
+    $name = str_replace(array('*', '/'), '', $name);
+    $query = '/* '. $name .' : '. $bt[2]['function'] .' */ '. $query;
   }
 
   $result = mysqli_query($active_db, $query);
 
   if (variable_get('dev_query', 0)) {
-    $bt = debug_backtrace();
-    $query = $bt[2]['function'] . "\n" . $query;
+    $query = $bt[2]['function'] ."\n". $query;
     list($usec, $sec) = explode(' ', microtime());
     $stop = (float)$usec + (float)$sec;
     $diff = $stop - $timer;
@@ -153,6 +123,8 @@ function _db_query($query, $debug = 0) {
     return $result;
   }
   else {
+    // Indicate to drupal_error_handler that this is a database error.
+    ${DB_ERROR} = TRUE;
     trigger_error(check_plain(mysqli_error($active_db) ."\nquery: ". $query), E_USER_WARNING);
     return FALSE;
   }
@@ -164,12 +136,13 @@ function _db_query($query, $debug = 0) {
  * @param $result
  *   A database query result resource, as returned from db_query().
  * @return
- *   An object representing the next row of the result. The attributes of this
- *   object are the table fields selected by the query.
+ *   An object representing the next row of the result, or FALSE. The attributes
+ *   of this object are the table fields selected by the query.
  */
 function db_fetch_object($result) {
   if ($result) {
-    return mysqli_fetch_object($result);
+    $object = mysqli_fetch_object($result);
+    return isset($object) ? $object : FALSE;
   }
 }
 
@@ -179,27 +152,14 @@ function db_fetch_object($result) {
  * @param $result
  *   A database query result resource, as returned from db_query().
  * @return
- *   An associative array representing the next row of the result. The keys of
- *   this object are the names of the table fields selected by the query, and
- *   the values are the field values for this result row.
+ *   An associative array representing the next row of the result, or FALSE.
+ *   The keys of this object are the names of the table fields selected by the
+ *   query, and the values are the field values for this result row.
  */
 function db_fetch_array($result) {
   if ($result) {
-    return mysqli_fetch_array($result, MYSQLI_ASSOC);
-  }
-}
-
-/**
- * Determine how many result rows were found by the preceding query.
- *
- * @param $result
- *   A database query result resource, as returned from db_query().
- * @return
- *   The number of result rows.
- */
-function db_num_rows($result) {
-  if ($result) {
-    return mysqli_num_rows($result);
+    $array = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    return isset($array) ? $array : FALSE;
   }
 }
 
@@ -211,14 +171,14 @@ function db_num_rows($result) {
  *
  * @param $result
  *   A database query result resource, as returned from db_query().
- * @param $row
- *   The index of the row whose result is needed.
  * @return
  *   The resulting field or FALSE.
  */
-function db_result($result, $row = 0) {
-  if ($result && mysqli_num_rows($result) > $row) {
-    $array = mysqli_fetch_array($result, MYSQLI_NUM);
+function db_result($result) {
+  if ($result && mysqli_num_rows($result) > 0) {
+    // The mysqli_fetch_row function has an optional second parameter $row
+    // but that can't be used for compatibility with Oracle, DB2, etc.
+    $array = mysqli_fetch_row($result);
     return $array[0];
   }
   return FALSE;
@@ -230,27 +190,6 @@ function db_result($result, $row = 0) {
 function db_error() {
   global $active_db;
   return mysqli_errno($active_db);
-}
-
-/**
- * Return a new unique ID in the given sequence.
- *
- * For compatibility reasons, Drupal does not use auto-numbered fields in its
- * database tables. Instead, this function is used to return a new unique ID
- * of the type requested. If necessary, a new sequence with the given name
- * will be created.
- *
- * Note that the table name should be in curly brackets to preserve compatibility
- * with table prefixes. For example, db_next_id('{node}_nid');
- */
-function db_next_id($name) {
-  $name = db_prefix_tables($name);
-  db_query('LOCK TABLES {sequences} WRITE');
-  $id = db_result(db_query("SELECT id FROM {sequences} WHERE name = '%s'", $name)) + 1;
-  db_query("REPLACE INTO {sequences} VALUES ('%s', %d)", $name, $id);
-  db_query('UNLOCK TABLES');
-
-  return $id;
 }
 
 /**
@@ -315,9 +254,8 @@ function db_query_range($query) {
  * so that they can be properly escaped to avoid SQL injection attacks.
  *
  * Note that if you need to know how many results were returned, you should do
- * a SELECT COUNT(*) on the temporary table afterwards. db_num_rows() and
- * db_affected_rows() do not give consistent result across different database
- * types in this case.
+ * a SELECT COUNT(*) on the temporary table afterwards. db_affected_rows() does
+ * not give consistent result across different database types in this case.
  *
  * @param $query
  *   A string containing a normal SELECT SQL query.
@@ -343,7 +281,7 @@ function db_query_temporary($query) {
   $tablename = array_pop($args);
   array_shift($args);
 
-  $query = preg_replace('/^SELECT/i', 'CREATE TEMPORARY TABLE '. $tablename .' SELECT', db_prefix_tables($query));
+  $query = preg_replace('/^SELECT/i', 'CREATE TEMPORARY TABLE '. $tablename .' Engine=HEAP SELECT', db_prefix_tables($query));
   if (isset($args[0]) and is_array($args[0])) { // 'All arguments in one array' syntax
     $args = $args[0];
   }
@@ -362,7 +300,7 @@ function db_query_temporary($query) {
  */
 function db_encode_blob($data) {
   global $active_db;
-  return "'" . mysqli_real_escape_string($active_db, $data) . "'";
+  return "'". mysqli_real_escape_string($active_db, $data) ."'";
 }
 
 /**
@@ -403,7 +341,14 @@ function db_unlock_tables() {
  * Check if a table exists.
  */
 function db_table_exists($table) {
-  return db_num_rows(db_query("SHOW TABLES LIKE '{" . db_escape_table($table) . "}'"));
+  return (bool) db_fetch_object(db_query("SHOW TABLES LIKE '{". db_escape_table($table) ."}'"));
+}
+
+/**
+ * Check if a column exists in the given table.
+ */
+function db_column_exists($table, $column) {
+  return (bool) db_fetch_object(db_query("SHOW COLUMNS FROM {". db_escape_table($table) ."} LIKE '". db_escape_table($column) ."'"));
 }
 
 /**
@@ -419,8 +364,16 @@ function db_table_exists($table) {
  */
 function db_distinct_field($table, $field, $query) {
   $field_to_select = 'DISTINCT('. $table .'.'. $field .')';
-  // (?<!text) is a negative look-behind (no need to rewrite queries that already use DISTINCT).
-  return preg_replace('/(SELECT.*)(?:'. $table .'\.|\s)(?<!DISTINCT\()(?<!DISTINCT\('. $table .'\.)'. $field .'(.*FROM )/AUsi', '\1 '. $field_to_select .'\2', $query);
+  $matches = array();
+  if (preg_match('/^SELECT(.*?)FROM(.*)/is', $query, $matches)) {
+    $select = preg_replace(
+      '/((?:^|,)\s*)(?<!DISTINCT\()(?:'. $table .'\.)?'. $field .'(\s*(?:,|$))/is',
+      '\1'. $field_to_select .'\2', $matches[1], 1
+    );
+    
+    return 'SELECT'. $select .'FROM'.$matches[2];
+  }
+  return $query;
 }
 
 /**

@@ -1,36 +1,37 @@
-// $Id: collapse.js,v 1.10 2007/01/11 03:38:31 unconed Exp $
+// $Id: collapse.js,v 1.17 2008/01/29 10:58:25 goba Exp $
 
 /**
  * Toggle the visibility of a fieldset using smooth animations
  */
 Drupal.toggleFieldset = function(fieldset) {
   if ($(fieldset).is('.collapsed')) {
-    var content = $('> div', fieldset).hide();
+    // Action div containers are processed separately because of a IE bug
+    // that alters the default submit button behavior.
+    var content = $('> div:not(.action)', fieldset);
     $(fieldset).removeClass('collapsed');
-    content.slideDown(300, {
+    content.hide();
+    content.slideDown( {
+      duration: 'fast',
+      easing: 'linear',
       complete: function() {
-        // Make sure we open to height auto
-        $(this).css('height', 'auto');
         Drupal.collapseScrollIntoView(this.parentNode);
         this.parentNode.animating = false;
+        $('div.action', fieldset).show();
       },
       step: function() {
-         // Scroll the fieldset into view
+        // Scroll the fieldset into view
         Drupal.collapseScrollIntoView(this.parentNode);
       }
     });
-    if (typeof Drupal.textareaAttach != 'undefined') {
-      // Initialize resizable textareas that are now revealed
-      Drupal.textareaAttach(null, fieldset);
-    }
   }
   else {
-    var content = $('> div', fieldset).slideUp('medium', function() {
+    $('div.action', fieldset).hide();
+    var content = $('> div:not(.action)', fieldset).slideUp('fast', function() {
       $(this.parentNode).addClass('collapsed');
       this.parentNode.animating = false;
     });
   }
-}
+};
 
 /**
  * Scroll a given fieldset into view as much as possible.
@@ -38,30 +39,28 @@ Drupal.toggleFieldset = function(fieldset) {
 Drupal.collapseScrollIntoView = function (node) {
   var h = self.innerHeight || document.documentElement.clientHeight || $('body')[0].clientHeight || 0;
   var offset = self.pageYOffset || document.documentElement.scrollTop || $('body')[0].scrollTop || 0;
-  var pos = Drupal.absolutePosition(node);
+  var posY = $(node).offset().top;
   var fudge = 55;
-  if (pos.y + node.offsetHeight + fudge > h + offset) {
+  if (posY + node.offsetHeight + fudge > h + offset) {
     if (node.offsetHeight > h) {
-      window.scrollTo(0, pos.y);
+      window.scrollTo(0, posY);
     } else {
-      window.scrollTo(0, pos.y + node.offsetHeight - h + fudge);
+      window.scrollTo(0, posY + node.offsetHeight - h + fudge);
     }
   }
-}
+};
 
-// Global Killswitch
-if (Drupal.jsEnabled) {
-  $(document).ready(function() {
-    $('fieldset.collapsible > legend').each(function() {
-      var fieldset = $(this.parentNode);
-      // Expand if there are errors inside
-      if ($('input.error, textarea.error, select.error', fieldset).size() > 0) {
-        fieldset.removeClass('collapsed');
-      }
+Drupal.behaviors.collapse = function (context) {
+  $('fieldset.collapsible > legend:not(.collapse-processed)', context).each(function() {
+    var fieldset = $(this.parentNode);
+    // Expand if there are errors inside
+    if ($('input.error, textarea.error, select.error', fieldset).size() > 0) {
+      fieldset.removeClass('collapsed');
+    }
 
-      // Turn the legend into a clickable link and wrap the contents of the fieldset
-      // in a div for easier animation
-      var text = this.innerHTML;
+    // Turn the legend into a clickable link and wrap the contents of the fieldset
+    // in a div for easier animation
+    var text = this.innerHTML;
       $(this).empty().append($('<a href="#">'+ text +'</a>').click(function() {
         var fieldset = $(this).parents('fieldset:first')[0];
         // Don't animate multiple times
@@ -70,7 +69,9 @@ if (Drupal.jsEnabled) {
           Drupal.toggleFieldset(fieldset);
         }
         return false;
-      })).after($('<div class="fieldset-wrapper"></div>').append(fieldset.children(':not(legend)')));
-    });
+      }))
+      .after($('<div class="fieldset-wrapper"></div>')
+      .append(fieldset.children(':not(legend):not(.action)')))
+      .addClass('collapse-processed');
   });
-}
+};

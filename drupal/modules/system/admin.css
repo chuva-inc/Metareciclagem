@@ -1,4 +1,4 @@
-/* $Id: admin.css,v 1.12 2006/11/23 11:05:46 dries Exp $ */
+/* $Id: admin.css,v 1.18.2.1 2008/04/25 21:01:54 goba Exp $ */
 
 /*
 ** Formatting for administration page
@@ -14,7 +14,7 @@ div.admin-panel .description {
 }
 
 div.admin-panel .body {
-  padding: 0 4px 2px 8px;
+  padding: 0 4px 2px 8px; /* LTR */
 }
 
 div.admin {
@@ -33,9 +33,9 @@ div.admin .right {
 }
 
 div.admin .expert-link {
-  text-align: right;
-  margin-right: 1em;
-  padding-right: 4px;
+  text-align: right; /* LTR */
+  margin-right: 1em; /* LTR */
+  padding-right: 4px; /* LTR */
 }
 
 table.package {
@@ -43,6 +43,9 @@ table.package {
 }
 table.package .description {
   width: 100%;
+}
+table.package .version {
+  direction: ltr;
 }
 div.admin-dependencies, div.admin-required {
   font-size: 0.9em;
@@ -65,11 +68,11 @@ table.system-status-report th {
   border-bottom: 1px solid #ccc;
 }
 table.system-status-report th, table.system-status-report tr.merge-up td {
-  padding-left: 30px;
+  padding-left: 30px; /* LTR */
 }
-table.system-status-report th  {
+table.system-status-report th {
   background-repeat: no-repeat;
-  background-position: 5px 50%;
+  background-position: 5px 50%; /* LTR */
   padding-top: 6px;
   padding-bottom: 6px;
 }
@@ -96,4 +99,39 @@ table.system-status-report tr.ok th {
 }
 .theme-settings-bottom {
   clear: both;
+}
+
+/**
+ * Formatting for theme overview
+ */
+table.screenshot {
+  margin-right: 1em; /* LTR */
+}
+.theme-info h2 {
+  margin-bottom: 0;
+}
+.theme-info p {
+  margin-top: 0;
+}
+
+
+/**
+ * Date and time settings page
+ */
+.date-container {
+  overflow: auto;
+  clear: left; /* LTR */
+}
+.date-container .form-item {
+  margin-top: 0;
+}
+.date-container .select-container, .date-container .custom-container {
+  float: left; /* LTR */
+}
+.date-container .custom-container {
+  margin-left: 15px; /* LTR */
+  width: 50%;
+}
+html.js .custom-container label {
+  visibility: hidden;
 }

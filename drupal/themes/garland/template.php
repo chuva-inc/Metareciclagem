@@ -1,20 +1,20 @@
 <?php
-// $Id: template.php,v 1.4.2.1 2007/04/18 03:38:59 drumm Exp $
+// $Id: template.php,v 1.16.2.2 2009/08/10 11:32:54 goba Exp $
 
 /**
  * Sets the body-tag class attribute.
  *
  * Adds 'sidebar-left', 'sidebar-right' or 'sidebars' classes as needed.
  */
-function phptemplate_body_class($sidebar_left, $sidebar_right) {
-  if ($sidebar_left != '' && $sidebar_right != '') {
+function phptemplate_body_class($left, $right) {
+  if ($left != '' && $right != '') {
     $class = 'sidebars';
   }
   else {
-    if ($sidebar_left != '') {
+    if ($left != '') {
       $class = 'sidebar-left';
     }
-    if ($sidebar_right != '') {
+    if ($right != '') {
       $class = 'sidebar-right';
     }
   }
@@ -38,53 +38,62 @@ function phptemplate_breadcrumb($breadcrumb) {
 }
 
 /**
- * Allow themable wrapping of all comments.
+ * Override or insert PHPTemplate variables into the templates.
  */
-function phptemplate_comment_wrapper($content, $type = null) {
-  static $node_type;
-  if (isset($type)) $node_type = $type;
+function phptemplate_preprocess_page(&$vars) {
+  $vars['tabs2'] = menu_secondary_local_tasks();
 
-  if (!$content || $node_type == 'forum') {
-    return '<div id="comments">'. $content . '</div>';
-  }
-  else {
-    return '<div id="comments"><h2 class="comments">'. t('Comments') .'</h2>'. $content .'</div>';
+  // Hook into color.module
+  if (module_exists('color')) {
+    _color_page_alter($vars);
   }
 }
 
 /**
- * Override or insert PHPTemplate variables into the templates.
+ * Add a "Comments" heading above comments except on forum pages.
  */
-function _phptemplate_variables($hook, $vars) {
-  if ($hook == 'page') {
-
-    if ($secondary = menu_secondary_local_tasks()) {
-      $output = '<span class="clear"></span>';
-      $output .= "<ul class=\"tabs secondary\">\n". $secondary ."</ul>\n";
-      $vars['tabs2'] = $output;
-    }
-
-    // Hook into color.module
-    if (module_exists('color')) {
-      _color_page_alter($vars);
-    }
-    return $vars;
+function garland_preprocess_comment_wrapper(&$vars) {
+  if ($vars['content'] && $vars['node']->type != 'forum') {
+    $vars['content'] = '<h2 class="comments">'. t('Comments') .'</h2>'.  $vars['content'];
   }
-  return array();
 }
 
 /**
  * Returns the rendered local tasks. The default implementation renders
- * them as tabs.
+ * them as tabs. Overridden to split the secondary tasks.
  *
  * @ingroup themeable
  */
 function phptemplate_menu_local_tasks() {
-  $output = '';
+  return menu_primary_local_tasks();
+}
 
-  if ($primary = menu_primary_local_tasks()) {
-    $output .= "<ul class=\"tabs primary\">\n". $primary ."</ul>\n";
+function phptemplate_comment_submitted($comment) {
+  return t('!datetime — !username',
+    array(
+      '!username' => theme('username', $comment),
+      '!datetime' => format_date($comment->timestamp)
+    ));
+}
+
+function phptemplate_node_submitted($node) {
+  return t('!datetime — !username',
+    array(
+      '!username' => theme('username', $node),
+      '!datetime' => format_date($node->created),
+    ));
+}
+
+/**
+ * Generates IE CSS links for LTR and RTL languages.
+ */
+function phptemplate_get_ie_styles() {
+  global $language;
+
+  $iecss = '<link type="text/css" rel="stylesheet" media="all" href="'. base_path() . path_to_theme() .'/fix-ie.css" />';
+  if ($language->direction == LANGUAGE_RTL) {
+    $iecss .= '<style type="text/css" media="all">@import "'. base_path() . path_to_theme() .'/fix-ie-rtl.css";</style>';
   }
 
-  return $output;
+  return $iecss;
 }

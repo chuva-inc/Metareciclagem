@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlrpcs.inc,v 1.21.2.1 2008/05/10 01:53:33 drumm Exp $
+// $Id: xmlrpcs.inc,v 1.24.2.1 2008/04/28 10:04:52 dries Exp $
 
 /**
  * The main entry point for XML-RPC requests.
@@ -55,7 +55,7 @@ function xmlrpc_server($callbacks) {
 
   $data = file_get_contents('php://input');
   if (!$data) {
-     die('XML-RPC server accepts POST requests only.');
+    die('XML-RPC server accepts POST requests only.');
   }
   $xmlrpc_server->message = xmlrpc_message($data);
   if (!xmlrpc_message_parse($xmlrpc_server->message)) {
@@ -109,7 +109,7 @@ function xmlrpc_server_output($xml) {
   header('Connection: close');
   header('Content-Length: '. strlen($xml));
   header('Content-Type: text/xml');
-  header('Date: '.date('r'));
+  header('Date: '. date('r'));
   echo $xml;
   exit;
 }
@@ -201,12 +201,7 @@ function xmlrpc_server_call($xmlrpc_server, $methodname, $args) {
       }
     }
   }
-  /*
-  if (count($args) == 1) {
-    // If only one parameter just send that instead of the whole array
-    $args = $args[0];
-  }
-  */
+
   if (!function_exists($method)) {
     return xmlrpc_error(-32601, t('Server error. Requested function @method does not exist.', array("@method" => $method)));
   }

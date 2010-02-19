@@ -1,5 +1,5 @@
 <?php
-// $Id: install.inc,v 1.31.2.4 2008/10/05 01:46:57 drumm Exp $
+// $Id: install.inc,v 1.56.2.4 2009/02/16 10:25:02 goba Exp $
 
 define('SCHEMA_UNINSTALLED', -1);
 define('SCHEMA_INSTALLED', 0);
@@ -22,8 +22,10 @@ define('FILE_NOT_EXECUTABLE', 128);
  * Initialize the update system by loading all installed module's .install files.
  */
 function drupal_load_updates() {
-  foreach (module_list() as $module) {
-    module_load_install($module);
+  foreach (drupal_get_installed_schema_version(NULL, FALSE, TRUE) as $module => $schema_version) {
+    if ($schema_version > -1) {
+      module_load_install($module);
+    }
   }
 }
 
@@ -33,7 +35,7 @@ function drupal_load_updates() {
  * @param $module
  *   A module name.
  * @return
- *   If the module has updates, an array of available updates sorted by version.
+ *   If the module has updates, an array of available updates sorted by version. 
  *   Otherwise, FALSE.
  */
 function drupal_get_schema_versions($module) {
@@ -59,10 +61,15 @@ function drupal_get_schema_versions($module) {
  *
  * @param $module
  *   A module name.
+ * @param $reset
+ *   Set to TRUE after modifying the system table.
+ * @param $array
+ *   Set to TRUE if you want to get information about all modules in the
+ *   system.
  * @return
  *   The currently installed schema version.
  */
-function drupal_get_installed_schema_version($module, $reset = FALSE) {
+function drupal_get_installed_schema_version($module, $reset = FALSE, $array = FALSE) {
   static $versions = array();
 
   if ($reset) {
@@ -71,13 +78,13 @@ function drupal_get_installed_schema_version($module, $reset = FALSE) {
 
   if (!$versions) {
     $versions = array();
-    $result = db_query("SELECT name, schema_version FROM {system} WHERE type = 'module'");
+    $result = db_query("SELECT name, schema_version FROM {system} WHERE type = '%s'", 'module');
     while ($row = db_fetch_object($result)) {
       $versions[$row->name] = $row->schema_version;
     }
   }
 
-  return $versions[$module];
+  return $array ? $versions : $versions[$module];
 }
 
 /**
@@ -166,7 +173,8 @@ function drupal_detect_database_types() {
  *   An array of settings that need to be updated.
  */
 function drupal_rewrite_settings($settings = array(), $prefix = '') {
-  $settings_file = './'. conf_path() .'/'. $prefix .'settings.php';
+  $default_settings = './sites/default/default.settings.php';
+  $settings_file = './'. conf_path(FALSE, TRUE) .'/'. $prefix .'settings.php';
 
   // Build list of setting names and insert the values into the global namespace.
   $keys = array();
@@ -177,7 +185,7 @@ function drupal_rewrite_settings($settings = array(), $prefix = '') {
 
   $buffer = NULL;
   $first = TRUE;
-  if ($fp = @fopen($settings_file, 'r+')) {
+  if ($fp = fopen($default_settings, 'r')) {
     // Step line by line through settings.php.
     while (!feof($fp)) {
       $line = fgets($fp);
@@ -205,7 +213,7 @@ function drupal_rewrite_settings($settings = array(), $prefix = '') {
           // Write new value to settings.php in the following format:
           //    $'setting' = 'value'; // 'comment'
           $setting = $settings[$variable[1]];
-          $buffer .= '$'. $variable[1] ." = '". $setting['value'] ."';". ($setting['comment'] ? ' // '. $setting['comment'] ."\n" : "\n");
+          $buffer .= '$'. $variable[1] ." = '". $setting['value'] ."';". (!empty($setting['comment']) ? ' // '. $setting['comment'] ."\n" : "\n");
           unset($settings[$variable[1]]);
         }
         else {
@@ -227,11 +235,11 @@ function drupal_rewrite_settings($settings = array(), $prefix = '') {
 
     $fp = fopen($settings_file, 'w');
     if ($fp && fwrite($fp, $buffer) === FALSE) {
-        drupal_set_message(st('Failed to modify %settings, please verify the file permissions.', array('%settings' => $settings_file)), 'error');
+      drupal_set_message(st('Failed to modify %settings, please verify the file permissions.', array('%settings' => $settings_file)), 'error');
     }
   }
   else {
-    drupal_set_message(st('Failed to open %settings, please verify the file permissions.', array('%settings' => $settings_file)), 'error');
+    drupal_set_message(st('Failed to open %settings, please verify the file permissions.', array('%settings' => $default_settings)), 'error');
   }
 }
 
@@ -273,7 +281,7 @@ function drupal_verify_profile($profile, $locale) {
 
   // Get a list of modules required by this profile.
   $function = $profile .'_profile_modules';
-  $module_list = array_merge(array('system'), $function(), ($locale ? array('locale') : array()));
+  $module_list = array_merge(drupal_required_modules(), $function(), ($locale != 'en' && !empty($locale) ? array('locale') : array()));
 
   // Get a list of modules that exist in Drupal's assorted subdirectories.
   $present_modules = array();
@@ -294,42 +302,6 @@ function drupal_verify_profile($profile, $locale) {
 }
 
 /**
- * Install a profile (i.e. a set of modules) from scratch.
- * The profile must be verified first using drupal_verify_profile().
- *
- * @param profile
- *   The name of the profile to install.
- * @param module_list
- *   An array of modules to install.
- */
-function drupal_install_profile($profile, $module_list) {
-  // The system module is a special case; we can't bootstrap until it's
-  // installed, so we can't use the normal installation function.
-  $module_list = array_diff($module_list, array('system'));
-
-  $system_path = dirname(drupal_get_filename('module', 'system', NULL));
-  require_once './' . $system_path . '/system.install';
-  module_invoke('system', 'install');
-  $system_versions = drupal_get_schema_versions('system');
-  $system_version = $system_versions ? max($system_versions) : SCHEMA_INSTALLED;
-  db_query("INSERT INTO {system} (filename, name, type, description, status, throttle, bootstrap, schema_version) VALUES('%s', '%s', 'module', '', 1, 0, 0, %d)", $system_path . '/system.module', 'system', $system_version);
-
-  // Now that we've installed things properly, bootstrap the full Drupal environment
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-
-  // Install schemas for profile and all its modules.
-  module_rebuild_cache();
-  drupal_install_modules($module_list);
-
-  // And now, run the profile's install function.
-  $function = $profile .'_install';
-  if (function_exists($function)) {
-    $function();
-  }
-}
-
-
-/**
  * Calls the install function and updates the system table for a given list of
  * modules.
  *
@@ -337,20 +309,63 @@ function drupal_install_profile($profile, $module_list) {
  *   The modules to install.
  */
 function drupal_install_modules($module_list = array()) {
-  $enable_modules = array();
-
-  foreach ($module_list as $module) {
-    if (drupal_get_installed_schema_version($module, TRUE) == SCHEMA_UNINSTALLED) {
-      module_load_install($module);
-      module_invoke($module, 'install');
-      $versions = drupal_get_schema_versions($module);
-      drupal_set_installed_schema_version($module, $versions ? max($versions) : SCHEMA_INSTALLED);
-      $enable_modules[] = $module;
+  $files = module_rebuild_cache();
+  $module_list = array_flip(array_values($module_list));
+  do {
+    $moved = FALSE;
+    foreach ($module_list as $module => $weight) {
+      $file = $files[$module];
+      if (isset($file->info['dependencies']) && is_array($file->info['dependencies'])) {
+        foreach ($file->info['dependencies'] as $dependency) {
+          if (isset($module_list[$dependency]) && $module_list[$module] < $module_list[$dependency] +1) {
+            $module_list[$module] = $module_list[$dependency] +1;
+            $moved = TRUE;
+          }
+        }
+      }
     }
-  }
-
-  module_enable($enable_modules);
+  } while ($moved);
+  asort($module_list);
+  $module_list = array_keys($module_list);
+  array_filter($module_list, '_drupal_install_module');
+  module_enable($module_list);
 }
+
+/**
+ * Callback to install an individual profile module.
+ *
+ * Used during installation to install modules one at a time and then
+ * enable them, or to install a number of modules at one time
+ * from admin/build/modules.
+ */
+function _drupal_install_module($module) {
+  if (drupal_get_installed_schema_version($module, TRUE) == SCHEMA_UNINSTALLED) {
+    module_load_install($module);
+    module_invoke($module, 'install');
+    $versions = drupal_get_schema_versions($module);
+    drupal_set_installed_schema_version($module, $versions ? max($versions) : SCHEMA_INSTALLED);
+    return TRUE;
+  }
+}
+
+/**
+ * Callback to install the system module.
+ *
+ * Separated from the installation of other modules so core system
+ * functions can be made available while other modules are installed.
+ */
+function drupal_install_system() {
+  $system_path = dirname(drupal_get_filename('module', 'system', NULL));
+  require_once './'. $system_path .'/system.install';
+  module_invoke('system', 'install');
+  $system_versions = drupal_get_schema_versions('system');
+  $system_version = $system_versions ? max($system_versions) : SCHEMA_INSTALLED;
+  db_query("INSERT INTO {system} (filename, name, type, owner, status, throttle, bootstrap, schema_version) VALUES('%s', '%s', '%s', '%s', %d, %d, %d, %d)", $system_path .'/system.module', 'system', 'module', '', 1, 0, 0, $system_version);
+  // Now that we've installed things properly, bootstrap the full Drupal environment
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+  module_rebuild_cache();
+}
+
 
 /**
  * Calls the uninstall function and updates the system table for a given module.
@@ -359,8 +374,37 @@ function drupal_install_modules($module_list = array()) {
  *   The module to uninstall.
  */
 function drupal_uninstall_module($module) {
+  // First, retrieve all the module's menu paths from db.
+  drupal_load('module', $module);
+  $paths = module_invoke($module, 'menu');
+
+  // Uninstall the module(s).
   module_load_install($module);
   module_invoke($module, 'uninstall');
+
+  // Now remove the menu links for all paths declared by this module.
+  if (!empty($paths)) {
+    $paths = array_keys($paths);
+    // Clean out the names of load functions.
+    foreach ($paths as $index => $path) {
+      $parts = explode('/', $path, MENU_MAX_PARTS);
+      foreach ($parts as $k => $part) {
+        if (preg_match('/^%[a-z_]*$/', $part)) {
+          $parts[$k] = '%';
+        }
+      }
+      $paths[$index] = implode('/', $parts);
+    }
+    $placeholders = implode(', ', array_fill(0, count($paths), "'%s'"));
+
+    $result = db_query('SELECT * FROM {menu_links} WHERE router_path IN ('. $placeholders .') AND external = 0 ORDER BY depth DESC', $paths);
+    // Remove all such items. Starting from those with the greatest depth will
+    // minimize the amount of re-parenting done by menu_link_delete().
+    while ($item = db_fetch_array($result)) {
+      _menu_delete_item($item, TRUE);
+    }
+  }
+
   drupal_set_installed_schema_version($module, SCHEMA_UNINSTALLED);
 }
 
@@ -571,14 +615,15 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
  */
 function install_goto($path) {
   global $base_url;
-  header('Location: '. $base_url . '/' . $path);
+  header('Location: '. $base_url .'/'. $path);
   header('Cache-Control: no-cache'); // Not a permanent redirect.
   exit();
 }
 
 /**
- * Hardcoded function for doing the equivalent of theme('placeholder')
- * when the theme system is not available.
+ * Hardcoded function for doing the equivalent of t() during
+ * the install process, when database, theme, and localization
+ * system is possibly not yet available.
  */
 function st($string, $args = array()) {
   static $locale_strings = NULL;
@@ -586,7 +631,7 @@ function st($string, $args = array()) {
 
   if (!isset($locale_strings)) {
     $locale_strings = array();
-    $filename = './profiles/' . $profile . '/' . $install_locale . '.po';
+    $filename = './profiles/'. $profile .'/translations/'. $install_locale .'.po';
     if (file_exists($filename)) {
       require_once './includes/locale.inc';
       $file = (object) array('filepath' => $filename);
@@ -596,7 +641,6 @@ function st($string, $args = array()) {
   }
 
   require_once './includes/theme.inc';
-  $GLOBALS['theme'] = 'theme';
   // Transform arguments before inserting them
   foreach ($args as $key => $value) {
     switch ($key[0]) {
@@ -617,60 +661,6 @@ function st($string, $args = array()) {
 }
 
 /**
- * Converts a set of tables to UTF-8 encoding.
- *
- * This update is designed to be re-usable by contrib modules and is
- * used by system_update_169().
- */
-function _system_update_utf8($tables) {
-  // Are we starting this update for the first time?
-  if (!isset($_SESSION['update_utf8'])) {
-    switch ($GLOBALS['db_type']) {
-      // Only for MySQL 4.1+
-      case 'mysqli':
-        break;
-      case 'mysql':
-        if (version_compare(mysql_get_server_info($GLOBALS['active_db']), '4.1.0', '<')) {
-          return array();
-        }
-        break;
-      case 'pgsql':
-        return array();
-    }
-
-    // See if database uses UTF-8 already
-    global $db_url;
-    $url = parse_url(is_array($db_url) ? $db_url['default'] : $db_url);
-    $db_name = substr($url['path'], 1);
-    $result = db_fetch_array(db_query('SHOW CREATE DATABASE `%s`', $db_name));
-    if (preg_match('/utf8/i', array_pop($result))) {
-      return array();
-    }
-
-    // Make list of tables to convert
-    $_SESSION['update_utf8'] = $tables;
-    // Keep track of total for progress bar
-    $_SESSION['update_utf8_total'] = count($tables);
-  }
-
-  // Fetch remaining tables list and convert next table
-  $list = &$_SESSION['update_utf8'];
-
-  $ret = update_convert_table_utf8(array_shift($list));
-
-  // Are we done?
-  if (count($list) == 0) {
-    unset($_SESSION['update_utf8']);
-    unset($_SESSION['update_utf8_total']);
-    return $ret;
-  }
-
-  // Progress percentage
-  $ret['#finished'] = 1 - (count($list) / $_SESSION['update_utf8_total']);
-  return $ret;
-}
-
-/**
  * Check a profile's requirements.
  *
  * @param profile
@@ -678,7 +668,6 @@ function _system_update_utf8($tables) {
  */
 function drupal_check_profile($profile) {
   include_once './includes/file.inc';
-  include_once './includes/common.inc';
 
   $profile_file = "./profiles/$profile/$profile.profile";
 
@@ -690,7 +679,7 @@ function drupal_check_profile($profile) {
 
   // Get a list of modules required by this profile.
   $function = $profile .'_profile_modules';
-  $module_list = array_unique(array_merge(array('system'), $function()));
+  $module_list = array_unique(array_merge(drupal_required_modules(), $function()));
 
   // Get a list of all .install files.
   $installs = drupal_get_install_files($module_list);
@@ -734,7 +723,11 @@ function drupal_check_module($module) {
       // Print any error messages
       foreach ($requirements as $requirement) {
         if (isset($requirement['severity']) && $requirement['severity'] == REQUIREMENT_ERROR) {
-          drupal_set_message($requirement['description'] .' ('. t('Currently using !item !version', array('!item' => $requirement['title'], '!version' => $requirement['value'])) .')', 'error');
+          $message = $requirement['description'];
+          if (isset($requirement['value']) && $requirement['value']) {
+            $message .= ' ('. t('Currently using !item !version', array('!item' => $requirement['title'], '!version' => $requirement['value'])) .')';
+          }
+          drupal_set_message($message, 'error');
         }
       }
       return FALSE;

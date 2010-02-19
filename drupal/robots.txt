@@ -1,4 +1,4 @@
-# $Id: robots.txt,v 1.7.2.2 2008/02/25 02:18:25 drumm Exp $
+# $Id: robots.txt,v 1.9.2.1 2008/12/10 20:12:19 goba Exp $
 #
 # robots.txt
 #
@@ -20,39 +20,35 @@
 User-agent: *
 Crawl-delay: 10
 # Directories
-Disallow: /database/
 Disallow: /includes/
 Disallow: /misc/
 Disallow: /modules/
+Disallow: /profiles/
+Disallow: /scripts/
 Disallow: /sites/
 Disallow: /themes/
-Disallow: /scripts/
-Disallow: /updates/
-Disallow: /profiles/
 # Files
-Disallow: /xmlrpc.php
+Disallow: /CHANGELOG.txt
 Disallow: /cron.php
-Disallow: /update.php
-Disallow: /install.php
-Disallow: /INSTALL.txt
 Disallow: /INSTALL.mysql.txt
 Disallow: /INSTALL.pgsql.txt
-Disallow: /CHANGELOG.txt
-Disallow: /MAINTAINERS.txt
+Disallow: /install.php
+Disallow: /INSTALL.txt
 Disallow: /LICENSE.txt
+Disallow: /MAINTAINERS.txt
+Disallow: /update.php
 Disallow: /UPGRADE.txt
+Disallow: /xmlrpc.php
 # Paths (clean URLs)
 Disallow: /admin/
-Disallow: /comment/
 Disallow: /comment/reply/
-Disallow: /contact
-Disallow: /logout
-Disallow: /node/add
+Disallow: /contact/
+Disallow: /logout/
+Disallow: /node/add/
 Disallow: /search/
-Disallow: /search$
-Disallow: /user/register
-Disallow: /user/password
-Disallow: /user/login
+Disallow: /user/register/
+Disallow: /user/password/
+Disallow: /user/login/
 # Paths (no clean URLs)
 Disallow: /?q=admin/
 Disallow: /?q=comment/reply/
@@ -63,13 +59,3 @@ Disallow: /?q=search/
 Disallow: /?q=user/password/
 Disallow: /?q=user/register/
 Disallow: /?q=user/login/
-# The following default line doesn't block all tracker pages
-Disallow: /tracker/
-# this blocks paginated tracker pages
-Disallow: /tracker?
-Disallow: /*/track$
-Disallow: /*/feed
-# Views and Forum module problem:
-Disallow: /*sort=
-# Image module problem
-Disallow: /*size=

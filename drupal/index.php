@@ -1,5 +1,5 @@
 <?php
-// $Id: index.php,v 1.91 2006/12/12 09:32:18 unconed Exp $
+// $Id: index.php,v 1.94 2007/12/26 08:46:48 dries Exp $
 
 /**
  * @file
@@ -7,6 +7,9 @@
  *
  * The routines here dispatch control to the appropriate handler, which then
  * prints the appropriate page.
+ *
+ * All Drupal code is released under the GNU General Public License.
+ * See COPYRIGHT.txt and LICENSE.txt.
  */
 
 require_once './includes/bootstrap.inc';
@@ -31,7 +34,6 @@ if (is_int($return)) {
 elseif (isset($return)) {
   // Print any value (including an empty string) except NULL or undefined:
   print theme('page', $return);
-
 }
 
 drupal_page_footer();

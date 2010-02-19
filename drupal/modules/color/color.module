@@ -1,28 +1,41 @@
 <?php
-// $Id: color.module,v 1.13.2.6 2008/12/21 02:56:30 drumm Exp $
+// $Id: color.module,v 1.39.2.2 2009/05/16 16:09:21 dries Exp $
 
 /**
- * Implementation of hook_help
+ * Implementation of hook_help().
  */
-function color_help($section) {
-  switch ($section) {
+function color_help($path, $arg) {
+  switch ($path) {
     case 'admin/help#color':
-      $output = '<p>'. t('Color module allows a site administrator to quickly and easily change the color scheme of the entire site. In order for color module to work however, a theme must be specifically designed to use the color changing features. The default theme, Garland, (as well as its fixed width counterpart, Minnelli) was designed to take advantage of these features. With color module, you can easily change the color of links, backgrounds, text, and more depending on which color module enabled theme you are using. Color module requires your <a href="@url">file download method</a> to be set to public.', array('@url' => url('admin/settings/file-system'))) .'</p>';
-      $output .= '<p>'. t("It is important to remember that color module saves a modified copy of the theme's style.css file in the files directory, and includes it after the theme's original style.css. This means that if you make any manual changes to your theme's style.css file, you must save your color settings again, even if they haven't changed. This causes the color module generated version of style.css in the files directory to be recreated using the new version of the original file.") .'</p>';
+      $output = '<p>'. t('The color module allows a site administrator to quickly and easily change the color scheme of certain themes. Although not all themes support color module, both Garland (the default theme) and Minnelli were designed to take advantage of its features. By using color module with a compatible theme, you can easily change the color of links, backgrounds, text, and other theme elements. Color module requires that your <a href="@url">file download method</a> be set to public.', array('@url' => url('admin/settings/file-system'))) .'</p>';
+      $output .= '<p>'. t("It is important to remember that color module saves a modified copy of the theme's specified stylesheets in the files directory. This means that if you make any manual changes to your theme's stylesheet, you must save your color settings again, even if they haven't changed. This causes the color module generated version of the stylesheets in the files directory to be recreated using the new version of the original file.") .'</p>';
+      $output .= '<p>'. t('To change the color settings for a compatible theme, select the "configure" link for the theme on the <a href="@themes">themes administration page</a>.', array('@themes' => url('admin/build/themes'))) .'</p>';
+      $output .= '<p>'. t('For more information, see the online handbook entry for <a href="@color">Color module</a>.', array('@color' => 'http://drupal.org/handbook/modules/color/')) .'</p>';
       return $output;
   }
 }
 
 /**
+ * Implementation of hook_theme().
+ */
+function color_theme() {
+  return array(
+    'color_scheme_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
+}
+
+/**
  * Implementation of hook_form_alter().
  */
-function color_form_alter($form_id, &$form) {
+function color_form_alter(&$form, $form_state, $form_id) {
   // Insert the color changer into the theme settings page.
   if ($form_id == 'system_theme_settings' && color_get_info(arg(4)) && function_exists('gd_info')) {
     if (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) != FILE_DOWNLOADS_PUBLIC) {
       // Disables the color changer when the private download method is used.
       // TODO: This should be solved in a different way. See issue #181003.
-      drupal_set_message(t('The color picker only works if the <a href="@url">download method</a> is set to public.', array('@url' => url('admin/settings/file-system'))));
+      drupal_set_message(t('The color picker only works if the <a href="@url">download method</a> is set to public.', array('@url' => url('admin/settings/file-system'))), 'warning');
     }
     else {
       $form['color'] = array(
@@ -32,12 +45,12 @@ function color_form_alter($form_id, &$form) {
         '#attributes' => array('id' => 'color_scheme_form'),
         '#theme' => 'color_scheme_form',
       );
-      $form['color'] += color_scheme_form(arg(4));
-      $form['#submit']['color_scheme_form_submit'] = array();
+      $form['color'] += color_scheme_form($form_state, arg(4));
+      $form['#submit'][] = 'color_scheme_form_submit';
     }
   }
 
-  // Use the generated screenshot in the theme list
+  // Use the generated screenshot in the theme list.
   if ($form_id == 'system_theme_select_form' || $form_id == 'system_themes') {
     $themes = list_themes();
     foreach (element_children($form) as $theme) {
@@ -54,16 +67,49 @@ function color_form_alter($form_id, &$form) {
  * Callback for the theme to alter the resources used.
  */
 function _color_page_alter(&$vars) {
-  global $theme_key;
+  global $language, $theme_key;
 
-  // Override stylesheet
-  $path = variable_get('color_'. $theme_key .'_stylesheet', NULL);
-  if ($path) {
-    $vars['css']['all']['theme'][$path] = TRUE;
+  // Override stylesheets.
+  $color_paths = variable_get('color_'. $theme_key .'_stylesheets', array());
+  if (!empty($color_paths)) {
+    // Loop over theme CSS files and try to rebuild CSS array with rewritten
+    // stylesheets. Keep the orginal order intact for CSS cascading.
+    $new_theme_css = array();
+
+    foreach ($vars['css']['all']['theme'] as $old_path => $old_preprocess) {
+      // Add the non-colored stylesheet first as we might not find a
+      // re-colored stylesheet for replacement later.
+      $new_theme_css[$old_path] = $old_preprocess;
+
+      // Loop over the path array with recolored CSS files to find matching
+      // paths which could replace the non-recolored paths.
+      foreach ($color_paths as $color_path) {
+        // Color module currently requires unique file names to be used,
+        // which allows us to compare different file paths.
+        if (basename($old_path) == basename($color_path)) {
+          // Pull out the non-colored and add rewritten stylesheet.
+          unset($new_theme_css[$old_path]);
+          $new_theme_css[$color_path] = $old_preprocess;
+
+          // If the current language is RTL and the CSS file had an RTL variant,
+          // pull out the non-colored and add rewritten RTL stylesheet.
+          if ($language->direction == LANGUAGE_RTL) {
+            $rtl_old_path = str_replace('.css', '-rtl.css', $old_path);
+            $rtl_color_path = str_replace('.css', '-rtl.css', $color_path);
+            if (file_exists($rtl_color_path)) {
+              unset($new_theme_css[$rtl_old_path]);
+              $new_theme_css[$rtl_color_path] = $old_preprocess;
+            }
+          }
+          break;
+        }
+      }
+    }
+    $vars['css']['all']['theme'] = $new_theme_css;
     $vars['styles'] = drupal_get_css($vars['css']);
   }
 
-  // Override logo
+  // Override logo.
   $logo = variable_get('color_'. $theme_key .'_logo', NULL);
   if ($logo && $vars['logo'] && preg_match('!'. $theme_key .'/logo.png$!', $vars['logo'])) {
     $vars['logo'] = base_path() . $logo;
@@ -101,7 +147,7 @@ function color_get_palette($theme, $default = false) {
 /**
  * Form callback. Returns the configuration form.
  */
-function color_scheme_form($theme) {
+function color_scheme_form(&$form_state, $theme) {
   $base = drupal_get_path('module', 'color');
   $info = color_get_info($theme);
 
@@ -156,6 +202,8 @@ function color_scheme_form($theme) {
 
 /**
  * Theme color form.
+ *
+ * @ingroup themeable
  */
 function theme_color_scheme_form($form) {
   // Include stylesheet
@@ -163,7 +211,7 @@ function theme_color_scheme_form($form) {
   $info = $form['info']['#value'];
   $path = drupal_get_path('theme', $theme) .'/';
   drupal_add_css($path . $info['preview_css']);
-
+  $output = '';
   // Wrapper
   $output .= '<div class="color-form clear-block">';
 
@@ -180,7 +228,7 @@ function theme_color_scheme_form($form) {
   // Preview
   $output .= drupal_render($form);
   $output .= '<h2>'. t('Preview') .'</h2>';
-  $output .= '<div id="preview"><div id="text"><h2>Lorem ipsum dolor</h2><p>Sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud <a href="#">exercitation ullamco</a> laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p></div><div id="img" style="background-image: url('. base_path() . $path . $info['preview_image'] .')" alt=""></div></div>';
+  $output .= '<div id="preview"><div id="text"><h2>Lorem ipsum dolor</h2><p>Sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud <a href="#">exercitation ullamco</a> laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p></div><div id="img" style="background-image: url('. base_path() . $path . $info['preview_image'] .')"></div></div>';
 
   // Close wrapper
   $output .= '</div>';
@@ -191,18 +239,18 @@ function theme_color_scheme_form($form) {
 /**
  * Submit handler for color change form.
  */
-function color_scheme_form_submit($form_id, $values) {
+function color_scheme_form_submit($form, &$form_state) {
   // Get theme coloring info
-  if (!isset($values['info'])) {
+  if (!isset($form_state['values']['info'])) {
     return;
   }
-  $theme = $values['theme'];
-  $info = $values['info'];
+  $theme = $form_state['values']['theme'];
+  $info = $form_state['values']['info'];
 
   // Resolve palette
-  $palette = $values['palette'];
-  if ($values['scheme'] != '') {
-    $scheme = explode(',', $values['scheme']);
+  $palette = $form_state['values']['palette'];
+  if ($form_state['values']['scheme'] != '') {
+    $scheme = explode(',', $form_state['values']['scheme']);
     foreach ($palette as $k => $color) {
       $palette[$k] = array_shift($scheme);
     }
@@ -229,22 +277,22 @@ function color_scheme_form_submit($form_id, $values) {
   foreach (variable_get('color_'. $theme .'_files', array()) as $file) {
     @unlink($file);
   }
-  if ($file = dirname($file)) {
+  if (isset($file) && $file = dirname($file)) {
     @rmdir($file);
   }
 
   // Don't render the default colorscheme, use the standard theme instead.
   if (implode(',', color_get_palette($theme, true)) == implode(',', $palette)
-    || $values['op'] == t('Reset to defaults')) {
+    || $form_state['values']['op'] == t('Reset to defaults')) {
     variable_del('color_'. $theme .'_palette');
-    variable_del('color_'. $theme .'_stylesheet');
+    variable_del('color_'. $theme .'_stylesheets');
     variable_del('color_'. $theme .'_logo');
     variable_del('color_'. $theme .'_files');
     variable_del('color_'. $theme .'_screenshot');
     return;
   }
 
-  // Prepare target locations for generated files
+  // Prepare target locations for generated files.
   $id = $theme .'-'. substr(md5(serialize($palette) . microtime()), 0, 8);
   $paths['color'] = file_directory_path() .'/color';
   $paths['target'] = $paths['color'] .'/'. $id;
@@ -254,15 +302,13 @@ function color_scheme_form_submit($form_id, $values) {
   $paths['target'] = $paths['target'] .'/';
   $paths['id'] = $id;
   $paths['source'] = drupal_get_path('theme', $theme) .'/';
-  $paths['stylesheet'] = $paths['target'] .'style.css';
   $paths['files'] = $paths['map'] = array();
 
-  // Save palette and stylesheet location
+  // Save palette and logo location.
   variable_set('color_'. $theme .'_palette', $palette);
-  variable_set('color_'. $theme .'_stylesheet', $paths['stylesheet']);
   variable_set('color_'. $theme .'_logo', $paths['target'] .'logo.png');
 
-  // Copy over neutral images
+  // Copy over neutral images.
   foreach ($info['copy'] as $file) {
     $base = basename($file);
     $source = $paths['source'] . $file;
@@ -271,24 +317,57 @@ function color_scheme_form_submit($form_id, $values) {
     $paths['files'][] = $paths['target'] . $base;
   }
 
-  // Render new images, if base image exists
+  // Render new images, if image provided.
   if ($info['base_image']) {
     _color_render_images($theme, $info, $paths, $palette);
   }
 
-  // Rewrite stylesheet
-  _color_rewrite_stylesheet($theme, $info, $paths, $palette);
+  // Rewrite theme stylesheets.
+  $css = array();
+  foreach ($info['css'] as $stylesheet) {
+    // Build a temporary array with LTR and RTL files.
+    $files = array();
+    if (file_exists($paths['source'] . $stylesheet)) {
+      $files[] = $stylesheet;
 
-  // Maintain list of files
+      $rtl_file = str_replace('.css', '-rtl.css', $stylesheet);
+      if (file_exists($paths['source'] . $rtl_file)) {
+        $files[] = $rtl_file;
+      }
+    }
+
+    foreach ($files as $file) {
+      // Aggregate @imports recursively for each configured top level CSS file
+      // without optimization. Aggregation and optimization will be
+      // handled by drupal_build_css_cache() only.
+      $style = drupal_load_stylesheet($paths['source'] . $file, FALSE);
+
+      // Return the path to where this CSS file originated from, stripping
+      // off the name of the file at the end of the path.
+      $base = base_path() . dirname($paths['source'] . $file) .'/';
+      _drupal_build_css_path(NULL, $base);
+
+      // Prefix all paths within this CSS file, ignoring absolute paths.
+      $style = preg_replace_callback('/url\([\'"]?(?![a-z]+:|\/+)([^\'")]+)[\'"]?\)/i', '_drupal_build_css_path', $style);
+
+      // Rewrite stylesheet with new colors.
+      $style = _color_rewrite_stylesheet($theme, $info, $paths, $palette, $style);
+      $base_file = basename($file);
+      $css[] = $paths['target'] . $base_file;
+      _color_save_stylesheet($paths['target'] . $base_file, $style, $paths);
+    }
+  }
+
+  // Maintain list of files.
+  variable_set('color_'. $theme .'_stylesheets', $css);
   variable_set('color_'. $theme .'_files', $paths['files']);
 }
 
 /**
  * Rewrite the stylesheet to match the colors in the palette.
  */
-function _color_rewrite_stylesheet($theme, &$info, &$paths, $palette) {
-  // Load stylesheet
-  $style = file_get_contents($paths['source'] .'style.css');
+function _color_rewrite_stylesheet($theme, &$info, &$paths, $palette, $style) {
+  $themes = list_themes();
 
   // Prepare color conversion table
   $conversion = $palette;
@@ -299,13 +378,10 @@ function _color_rewrite_stylesheet($theme, &$info, &$paths, $palette) {
   $default = color_get_palette($theme, true);
 
   // Split off the "Don't touch" section of the stylesheet.
-  list($style, $fixed) = explode("Color Module: Don't touch", $style);
-
-  // Look for @import commands and insert the referenced stylesheets.
-  $cwd = getcwd();
-  chdir(drupal_get_path('theme', $theme));
-  $style = preg_replace_callback('/@import\s*["\']([^"\']+)["\'];/', '_color_import_stylesheet', $style);
-  chdir($cwd);
+  $split = "Color Module: Don't touch";
+  if (strpos($style, $split) !== FALSE) {
+    list($style, $fixed) = explode($split, $style);
+  }
 
   // Find all colors in the stylesheet and the chunks in between.
   $style = preg_split('/(#[0-9a-f]{6}|#[0-9a-f]{3})/i', $style, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -313,11 +389,11 @@ function _color_rewrite_stylesheet($theme, &$info, &$paths, $palette) {
   $output = '';
   $base = 'base';
 
-  // Iterate over all parts
+  // Iterate over all parts.
   foreach ($style as $chunk) {
     if ($is_color) {
       $chunk = drupal_strtolower($chunk);
-      // Check if this is one of the colors in the default palette
+      // Check if this is one of the colors in the default palette.
       if ($key = array_search($chunk, $default)) {
         $chunk = $conversion[$key];
       }
@@ -345,29 +421,32 @@ function _color_rewrite_stylesheet($theme, &$info, &$paths, $palette) {
     $output .= $chunk;
     $is_color = !$is_color;
   }
-  // Append fixed colors segment
-  $output .= $fixed;
+  // Append fixed colors segment.
+  if (isset($fixed)) {
+    $output .= $fixed;
+  }
 
-  // Replace paths to images
+  // Replace paths to images.
   foreach ($paths['map'] as $before => $after) {
+    $before = base_path() . $paths['source'] . $before;
+    $before = preg_replace('`(^|/)(?!../)([^/]+)/../`', '$1', $before);
     $output = str_replace($before, $after, $output);
   }
 
-  // Write new stylesheet
-  $file = fopen($paths['stylesheet'], 'w+');
-  fwrite($file, $output);
-  fclose($file);
-  $paths['files'][] = $paths['stylesheet'];
-
-  // Set standard file permissions for webserver-generated files
-  @chmod($paths['stylesheet'], 0664);
+  return $output;
 }
 
 /**
- * Helper function for _color_rewrite_stylesheet.
+ * Save the rewritten stylesheet to disk.
  */
-function _color_import_stylesheet($matches) {
-  return preg_replace('/url\(([\'"]?)(?![a-z]+:)/i', 'url(\1'. dirname($matches[1]) .'/', file_get_contents($matches[1]));
+function _color_save_stylesheet($file, $style, &$paths) {
+
+  // Write new stylesheet.
+  file_save_data($style, $file, FILE_EXISTS_REPLACE);
+  $paths['files'][] = $file;
+
+  // Set standard file permissions for webserver-generated files.
+  @chmod($file, 0664);
 }
 
 /**
@@ -456,6 +535,8 @@ function _color_shift($given, $ref1, $ref2, $target) {
   $target = _color_unpack($target, true);
   $ref1 = _color_unpack($ref1, true);
   $ref2 = _color_unpack($ref2, true);
+  $numerator = 0;
+  $denominator = 0;
   for ($i = 0; $i < 3; ++$i) {
     $numerator += ($ref2[$i] - $ref1[$i]) * ($ref2[$i] - $ref1[$i]);
     $denominator += ($target[$i] - $ref1[$i]) * ($target[$i] - $ref1[$i]);
@@ -532,6 +613,7 @@ function _color_unpack($hex, $normalize = false) {
  * Convert an RGB triplet to a hex color.
  */
 function _color_pack($rgb, $normalize = false) {
+  $out = 0;
   foreach ($rgb as $k => $v) {
     $out |= (($v * ($normalize ? 255 : 1)) << (16 - $k * 8));
   }
@@ -547,9 +629,11 @@ function _color_hsl2rgb($hsl) {
   $l = $hsl[2];
   $m2 = ($l <= 0.5) ? $l * ($s + 1) : $l + $s - $l*$s;
   $m1 = $l * 2 - $m2;
-  return array(_color_hue2rgb($m1, $m2, $h + 0.33333),
-               _color_hue2rgb($m1, $m2, $h),
-               _color_hue2rgb($m1, $m2, $h - 0.33333));
+  return array(
+    _color_hue2rgb($m1, $m2, $h + 0.33333),
+    _color_hue2rgb($m1, $m2, $h),
+    _color_hue2rgb($m1, $m2, $h - 0.33333),
+  );
 }
 
 /**

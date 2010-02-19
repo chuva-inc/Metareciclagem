@@ -1,5 +1,5 @@
 <?php
-// $Id: module.inc,v 1.93.2.2 2007/07/21 00:54:18 drumm Exp $
+// $Id: module.inc,v 1.115.2.1 2009/02/16 10:32:10 goba Exp $
 
 /**
  * @file
@@ -48,8 +48,8 @@ function module_list($refresh = FALSE, $bootstrap = TRUE, $sort = FALSE, $fixed_
   static $list, $sorted_list;
 
   if ($refresh || $fixed_list) {
-    unset($sorted_list);
     $list = array();
+    $sorted_list = NULL;
     if ($fixed_list) {
       foreach ($fixed_list as $name => $module) {
         drupal_get_filename('module', $name, $module['filename']);
@@ -102,16 +102,32 @@ function module_rebuild_cache() {
 
   ksort($files);
 
+  // Set defaults for module info
+  $defaults = array(
+    'dependencies' => array(),
+    'dependents' => array(),
+    'description' => '',
+    'version' => NULL,
+    'php' => DRUPAL_MINIMUM_PHP,
+  );
+
   foreach ($files as $filename => $file) {
-    $file->info = _module_parse_info_file(dirname($file->filename) .'/'. $file->name .'.info');
+    // Look for the info file.
+    $file->info = drupal_parse_info_file(dirname($file->filename) .'/'. $file->name .'.info');
+
     // Skip modules that don't provide info.
     if (empty($file->info)) {
       unset($files[$filename]);
       continue;
     }
-    $files[$filename]->info = $file->info;
+    // Merge in defaults and save.
+    $files[$filename]->info = $file->info + $defaults;
 
-    // log the critical hooks implemented by this module
+    // Invoke hook_system_info_alter() to give installed modules a chance to
+    // modify the data in the .info files if necessary.
+    drupal_alter('system_info', $files[$filename]->info, $files[$filename]);
+
+    // Log the critical hooks implemented by this module.
     $bootstrap = 0;
     foreach (bootstrap_hooks() as $hook) {
       if (module_hook($file->name, $hook)) {
@@ -121,87 +137,85 @@ function module_rebuild_cache() {
     }
 
     // Update the contents of the system table:
-    // TODO: We shouldn't actually need this description field anymore. Remove me next release.
     if (isset($file->status) || (isset($file->old_filename) && $file->old_filename != $file->filename)) {
-      db_query("UPDATE {system} SET description = '%s', name = '%s', filename = '%s', bootstrap = %d WHERE filename = '%s'", $file->info['description'], $file->name, $file->filename, $bootstrap, $file->old_filename);
+      db_query("UPDATE {system} SET info = '%s', name = '%s', filename = '%s', bootstrap = %d WHERE filename = '%s'", serialize($files[$filename]->info), $file->name, $file->filename, $bootstrap, $file->old_filename);
     }
     else {
       // This is a new module.
-      db_query("INSERT INTO {system} (name, description, type, filename, status, throttle, bootstrap) VALUES ('%s', '%s', '%s', '%s', %d, %d, %d)", $file->name, $file->info['description'], 'module', $file->filename, $file->status, $file->throttle, $bootstrap);
+      $files[$filename]->status = 0;
+      $files[$filename]->throttle = 0;
+      db_query("INSERT INTO {system} (name, info, type, filename, status, throttle, bootstrap) VALUES ('%s', '%s', '%s', '%s', %d, %d, %d)", $file->name, serialize($files[$filename]->info), 'module', $file->filename, 0, 0, $bootstrap);
     }
   }
-  $files = _module_build_dependents($files);
+  $files = _module_build_dependencies($files);
   return $files;
 }
 
 /**
- * Find dependents; modules that are required by other modules.
- * Adds an array of dependents to the $file->info array.
+ * Find dependencies any level deep and fill in dependents information too.
  *
+ * If module A depends on B which in turn depends on C then this function will
+ * add C to the list of modules A depends on. This will be repeated until
+ * module A has a list of all modules it depends on. If it depends on itself,
+ * called a circular dependency, that's marked by adding a nonexistent module,
+ * called -circular- to this list of modules. Because this does not exist,
+ * it'll be impossible to switch module A on.
+ *
+ * Also we fill in a dependents array in $file->info. Using the names above,
+ * the dependents array of module B lists A.
+ *
+ * @param $files
+ *   The array of filesystem objects used to rebuild the cache.
  * @return
- *   The list of files array with dependents added where applicable.
+ *   The same array with dependencies and dependents added where applicable.
  */
-function _module_build_dependents($files) {
-  foreach ($files as $filename => $file) {
-    if (isset($file->info['dependencies']) && is_array($file->info['dependencies'])) {
-      foreach ($file->info['dependencies'] as $dependency) {
-        if (!empty($files[$dependency]) && is_array($files[$dependency]->info)) {
-          if (!isset($files[$dependency]->info['dependents'])) {
-            $files[$dependency]->info['dependents'] = array();
+function _module_build_dependencies($files) {
+  do {
+    $new_dependency = FALSE;
+    foreach ($files as $filename => $file) {
+      // We will modify this object (module A, see doxygen for module A, B, C).
+      $file = &$files[$filename];
+      if (isset($file->info['dependencies']) && is_array($file->info['dependencies'])) {
+        foreach ($file->info['dependencies'] as $dependency_name) {
+          // This is a nonexistent module.
+          if ($dependency_name == '-circular-' || !isset($files[$dependency_name])) {
+            continue;
           }
-          $files[$dependency]->info['dependents'][] = $filename;
+          // $dependency_name is module B (again, see doxygen).
+          $files[$dependency_name]->info['dependents'][$filename] = $filename;
+          $dependency = $files[$dependency_name];
+          if (isset($dependency->info['dependencies']) && is_array($dependency->info['dependencies'])) {
+            // Let's find possible C modules.
+            foreach ($dependency->info['dependencies'] as $candidate) {
+              if (array_search($candidate, $file->info['dependencies']) === FALSE) {
+                // Is this a circular dependency?
+                if ($candidate == $filename) {
+                  // As a module name can not contain dashes, this makes
+                  // impossible to switch on the module.
+                  $candidate = '-circular-';
+                  // Do not display the message or add -circular- more than once.
+                  if (array_search($candidate, $file->info['dependencies']) !== FALSE) {
+                    continue;
+                  }
+                  drupal_set_message(t('%module is part of a circular dependency. This is not supported and you will not be able to switch it on.', array('%module' => $file->info['name'])), 'error');
+                }
+                else {
+                  // We added a new dependency to module A. The next loop will
+                  // be able to use this as "B module" thus finding even
+                  // deeper dependencies.
+                  $new_dependency = TRUE;
+                }
+                $file->info['dependencies'][] = $candidate;
+              }
+            }
+          }
         }
       }
+      // Don't forget to break the reference.
+      unset($file);
     }
-  }
+  } while ($new_dependency);
   return $files;
-}
-
-/**
- * Parse Drupal info file format.
- * Uses ini parser provided by php's parse_ini_file().
- *
- * Files should use the ini format to specify values.
- * e.g.
- * key = "value"
- * key2 = value2
- *
- * Some things to be aware of:
- * - This function is NOT for placing arbitrary module-specific settings. Use variable_get()
- *   and variable_set() for that.
- * - You may not use double-quotes in a value.
- *
- * Information stored in the module.info file:
- * name - The real name of the module for display purposes.
- * description - A brief description of the module.
- * dependencies - A space delimited list of the short names (shortname) of other modules this module depends on.
- * package - The name of the package of modules this module belongs to.
- *
- * Example of .info file:
- *   name = Forum
- *   description = Enables threaded discussions about general topics.
- *   dependencies = taxonomy comment
- *   package = Core - optional
- *
- * @param $filename
- *   The file we are parsing. Accepts file with relative or absolute path.
- * @return
- *   The info array.
- */
-function _module_parse_info_file($filename) {
-  $info = array();
-
-  if (file_exists($filename)) {
-    $info = parse_ini_file($filename);
-
-    if (isset($info['dependencies'])) {
-      $info['dependencies'] = explode(" ", $info['dependencies']);
-    }
-    else {
-      $info['dependencies'] = NULL;
-    }
-  }
-  return $info;
 }
 
 /**
@@ -224,9 +238,42 @@ function module_load_install($module) {
   // Make sure the installation API is available
   include_once './includes/install.inc';
 
-  $install_file = './'. drupal_get_path('module', $module) .'/'. $module .'.install';
-  if (is_file($install_file)) {
-    include_once $install_file;
+  module_load_include('install', $module);
+}
+
+/**
+ * Load a module include file.
+ *
+ * @param $type
+ *   The include file's type (file extension).
+ * @param $module
+ *   The module to which the include file belongs.
+ * @param $name
+ *   Optionally, specify the file name. If not set, the module's name is used.
+ */
+function module_load_include($type, $module, $name = NULL) {
+  if (empty($name)) {
+    $name = $module;
+  }
+
+  $file = './'. drupal_get_path('module', $module) ."/$name.$type";
+
+  if (is_file($file)) {
+    require_once $file;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Load an include file for each of the modules that have been enabled in
+ * the system table.
+ */
+function module_load_all_includes($type, $name = NULL) {
+  $modules = module_list();
+  foreach ($modules as $module) {
+    module_load_include($type, $module, $name);
   }
 }
 
@@ -239,10 +286,10 @@ function module_load_install($module) {
 function module_enable($module_list) {
   $invoke_modules = array();
   foreach ($module_list as $module) {
-    $existing = db_fetch_object(db_query("SELECT status FROM {system} WHERE type = 'module' AND name = '%s'", $module));
-    if ($existing->status === '0') {
+    $existing = db_fetch_object(db_query("SELECT status FROM {system} WHERE type = '%s' AND name = '%s'", 'module', $module));
+    if ($existing->status == 0) {
       module_load_install($module);
-      db_query("UPDATE {system} SET status = 1, throttle = 0 WHERE type = 'module' AND name = '%s'", $module);
+      db_query("UPDATE {system} SET status = %d, throttle = %d WHERE type = '%s' AND name = '%s'", 1, 0, 'module', $module);
       drupal_load('module', $module);
       $invoke_modules[] = $module;
     }
@@ -253,11 +300,17 @@ function module_enable($module_list) {
     module_list(TRUE, FALSE);
     // Force to regenerate the stored list of hook implementations.
     module_implements('', FALSE, TRUE);
-    cache_clear_all('*', 'cache_menu', TRUE);
   }
 
   foreach ($invoke_modules as $module) {
     module_invoke($module, 'enable');
+    // Check if node_access table needs rebuilding.
+    // We check for the existence of node_access_needs_rebuild() since
+    // at install time, module_enable() could be called while node.module
+    // is not enabled yet.
+    if (function_exists('node_access_needs_rebuild') && !node_access_needs_rebuild() && module_hook($module, 'node_grants')) {
+      node_access_needs_rebuild(TRUE);
+    }
   }
 }
 
@@ -271,9 +324,14 @@ function module_disable($module_list) {
   $invoke_modules = array();
   foreach ($module_list as $module) {
     if (module_exists($module)) {
+      // Check if node_access table needs rebuilding.
+      if (!node_access_needs_rebuild() && module_hook($module, 'node_grants')) {
+        node_access_needs_rebuild(TRUE);
+      }
+
       module_load_install($module);
       module_invoke($module, 'disable');
-      db_query("UPDATE {system} SET status = 0, throttle = 0 WHERE type = 'module' AND name = '%s'", $module);
+      db_query("UPDATE {system} SET status = %d, throttle = %d WHERE type = '%s' AND name = '%s'", 0, 0, 'module', $module);
       $invoke_modules[] = $module;
     }
   }
@@ -283,7 +341,12 @@ function module_disable($module_list) {
     module_list(TRUE, FALSE);
     // Force to regenerate the stored list of hook implementations.
     module_implements('', FALSE, TRUE);
-    cache_clear_all('*', 'cache_menu', TRUE);
+  }
+
+  // If there remains no more node_access module, rebuilding will be
+  // straightforward, we can do it right now.
+  if (node_access_needs_rebuild() && count(module_implements('node_grants')) == 0) {
+    node_access_rebuild();
   }
 }
 
@@ -379,8 +442,9 @@ function module_implements($hook, $sort = FALSE, $refresh = FALSE) {
  */
 function module_invoke() {
   $args = func_get_args();
-  $module = array_shift($args);
-  $hook = array_shift($args);
+  $module = $args[0];
+  $hook = $args[1];
+  unset($args[0], $args[1]);
   $function = $module .'_'. $hook;
   if (module_hook($module, $hook)) {
     return call_user_func_array($function, $args);
@@ -399,13 +463,14 @@ function module_invoke() {
  */
 function module_invoke_all() {
   $args = func_get_args();
-  $hook = array_shift($args);
+  $hook = $args[0];
+  unset($args[0]);
   $return = array();
   foreach (module_implements($hook) as $module) {
     $function = $module .'_'. $hook;
     $result = call_user_func_array($function, $args);
     if (isset($result) && is_array($result)) {
-      $return = array_merge($return, $result);
+      $return = array_merge_recursive($return, $result);
     }
     else if (isset($result)) {
       $return[] = $result;
@@ -419,4 +484,9 @@ function module_invoke_all() {
  * @} End of "defgroup hooks".
  */
 
-
+/**
+ * Array of modules required by core.
+ */
+function drupal_required_modules() {
+  return array('block', 'filter', 'node', 'system', 'user');
+}
