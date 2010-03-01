@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlsitemap.install,v 1.5.2.51 2009/08/10 14:43:30 earnie Exp $
+// $Id: xmlsitemap.install,v 1.5.2.53 2009/09/06 16:48:35 davereid Exp $
 
 
 /**
@@ -545,11 +545,10 @@ function xmlsitemap_update_6150() {
   $ret = array();
   $path = drupal_get_path('module', 'xmlsitemap');
   if (is_dir($path . '/xmlsitemap')) {
-    $t = get_t();
     watchdog('xmlsitemap', 'You have not correctly followed the installation instructions for this module. You must make certain that the old xmlsitemap/xmlsitemap diretory is removed. The xmlsitemap/xmlsitemap/xmlsitemap.* files have been moved back to the modules root directory. The install instructions were to remove the modules/xmlsitemap directory completely before extracting the update. If you had followed that step you would have prevented this message.', NULL, WATCHDOG_ERROR);
     $ret['#abort'] = array(
       'success' => FALSE,
-      'query' => $t('You have not correctly followed the installation instructions for this module. You must make certain that the old xmlsitemap/xmlsitemap diretory is removed. The xmlsitemap/xmlsitemap/xmlsitemap.* files have been moved back to the modules root directory. The install instructions were to remove the modules/xmlsitemap directory completely before extracting the update. If you had followed that step you would have prevented this message.'),
+      'query' => 'You have not correctly followed the installation instructions for this module. You must make certain that the old xmlsitemap/xmlsitemap diretory is removed. The xmlsitemap/xmlsitemap/xmlsitemap.* files have been moved back to the modules root directory. The install instructions were to remove the modules/xmlsitemap directory completely before extracting the update. If you had followed that step you would have prevented this message.',
     );
   }
   return $ret;
@@ -561,7 +560,7 @@ function xmlsitemap_update_6150() {
 function xmlsitemap_update_6151() {
   $ret = array();
   db_add_index($ret, 'xmlsitemap', 'type_id', array('type', 'id'));
-  return $ret;  
+  return $ret;
 }
 
 /**
@@ -577,17 +576,25 @@ function xmlsitempa_update_6152() {
 /**
  * Implementation of hook_requirements().
  */
-function xmlsmitemap_requirements($phase) {
+function xmlsitemap_requirements($phase) {
   $requirements = array();
-  $path = drupal_get_path('module', 'xmlsitemap');
-  if (is_dir($path . '/xmlsitemap')) {
-    $t = get_t();
+  $t = get_t();
+
+  if (is_dir(drupal_get_path('module', 'xmlsitemap') . '/xmlsitemap')) {
     watchdog('xmlsitemap', 'You have not correctly followed the installation instructions for this module. You must make certain that the old xmlsitemap/xmlsitemap diretory is removed. The xmlsitemap/xmlsitemap/xmlsitemap.* files have been moved back to the modules root directory. The install instructions were to removed the modules/xmlsitemap directory completely before extracting the update. If you had followed that step you would have prevented this message.', NULL, WATCHDOG_ERROR);
     $requirements['xmlsitemap'] = array(
       'title' => $t('xmlsitemap'),
       'value' => $t('Installation issue'),
       'description' => $t('You have not correctly followed the installation instructions for this module. You must make certain that the old xmlsitemap/xmlsitemap diretory is removed. The xmlsitemap/xmlsitemap/xmlsitemap.* files have been moved back to the modules root directory. The install instructions were to removed the modules/xmlsitemap directory completely before extracting the update. If you had followed that step you would have prevented this message.'),
       'severity' => REQUIREMENT_ERROR,
+    );
+  }
+  if (variable_get('clean_url', 0) && file_exists('./sitemap.xml')) {
+    $requirements['xmlsitemap_file'] = array(
+      'title' => $t('XML sitemap'),
+      'value' => $t('Existing sitemap.xml file found.'),
+      'severity' => REQUIREMENT_ERROR,
+      'description' => $t('The XML sitemap module cannot display its XML output if there is an existing sitemap.xml file in your website root.'),
     );
   }
   return $requirements;
@@ -600,4 +607,3 @@ function xmlsitemap_uninstall() {
   drupal_uninstall_schema('xmlsitemap');
   db_query("DELETE FROM {variable} WHERE name LIKE 'xmlsitemap\_%'");
 }
-

@@ -1,5 +1,5 @@
 <?php
-// $Id: views.module,v 1.338 2009/06/03 00:01:00 merlinofchaos Exp $
+// $Id: views.module,v 1.341.2.1 2009/11/30 19:11:35 merlinofchaos Exp $
 /**
  * @file
  * Primarily Drupal hooks and global API functions to manipulate views.
@@ -157,8 +157,7 @@ function views_menu() {
   $items['views/ajax'] = array(
     'title' => 'Views',
     'page callback' => 'views_ajax',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'description' => 'Ajax callback for view loading.',
     'file' => 'includes/ajax.inc',
     'type' => MENU_CALLBACK,
@@ -857,7 +856,6 @@ function views_get_view($name, $reset = FALSE) {
   return $view->clone_view();
 }
 
-
 // ------------------------------------------------------------------
 // Views debug helper functions
 
@@ -971,6 +969,7 @@ function views_exposed_form(&$form_state) {
     '#name' => '', // prevent from showing up in $_GET.
     '#type' => 'submit',
     '#value' => t('Apply'),
+    '#id' => form_clean_id('edit-submit-' . $view->name),
   );
 
   $form['#action'] = url($view->get_url());
@@ -1117,11 +1116,56 @@ function views_embed_view($name, $display_id = 'default') {
   }
 
   $view = views_get_view($name);
-  if (!$view) {
+  if (!$view || !$view->access($display_id)) {
     return;
   }
 
   return $view->preview($display_id, $args);
+}
+
+/**
+* Get the result of a view.
+*
+* @param string $name
+*      The name of the view to retrieve the data from.
+* @param string $display_id
+*      The display id. On the edit page for the view in question, you'll find
+*      a list of displays at the left side of the control area. "Defaults"
+*      will be at the top of that list. Hover your cursor over the name of the
+*      display you want to use. An URL will appear in the status bar of your
+*      browser. This is usually at the bottom of the window, in the chrome.
+*      Everything after #views-tab- is the display ID, e.g. page_1.
+ * @param ...
+ *   Any additional parameters will be passed as arguments.
+* @return
+*      array
+*          An array containing an object for each view item.
+*/
+function views_get_view_result($name, $display_id = NULL) {
+  $args = func_get_args();
+  array_shift($args); // remove $name
+  if (count($args)) {
+    array_shift($args); // remove $display_id
+  }
+
+  $view = views_get_view($name);
+  if (is_object($view)) {
+    if (is_array($args)) {
+      $view->set_arguments($args);
+    }
+    if (is_string($display_id)) {
+      $view->set_display($display_id);
+    }
+    else {
+      $view->init_display();
+    }
+    $view->pre_execute();
+    $view->execute();
+    return $view->result;
+  }
+  else {
+    return array();
+  }
 }
 
 /**

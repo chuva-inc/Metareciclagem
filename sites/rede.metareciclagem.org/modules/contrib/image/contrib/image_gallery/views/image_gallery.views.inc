@@ -1,5 +1,5 @@
 <?php
-// $Id: image_gallery.views.inc,v 1.2 2009/08/27 12:10:57 joachim Exp $
+// $Id: image_gallery.views.inc,v 1.3 2009/09/05 14:50:31 joachim Exp $
 
 /**
  * @file
@@ -196,7 +196,7 @@ function image_gallery_views_plugins() {
        * Uses a handler rather than a tpl file.
        */
       'image_gallery' => array(
-        'title' => t('Gallery'),
+        'title' => t('Gallery page'),
         'help' => t('Display the view as a gallery of images, with a URL and menu links.'),
         'parent' => 'page',
         'handler' => 'image_gallery_plugin_display_image_gallery',

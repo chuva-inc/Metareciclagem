@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlsitemap_engines.admin.inc,v 1.1.2.17 2009/08/25 16:52:52 earnie Exp $
+// $Id: xmlsitemap_engines.admin.inc,v 1.1.2.19 2010/01/27 00:33:17 davereid Exp $
 
 
 /**
@@ -28,7 +28,7 @@ function xmlsitemap_engines_settings() {
   $form['submission']['xmlsitemap_engines_submit'] = array(
     '#type' => 'checkbox',
     '#title' => t('Submit the sitemap when content changes'),
-    '#description' => t('If enabled, the search engines will be notified of changes to the sitemap each time the sitemap content is changed.'),
+    '#description' => t('If enabled, the search engines will only be notified of changes to the sitemap whenever the sitemap content is changed.'),
     '#default_value' => variable_get('xmlsitemap_engines_submit', FALSE),
   );
   $form['submission']['xmlsitemap_engines_cron_submit_frequency'] = array(
@@ -85,12 +85,6 @@ function xmlsitemap_engines_settings() {
     '#value' => variable_get('xmlsitemap_engines_google_url', 'http://www.google.com/webmasters/tools/ping?sitemap=[sitemap]'),
     '#disabled' => TRUE,
   );
-  $form['google']['xmlsitemap_engines_google_verify'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Verification link'),
-    '#description' => t('In order to show statistics, Google will ask you to verify that you control this site by creating a file with a certain name. Enter that name here and the XML sitemap module will create a path to that file name. This will only work if you have clean URLs enabled.'),
-    '#default_value' => variable_get('xmlsitemap_engines_google_verify', ''),
-  );
   // Moreover.com fields.
   $form['moreover'] = array(
     '#type' => 'fieldset',
@@ -129,18 +123,6 @@ function xmlsitemap_engines_settings() {
     '#value' => variable_get('xmlsitemap_engines_bing_url', 'http://www.bing.com/webmaster/ping.aspx?siteMap=[sitemap]'),
     '#disabled' => TRUE,
   );
-  $form['bing']['xmlsitemap_engines_bing_verify'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Authentication file'),
-    '#description' => t('Before allowing you to view additional information, Bing will ask you to verify that you control this site by creating a file with a certain name. Enter that name here, and XML sitemap will create a path to that file name. This will only work if you have clean URLs enabled.'),
-    '#default_value' => variable_get('xmlsitemap_engines_bing_verify', ''),
-  );
-  $form['bing']['xmlsitemap_engines_bing_verify_string'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Bing authentication tag'),
-    '#description' => t('Bing will give you an authentication tag.'),
-    '#default_value' => variable_get('xmlsitemap_engines_bing_verify_string', ''),
-  );
   // Yahoo! fields.
   $form['yahoo'] = array(
     '#type' => 'fieldset',
@@ -160,31 +142,9 @@ function xmlsitemap_engines_settings() {
     '#value' => variable_get('xmlsitemap_engines_yahoo_url', 'http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=[sitemap]'),
     '#disabled' => TRUE,
   );
-  $form['yahoo']['xmlsitemap_engines_yahoo_verify'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Verification link'),
-    '#description' => t('Before allowing you to view additional information, Yahoo! will ask you to verify that you control this site by creating a file with a certain name. Enter that name here, and XML sitemap will create a path to that file name. This will only work if you have clean URLs enabled.'),
-    '#default_value' => variable_get('xmlsitemap_engines_yahoo_verify', ''),
-  );
-  $form['yahoo']['xmlsitemap_engines_yahoo_verify_string'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Authentication key'),
-    '#description' => t('Yahoo! will ask you to put an authentication key in the verification file.'),
-    '#default_value' => variable_get('xmlsitemap_engines_yahoo_verify_string', ''),
-  );
-  $form = system_settings_form($form);
-  $form['#submit'][] = 'xmlsitemap_engines_settings_submit';
-  return $form;
-}
-
-/**
- * Submit the settings form.
- */
-function xmlsitemap_engines_settings_submit($form, &$form_state) {
-  variable_set('menu_rebuild_needed', TRUE);
+  return system_settings_form($form);
 }
 
 /**
  * @} End of "addtogroup xmlsitemap".
  */
-

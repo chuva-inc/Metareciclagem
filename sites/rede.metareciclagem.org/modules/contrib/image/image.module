@@ -1,5 +1,5 @@
 <?php
-// $Id: image.module,v 1.318 2009/08/26 18:21:22 joachim Exp $
+// $Id: image.module,v 1.322 2009/09/13 20:21:04 joachim Exp $
 
 define('IMAGE_ORIGINAL', '_original');
 define('IMAGE_PREVIEW', 'preview');
@@ -476,19 +476,29 @@ function image_load(&$node) {
     // There's no original image, we're in trouble...
     return;
   }
+  
+  if ((arg(0) != 'batch') && (strpos($_GET['q'], 'admin/content/node') === FALSE)) {
+    _image_build_derivatives_if_needed($node);
+  }
+}
+  
+/**
+ * Rebuild derivatives if needed. Helper function for image_load(). 
+ */
+function _image_build_derivatives_if_needed(&$node) {
   $node->rebuild_images = FALSE;
 
   // Figure out which sizes should have been generated.
   $all_sizes = image_get_sizes();
   unset($all_sizes[IMAGE_ORIGINAL]);
-  $needed_sizes = array_keys(image_get_derivative_sizes($original_path));
+  $needed_sizes = array_keys(image_get_derivative_sizes($node->images[IMAGE_ORIGINAL]));
   $unneeded_sizes = array_diff(array_keys($all_sizes), $needed_sizes);
 
   // Derivative sizes that are larger than the original get set to the
   // original.
   foreach ($unneeded_sizes as $key) {
     if (empty($node->images[$key])) {
-      $node->images[$key] = $original_path;
+      $node->images[$key] = $node->images[IMAGE_ORIGINAL];
     }
     else {
       // Need to remove an extra derivative image in the database.
@@ -512,6 +522,8 @@ function image_load(&$node) {
 
   // Correct any problems with the derivative images.
   if ($node->rebuild_images) {
+    // Possibly TODO: calling a hook implementation here isn't very elegant.
+    // but the code there is tangled and it works, so maybe leave it ;)    
     image_update($node);
     watchdog('image', 'Derivative images were regenerated for %title.', array('%title' => $node->title), WATCHDOG_INFO, l(t('view'), 'node/'. $node->nid));
   }

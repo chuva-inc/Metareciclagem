@@ -1,5 +1,5 @@
 <?php
-// $Id: context.inc,v 1.33 2009/08/03 21:41:41 merlinofchaos Exp $
+// $Id: context.inc,v 1.33.2.5 2009/10/27 22:46:00 merlinofchaos Exp $
 
 /**
  * @file
@@ -610,13 +610,21 @@ function ctools_context_keyword_substitute($string, $keywords, $contexts) {
 
       if (strpos($keyword, ':')) {
         list($context, $converter) = explode(':', $keyword);
-        if (isset($context_keywords[$context])) {
+        if (empty($context->empty) && isset($context_keywords[$context])) {
           $keywords['%' . $keyword] = ctools_context_convert_context($context_keywords[$context], $converter);
+        }
+        else {
+          $keywords['%' . $keyword] = '';
         }
       }
       else {
         if (isset($context_keywords[$keyword])) {
-          $keywords['%' . $keyword] = $context_keywords[$keyword]->title;
+          if (empty($context_keywords[$keyword]->empty)) {
+            $keywords['%' . $keyword] = $context_keywords[$keyword]->title;
+          }
+          else {
+            $keywords['%' . $keyword] = '';
+          }
         }
       }
     }
@@ -917,12 +925,24 @@ function ctools_context_get_context_from_relationships($relationships, &$context
       continue;
     }
 
-    if (empty($contexts[$rdata['context']])) {
-      continue;
+    if (is_array($rdata['context'])) {
+      $rcontexts = array();
+      foreach ($rdata['context'] as $cid) {
+        if (empty($contexts[$cid])) {
+          continue 2;
+        }
+        $rcontexts[] = $contexts[$cid];
+      }
+    }
+    else {
+      if (empty($contexts[$rdata['context']])) {
+        continue;
+      }
+      $rcontexts = $contexts[$rdata['context']];
     }
 
     $cid = ctools_context_id($rdata, 'relationship');
-    if ($context = ctools_context_get_context_from_relationship($rdata, $contexts[$rdata['context']])) {
+    if ($context = ctools_context_get_context_from_relationship($rdata, $rcontexts)) {
       $contexts[$cid] = $context;
     }
   }
@@ -1413,13 +1433,22 @@ function ctools_access_new_test($plugin) {
     }
   }
 
-  // Setup plugin defaults.
+
+  $default = NULL;
   if (isset($plugin['default'])) {
-    if (is_array($plugin['default'])) {
-      $test['settings'] = $plugin['default'];
+    $default = $plugin['default'];
+  }
+  elseif (isset($plugin['defaults'])) {
+    $default = $plugin['defaults'];
+  }
+
+  // Setup plugin defaults.
+  if (isset($default)) {
+    if (is_array($default)) {
+      $test['settings'] = $default;
     }
-    else if (function_exists($plugin['default'])) {
-      $test['settings'] = $plugin['default']();
+    else if (function_exists($default)) {
+      $test['settings'] = $default();
     }
     else {
       $test['settings'] = array();

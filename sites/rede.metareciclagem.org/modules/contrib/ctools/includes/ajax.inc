@@ -1,5 +1,5 @@
 <?php
-// $Id: ajax.inc,v 1.11 2009/08/17 18:31:13 merlinofchaos Exp $
+// $Id: ajax.inc,v 1.14.2.2 2009/12/07 18:57:44 merlinofchaos Exp $
 
 /**
  * @file
@@ -67,6 +67,15 @@
  *   - selector: The CSS selector. This can be any selector jquery uses in $().
  *   - name: The name or key of the data attached to this selector.
  *   - value: The value of the data. Not just limited to strings can be any format.
+ *
+ * - redirect
+ *   - url: The url to be redirected to. This can be an absolute URL or a Drupal path.
+ *
+ * - reload
+ *
+ * - submit
+ *   - selector: The CSS selector to identify the form for submission. This can
+ *     be any selector jquery uses in $().
  *
  * Commands are usually created with a couple of helper functions, so they
  * look like this:
@@ -344,7 +353,7 @@ function ctools_ajax_command_data($selector, $name, $value) {
      'value' => $value,
    );
  }
- 
+
 /**
  * Force a table to be restriped.
  *
@@ -357,6 +366,46 @@ function ctools_ajax_command_data($selector, $name, $value) {
 function ctools_ajax_command_restripe($selector) {
   return array(
     'command' => 'restripe',
+    'selector' => $selector,
+  );
+}
+
+/**
+ * Force a client-side redirect.
+ *
+ * @param $url
+ *   The url to be redirected to. This can be an absolute URL or a
+ *   Drupal path.
+ */
+function ctools_ajax_command_redirect($url) {
+  return array(
+    'command' => 'redirect',
+    'url' => url($url),
+  );
+}
+
+/**
+ * Force a reload of the current page.
+ */
+function ctools_ajax_command_reload() {
+  return array(
+    'command' => 'reload',
+  );
+}
+
+/**
+ * Submit a form.
+ *
+ * This is useful for submitting a parent form after a child form has finished
+ * processing in a modal overlay.
+ *
+ * @param $selector
+ *   The CSS selector to identify the form for submission. This can be any
+ *   selector jquery uses in $().
+ */
+function ctools_ajax_command_submit($selector) {
+  return array(
+    'command' => 'submit',
     'selector' => $selector,
   );
 }
@@ -391,8 +440,8 @@ function ctools_ajax_render_error($error = '') {
  * Associate a URL to a form element with a hidden form.
  *
  * This is a helper function to easily associate a URL with a form element
- * which can be used for different ajax functionality. 
- * 
+ * which can be used for different ajax functionality.
+ *
  * You would call this function on a form element in the form function like this:
  *
  * @code
@@ -404,7 +453,7 @@ function ctools_ajax_render_error($error = '') {
  *   );
  *   ctools_ajax_associate_url_to_element($form, $form['example'], 'example/ajax/urlpath');
  * @endcode
- * 
+ *
  * The AJAX request will POST the value of the form element in the "ctools_changed" parameter.
  *
  * @param &$form
@@ -423,8 +472,15 @@ function ctools_ajax_associate_url_to_element(&$form, &$form_element, $dest, $ty
   if (!isset($form_element['#id'])) {
     //Create a unique ID to associate $form_element and hidden elements since we dont have an ID
     $form_element['#id'] = uniqid('ctools-ajax-url-');
+
+    if (empty($form_element['#attributes']['class'])) {
+      $form_element['#attributes']['class'] = $type;
+    }
+    else {
+      $form_element['#attributes']['class'] .= " $type";
+    }
   }
-  
+
   //Add hidden form element to hold base URL
   $form[$form_element['#id'] . '-url'] = array(
     '#type' => 'hidden',

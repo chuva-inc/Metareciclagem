@@ -1,5 +1,5 @@
 <?php
-// $Id: custom.inc,v 1.8 2009/07/22 19:25:09 merlinofchaos Exp $
+// $Id: custom.inc,v 1.9.2.3 2010/01/29 20:18:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -11,26 +11,25 @@
  */
 
 /**
- * Callback function to supply a list of content types.
+ * Plugins are described by creating a $plugin array which will be used
+ * by the system that includes this file.
  */
-function ctools_custom_ctools_content_types() {
-  return array(
-    'single' => TRUE,
-    'no title override' => TRUE,
-    'title' => t('New custom content'),
-    'icon' => 'icon_block_custom.png',
-    'description' => t('Create a completely custom piece of HTML content.'),
-    // Make this a top level category so it appears higher in UIs that support
-    // that.
-    'top level' => TRUE,
-    'category' => t('Custom'),
-    'defaults' => array('title' => '', 'body' => '', 'format' => FILTER_FORMAT_DEFAULT, 'substitute' => TRUE),
-    // render callback is automatically deduced:
-    // 'render callback' => 'ctools_custom_content_type_render',
-    'js' => array('misc/autocomplete.js', 'misc/textarea.js', 'misc/collapse.js'),
-    'all contexts' => TRUE,
-  );
-}
+$plugin = array(
+  'single' => TRUE,
+  'no title override' => TRUE,
+  'title' => t('New custom content'),
+  'icon' => 'icon_block_custom.png',
+  'description' => t('Create a completely custom piece of HTML content.'),
+  // Make this a top level category so it appears higher in UIs that support
+  // that.
+  'top level' => TRUE,
+  'category' => t('Custom'),
+  'defaults' => array('admin_title' => '', 'title' => '', 'body' => '', 'format' => FILTER_FORMAT_DEFAULT, 'substitute' => TRUE),
+  // render callback is automatically deduced:
+  // 'render callback' => 'ctools_custom_content_type_render',
+  'js' => array('misc/autocomplete.js', 'misc/textarea.js', 'misc/collapse.js'),
+  'all contexts' => TRUE,
+);
 
 /**
  * Output function for the 'custom' content type. Outputs a custom
@@ -56,8 +55,9 @@ function ctools_custom_content_type_render($subtype, $conf, $args, $contexts) {
  */
 function ctools_custom_content_type_admin_title($subtype, $conf) {
   $output = t('Custom');
-  if (!empty($conf['title'])) {
-    $output .= " (" . filter_xss_admin($conf['title']) . ")";
+  $title = !empty($conf['admin_title']) ? $conf['admin_title'] : $conf['title'];
+  if ($title) {
+    $output = t('Custom: @title', array('@title' => $title));
   }
   return $output;
 }
@@ -75,7 +75,7 @@ function ctools_custom_content_type_admin_info($subtype, $conf) {
   // so that we get the printed php, not the eval'ed php.
   $php_filter = FALSE;
   foreach (filter_list_format($conf['format']) as $filter) {
-    if ($filter->module == 'php') { 
+    if ($filter->module == 'php') {
       $php_filter = TRUE;
       break;
     }
@@ -99,11 +99,19 @@ function ctools_custom_content_type_admin_info($subtype, $conf) {
  */
 function ctools_custom_content_type_edit_form(&$form, &$form_state) {
   $conf = $form_state['conf'];
+  $form['admin_title'] = array(
+    '#type' => 'textfield',
+    '#default_value' => isset($conf['admin_title']) ? $conf['admin_title'] : '',
+    '#title' => t('Administrative title'),
+    '#description' => t('This title will be used administratively to identify this pane. If blank, the regular title will be used.'),
+  );
+
   $form['title'] = array(
     '#type' => 'textfield',
     '#default_value' => $conf['title'],
     '#title' => t('Title'),
   );
+
   $form['body_field']['body'] = array(
     '#title' => t('Body'),
     '#type' => 'textarea',
@@ -136,7 +144,7 @@ function ctools_custom_content_type_edit_form(&$form, &$form_state) {
       }
     }
     $header = array(t('Keyword'), t('Value'));
-    $form['contexts']['context'] = array('#value' => theme('table', $header, $rows));   
+    $form['contexts']['context'] = array('#value' => theme('table', $header, $rows));
   }
 
   return $form;
@@ -147,6 +155,8 @@ function ctools_custom_content_type_edit_form(&$form, &$form_state) {
  */
 function ctools_custom_content_type_edit_form_submit(&$form, &$form_state) {
   foreach (array_keys($form_state['plugin']['defaults']) as $key) {
-    $form_state['conf'][$key] = $form_state['values'][$key];
+    if (isset($form_state['values'][$key])) {
+      $form_state['conf'][$key] = $form_state['values'][$key];
+    }
   }
 }

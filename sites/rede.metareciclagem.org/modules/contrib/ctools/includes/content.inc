@@ -1,5 +1,5 @@
 <?php
-// $Id: content.inc,v 1.12 2009/08/19 23:21:55 merlinofchaos Exp $
+// $Id: content.inc,v 1.12.2.4 2010/01/29 19:26:13 merlinofchaos Exp $
 
 /**
  * @file
@@ -126,7 +126,8 @@ function ctools_get_content_types() {
  *   An array of all subtypes available.
  */
 function ctools_content_get_subtypes($type) {
-  // @todo cache -- multiple calls on the same page can be intensive.
+  static $cache = array();
+
   $subtypes = array();
 
   if (is_array($type)) {
@@ -134,6 +135,10 @@ function ctools_content_get_subtypes($type) {
   }
   else {
     $plugin = ctools_get_content_type($type);
+  }
+
+  if (isset($cache[$plugin['name']])) {
+    return $cache[$plugin['name']];
   }
 
   if (isset($plugin['content types'])) {
@@ -153,6 +158,8 @@ function ctools_content_get_subtypes($type) {
     // Use exact name since this is a modify by reference.
     ctools_content_prepare_subtype($subtypes[$id], $plugin);
   }
+
+  $cache[$plugin['name']] = $subtypes;
 
   return $subtypes;
 }
@@ -277,6 +284,7 @@ function ctools_content_render($type, $subtype, $conf, $keywords = array(), $arg
     if (!empty($conf['override_title'])) {
       // Give previous title as an available substitution here.
       $keywords['%title'] = empty($content->title) ? '' : $content->title;
+      $content->original_title = $keywords['%title'];
       $content->title = $conf['override_title_text'];
     }
 
@@ -439,6 +447,8 @@ function ctools_content_configure_form_defaults(&$form, &$form_state) {
     $add_submit = TRUE;
   }
 
+  ctools_include('dependent');
+
   // Unless we're not allowed to override the title on this content type, add this
   // gadget to all panes.
   if (empty($plugin['no title override']) && empty($subtype['no title override'])) {
@@ -458,6 +468,7 @@ function ctools_content_configure_form_defaults(&$form, &$form_state) {
       '#id' => 'override-title-textfield',
       '#process' => array('ctools_dependent_process'),
       '#dependency' => array('override-title-checkbox' => array(1)),
+      '#dependency_type' => 'disable',
     );
     $form['aligner_stop'] = array(
       '#value' => '</div><div style="clear: both; padding: 0; margin: 0"></div>',

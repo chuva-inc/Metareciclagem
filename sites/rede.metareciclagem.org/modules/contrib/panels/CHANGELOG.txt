@@ -1,5 +1,39 @@
+Panels 6.x-3.3 (2010-Feb-01)
+==============
 
-Panels 6.x-3.0
+#612850: Fix crash bug with panes referencing deleted/missing views.
+#614178: Transition to panels-pane.tpl.php caused empty panes to display again.
+#634746 by joshk: Allow pane caching to modify the content during cache storage.
+#612116 by johnskulski: panels-pane preprocess was incorrectly rendering $links
+#612704 by c960657: panels_get_pane_content() inappropriately created a blank context when no contexts were available.
+#618624 by johnskulski: Better classes for panel panes.
+#651306 by joachim: Add "edit any panel node" permission. Not sure why this was never there.
+#497042: Add update.php to remove unused panels_page_router_store table, if it exists.
+#683162: Convert all plugins to use new $plugin = array() format. This is less brittle than the specially named hook.
+#543898: Fix notice error when a layout has no regions.
+#647706: Mini panel names can only be 32 characters, but the form failed to restrict the limit.
+
+Panels 6.x-3.2 (2009-Oct-21)
+==============
+
+#606980 by Deciphered and sethfreach: Typo caused panel-pane class to disappear if another class was assigned.
+#607242: Using the wrong variable in hook_block can cause title to not be overridable.
+#608062: Visibility rules did not appear in the list when added to a pane (though they still applied).
+
+Panels 6.x-3.1 (2009-Oct-15)
+==============
+
+#552846 by eMPee584: Fix notice with tablesorts on mini panels page if no mini panels exist.
+#568218: Links to clone, export, delete/revert, enable/disable variants from the main summary page were incorrect and led to an operation trail not found message.
+#533724: Prevent Panels from upgrading while uninstalled, as that upgrades into broken pages.
+#529816: Allow flexible layout to add custom classes to each region.
+Rearrange the pane dropdown menus to be better organized and look a little nicer.
+Add a new field to allow setting a panel title from one of its panes.
+#562560 by Damien McKenna: Integration with export.module
+#583172 by jacine: Turn panel pane into a template, as it always should have been.
+#604404: Make sure caching does not trigger for form POSTs.
+
+Panels 6.x-3.0 (2009-Aug-19)
 ==============
 
 #529258 by stella: Attempting to modify CSS properties on mini panel causes ajax failure.

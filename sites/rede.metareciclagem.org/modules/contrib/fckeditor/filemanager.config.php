@@ -1,6 +1,6 @@
 <?php
 
-// $Id: filemanager.config.php,v 1.2.2.5 2008/12/23 15:37:41 wwalc Exp $
+// $Id: filemanager.config.php,v 1.2.2.4.2.4 2008/12/23 15:41:49 wwalc Exp $
 /**
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2008 Frederico Caldeira Knabben
@@ -22,7 +22,7 @@
  * == END LICENSE ==
  *
  * @file
- * FCKeditor Module for Drupal 5.x
+ * FCKeditor Module for Drupal 6.x
  *
  * This file is required by FCKeditor module if you want to enable built-in file management functionality
  *
@@ -33,45 +33,42 @@
 
 $GLOBALS['devel_shutdown'] = FALSE;
 
-$fck_user_files_path = "";
-$fck_user_files_absolute_path = "";
+$fck_user_files_path = '';
+$fck_user_files_absolute_path = '';
 
-function CheckAuthentication()
-{
+function CheckAuthentication() {
   static $authenticated;
 
   if (!isset($authenticated)) {
-    $result = false;
-
     if (!empty($_SERVER['SCRIPT_FILENAME'])) {
       $drupal_path = dirname(dirname(dirname(dirname($_SERVER['SCRIPT_FILENAME']))));
-      if(!file_exists($drupal_path . "/includes/bootstrap.inc")) {
+      if (!file_exists($drupal_path .'/includes/bootstrap.inc')) {
         $drupal_path = dirname(dirname(dirname($_SERVER['SCRIPT_FILENAME'])));
         $depth = 2;
         do {
           $drupal_path = dirname($drupal_path);
-          $depth ++;          
+          $depth ++;
         }
-        while(!($bootstrapFileFound = file_exists($drupal_path . "/includes/bootstrap.inc")) && $depth<10);
+        while (!($bootstrap_file_found = file_exists($drupal_path .'/includes/bootstrap.inc')) && $depth<10);
       }
     }
-    if (!isset($bootstrapFileFound) || !$bootstrapFileFound) {
-      $drupal_path = "../../../";
-      if(!file_exists($drupal_path . "/includes/bootstrap.inc")) {
-        $drupal_path = "../..";
+    if (!isset($bootstrap_file_found) || !$bootstrap_file_found) {
+      $drupal_path = '../../../';
+      if (!file_exists($drupal_path .'/includes/bootstrap.inc')) {
+        $drupal_path = '../..';
         do {
-          $drupal_path .= "/..";
-          $depth = substr_count($drupal_path, "..");
+          $drupal_path .= '/..';
+          $depth = substr_count($drupal_path, '..');
         }
-        while(!($bootstrapFileFound = file_exists($drupal_path . "/includes/bootstrap.inc")) && $depth<10);
+        while (!($bootstrap_file_found = file_exists($drupal_path .'/includes/bootstrap.inc')) && $depth < 10);
       }
     }
-    if (!isset($bootstrapFileFound) || $bootstrapFileFound) {
+    if (!isset($bootstrap_file_found) || $bootstrap_file_found) {
       $fck_cwd = getcwd();
       chdir($drupal_path);
-      require_once "./includes/bootstrap.inc";
+      require_once './includes/bootstrap.inc';
       drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-      $authenticated = user_access("allow fckeditor file uploads");
+      $authenticated = user_access('allow fckeditor file uploads');
       if (isset($_SESSION['FCKeditor']['UserFilesPath'], $_SESSION['FCKeditor']['UserFilesAbsolutePath'])) {
         $GLOBALS['fck_user_files_path'] = $_SESSION['FCKeditor']['UserFilesPath'];
         $GLOBALS['fck_user_files_absolute_path'] = $_SESSION['FCKeditor']['UserFilesAbsolutePath'];
@@ -85,10 +82,10 @@ function CheckAuthentication()
 
 /**
  * Note:
- * Although in FCKeditor 2.5 $Config['Enabled'] is not used anymore, 
+ * Although in FCKeditor 2.5 $Config['Enabled'] is not used anymore,
  * CheckAuthentication() must be called once to initialize session
  * before sending any content
- * Static $authenticated variable is being assigned, so 
+ * Static $authenticated variable is being assigned, so
  * application performance is not affected
  */
 $Config['Enabled'] = CheckAuthentication();
@@ -101,8 +98,8 @@ else {
   // Nothing in session? Shouldn't happen... anyway let's try to upload it in the (almost) right place
   // Path to user files relative to the document root.
   $Config['UserFilesPath'] = strtr(base_path(), array(
-  "/modules/fckeditor/fckeditor/editor/filemanager/connectors/php" => "",
-  "/modules/fckeditor/fckeditor/editor/filemanager/browser/default/connectors/php" => "",
-  "/modules/fckeditor/fckeditor/editor/filemanager/upload/php" => "",
-  )) . file_directory_path() . "/";
+    '/modules/fckeditor/fckeditor/editor/filemanager/connectors/php' => '',
+    '/modules/fckeditor/fckeditor/editor/filemanager/browser/default/connectors/php' => '',
+    '/modules/fckeditor/fckeditor/editor/filemanager/upload/php' => '',
+  )) . file_directory_path() .'/';
 }

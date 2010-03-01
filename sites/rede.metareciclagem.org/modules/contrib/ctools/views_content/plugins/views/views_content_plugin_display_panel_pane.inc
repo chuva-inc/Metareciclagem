@@ -1,5 +1,5 @@
 <?php
-// $Id: views_content_plugin_display_panel_pane.inc,v 1.2 2009/04/20 21:35:25 merlinofchaos Exp $
+// $Id: views_content_plugin_display_panel_pane.inc,v 1.3 2009/09/09 18:25:03 merlinofchaos Exp $
 
 /**
  * The plugin that handles a panel_pane.
@@ -254,9 +254,18 @@ class views_content_plugin_display_panel_pane extends views_plugin_display {
           $form['argument_input'][$id]['context'] = array(
             '#type' => 'select',
             '#title' => t('Required context'),
-            '#description' => t('If "From context" is selected, which context to require.'),
+            '#description' => t('If "From context" is selected, which type of context to use.'),
             '#default_value' => $argument['context'],
             '#options' => ctools_context_get_all_converters(),
+            '#process' => array('views_process_dependency'),
+            '#dependency' => array($type_id => array('context')),
+          );
+
+          $form['argument_input'][$id]['context_optional'] = array(
+            '#type' => 'checkbox',
+            '#title' => t('Context is optional'),
+            '#description' => t('This context need not be present for the pane to function. If you plan to use this, ensure that the argument handler can handle empty values gracefully.'),
+            '#default_value' => $argument['context_optional'],
             '#process' => array('views_process_dependency'),
             '#dependency' => array($type_id => array('context')),
           );
@@ -332,6 +341,7 @@ class views_content_plugin_display_panel_pane extends views_plugin_display {
         $output[$id] = array(
           'type' => 'none',
           'context' => 'any',
+          'context_optional' => FALSE,
           'panel' => 0,
           'fixed' => '',
           'name' => $handler->ui_name(),

@@ -1,5 +1,5 @@
 <?php
-// $Id: modal.inc,v 1.7 2009/05/11 23:49:33 merlinofchaos Exp $
+// $Id: modal.inc,v 1.7.2.1 2009/10/13 20:06:36 merlinofchaos Exp $
 
 /**
  * @file
@@ -121,6 +121,15 @@ function ctools_modal_command_display($title, $html) {
 function ctools_modal_command_dismiss() {
   return array(
     'command' => 'modal_dismiss',
+  );
+}
+
+/**
+ * Display loading screen in the modal
+ */
+function ctools_modal_command_loading() {
+  return array(
+    'command' => 'modal_loading',
   );
 }
 

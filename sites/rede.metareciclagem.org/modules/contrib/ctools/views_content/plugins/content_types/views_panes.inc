@@ -1,5 +1,5 @@
 <?php
-// $Id: views_panes.inc,v 1.13 2009/07/20 17:45:21 merlinofchaos Exp $
+// $Id: views_panes.inc,v 1.14.2.6 2010/01/22 23:40:48 sdboyer Exp $
 
 /**
  * @file
@@ -105,9 +105,12 @@ function _views_content_panes_content_type($view, $display) {
         list($context, $converter) = explode('.', $argument['context'], 2);
       }
       else {
+        // Backwards-compat for before we had a system for delimiting the data
+        // we retrieve out of context objects.
         $context = $argument['context'];
       }
-      $contexts[] = new ctools_context_required($argument['label'], $context);
+      $class = 'ctools_context_' . (empty($argument['context_optional']) ? 'required' : 'optional');
+      $contexts[] = new $class($argument['label'], $context);
     }
   }
 
@@ -139,12 +142,14 @@ function views_content_views_panes_content_type_render($subtype, $conf, $panel_a
   }
 
   $view->set_display($display);
-  if (!$view->display_handler->access($GLOBALS['user'])) {
+  if (!$view->display_handler->access($GLOBALS['user']) || !$view->display_handler->panel_pane_display) {
     return;
   }
 
+
   $args = array();
   $arguments = $view->display_handler->get_option('arguments');
+
 
   $context_keys = array_keys($contexts);
   foreach ($view->display_handler->get_argument_input() as $id => $argument) {
@@ -196,6 +201,9 @@ function views_content_views_panes_content_type_render($subtype, $conf, $panel_a
 
   $allow = $view->display_handler->get_option('allow');
 
+  if (!empty($conf['path'])) {
+    $conf['path'] = ctools_context_keyword_substitute($conf['path'], array(), $contexts);
+  }
   if ($allow['path_override'] && !empty($conf['path'])) {
     $view->override_path = $conf['path'];
   }
@@ -268,6 +276,7 @@ function views_content_views_panes_content_type_render($subtype, $conf, $panel_a
  */
 function views_content_views_panes_content_type_edit_form(&$form, &$form_state) {
   $conf = $form_state['conf'];
+  $contexts = $form_state['contexts'];
   // This allows older content to continue to work, where we used to embed
   // the display directly.
   list($name, $display_id) = explode('-', $form_state['subtype_name']);
@@ -306,7 +315,6 @@ function views_content_views_panes_content_type_edit_form(&$form, &$form_state) 
       );
     }
   }
-  if ($view->display_handler->has_path()) {
     if ($allow['link_to_view'] ) {
       $form['link_to_view'] = array(
         '#type' => 'checkbox',
@@ -321,7 +329,6 @@ function views_content_views_panes_content_type_edit_form(&$form, &$form_state) 
         '#title' => t('Provide a "more" link.'),
       );
     }
-  }
 
   if (!empty($allow['feed_icons'])) {
     $form['feed_icons'] = array(
@@ -333,14 +340,12 @@ function views_content_views_panes_content_type_edit_form(&$form, &$form_state) 
 
   ctools_include('dependent');
   if ($allow['use_pager']) {
-    $form['pager_aligner_start'] = array(
-      '#value' => '<div class="option-text-aligner">',
-    );
     $form['use_pager'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use pager'),
         '#default_value' => isset($conf['use_pager']) ? $conf['use_pager'] : $view->display_handler->get_option('use_pager'),
       '#id' => 'use-pager-checkbox',
+      '#prefix' => '<div class="container-inline">',
     );
     $form['pager_id'] = array(
       '#type' => 'textfield',
@@ -350,9 +355,7 @@ function views_content_views_panes_content_type_edit_form(&$form, &$form_state) 
       '#id' => 'use-pager-textfield',
       '#process' => array('ctools_dependent_process'),
       '#dependency' => array('use-pager-checkbox' => array(1)),
-    );
-    $form['pager_aligner_stop'] = array(
-      '#value' => '</div><div style="clear: both; padding: 0; margin: 0"></div>',
+      '#suffix' => '</div>',
     );
   }
   if ($allow['items_per_page']) {
@@ -381,6 +384,33 @@ function views_content_views_panes_content_type_edit_form(&$form, &$form_state) 
       '#size' => 30,
       '#description' => t('If this is set, override the View URL path; this can sometimes be useful to set to the panel URL.'),
     );
+    if (!empty($contexts)) {
+      $form['path']['#description'] .= ' ' . t('You may use substitutions in this path.');
+
+      // We have to create a manual fieldset because fieldsets do not support IDs.
+      // Use 'hidden' instead of 'markup' so that the process will run.
+      $form['contexts_prefix'] = array(
+        '#type' => 'hidden',
+        '#id' => 'edit-path-substitutions',
+        '#prefix' => '<div><fieldset id="edit-path-substitutions" class="collapsed collapsible"><legend>' . t('Substitutions') . '</legend>',
+      );
+
+      $rows = array();
+      foreach ($contexts as $context) {
+        foreach (ctools_context_get_converters('%' . check_plain($context->keyword) . ':', $context) as $keyword => $title) {
+          $rows[] = array(
+            check_plain($keyword),
+            t('@identifier: @title', array('@title' => $title, '@identifier' => $context->identifier)),
+          );
+        }
+      }
+
+      $header = array(t('Keyword'), t('Value'));
+      $form['contexts']['context'] = array('#value' => theme('table', $header, $rows));
+      $form['contexts_suffix'] = array(
+        '#value' => '</fieldset></div>',
+      );
+    }
   }
 }
 
@@ -406,10 +436,7 @@ function views_content_views_panes_content_type_edit_form_submit(&$form, &$form_
 function views_content_views_panes_content_type_admin_title($subtype, $conf, $contexts) {
   list($name, $display) = explode('-', $subtype);
   $view = views_get_view($name);
-  if (empty($view)) {
-    return t('Deleted/missing view @view', array('@view' => $name));
-  }
-  if (empty($view->display[$display])) {
+  if (empty($view) || empty($view->display[$display])) {
     return t('Deleted/missing view @view', array('@view' => $name));
   }
 
@@ -422,4 +449,39 @@ function views_content_views_panes_content_type_admin_title($subtype, $conf, $co
  * Returns the administrative title for a type.
  */
 function views_content_views_panes_content_type_admin_info($subtype, $conf, $contexts) {
+  $info = array();
+
+  list($view_name, $display_name) = explode('-', $subtype);
+  $view = views_get_view($view_name);
+
+  if (empty($view) || empty($view->display[$display_name])) {
+    return;
+  }
+
+  $view->set_display($display_name);
+
+  // Add arguments first
+  if (!empty($conf['arguments'])) {
+    $keys = array_keys($conf['arguments']);
+    $values = array_values($conf['arguments']);
+    $argument_input = $view->display_handler->get_option('argument_input');
+
+    foreach ($conf['arguments'] as $key => $value) {
+      $label = $argument_input[$key]['label'];
+      $info[] = $label .': '. $value;
+    }
+  }
+
+  $block = new stdClass;
+  if ($info) {
+    $block->title = array_shift($info);
+
+    $info[] = $view->display_handler->get_option('pane_description');
+    $block->content = theme('item_list', $info);
+  }
+  else {
+    $block->title = $view->display_handler->get_option('pane_description');
+    $block->content = '';
+  }
+  return $block;
 }

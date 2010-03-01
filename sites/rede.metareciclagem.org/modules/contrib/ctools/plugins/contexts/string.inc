@@ -1,5 +1,5 @@
 <?php
-// $Id: string.inc,v 1.4 2009/07/11 01:17:45 merlinofchaos Exp $
+// $Id: string.inc,v 1.5.2.3 2010/01/29 20:18:26 merlinofchaos Exp $
 
 /**
  * @file
@@ -8,25 +8,26 @@
  */
 
 /**
- * Implementation of specially named hook_ctools_contexts().
+ * Plugins are described by creating a $plugin array which will be used
+ * by the system that includes this file.
  */
-function ctools_string_ctools_contexts() {
-  $args['string'] = array(
-    'title' => t('String'),
-    'description' => t('A context that is just a string.'),
-    'context' => 'ctools_context_create_string',
-    'keyword' => 'string',
-    'no ui' => TRUE,
-    'context name' => 'string',
-    'convert list' => array('raw' => t('Raw string')),
-    'convert' => 'ctools_context_string_convert',
-    'placeholder form' => array(
-      '#type' => 'textfield',
-      '#description' => t('Enter the string for this context.'),
-    ),
-  );
-  return $args;
-}
+$plugin = array(
+  'title' => t('String'),
+  'description' => t('A context that is just a string.'),
+  'context' => 'ctools_context_create_string',
+  'keyword' => 'string',
+  'no ui' => TRUE,
+  'context name' => 'string',
+  'convert list' => array(
+    'raw' => t('Raw string'),
+    'html_safe' => t('HTML-safe string'),
+  ),
+  'convert' => 'ctools_context_string_convert',
+  'placeholder form' => array(
+    '#type' => 'textfield',
+    '#description' => t('Enter the string for this context.'),
+  ),
+);
 
 /**
  * It's important to remember that $conf is optional here, because contexts
@@ -45,6 +46,7 @@ function ctools_context_create_string($empty, $data = NULL, $conf = FALSE) {
 
   if ($data !== FALSE ) {
     $context->data = $data;
+    $context->title = check_plain($data);
     return $context;
   }
 }
@@ -53,5 +55,11 @@ function ctools_context_create_string($empty, $data = NULL, $conf = FALSE) {
  * Convert a context into a string.
  */
 function ctools_context_string_convert($context, $type) {
-  return $context->data;
+  switch ($type) {
+    case 'raw':
+      return $context->data;
+    case 'html_safe':
+      return check_plain($context->data);
+  }
 }
+

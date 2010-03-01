@@ -1,5 +1,5 @@
 <?php
-// $Id: relcontext_content_type.inc,v 1.1 2009/08/17 22:02:26 merlinofchaos Exp $
+// $Id: relcontext_content_type.inc,v 1.1.2.2 2010/01/29 19:54:02 merlinofchaos Exp $
 
 
 /**
@@ -11,26 +11,27 @@
  */
 
 /**
- * Hook to supply a list of content types.
- * The hook is:
- * <modulename>_<content_type>_ctools_content_types()
+ * Plugins are described by creating a $plugin array which will be used
+ * by the system that includes this file.
  */
-function ctools_plugin_example_relcontext_content_type_ctools_content_types() {
-  return array(
-    // Unknown where this is used
-    'title' => t('CTools example relcontext content type'),
-    'admin info' => 'ctools_plugin_example_relcontext_content_type_admin_info',
-    'content_types' => 'relcontext_content_type',
-    'single' => TRUE,
-    'render callback' => 'relcontext_content_type_render',
-    // Icon goes in the directory with the content type. Here, in panels/content_types.
-    'icon' => 'icon_example.png',
-    'description' => t('Relcontext content type - works with relcontext context.'),
-    'required context' => new ctools_context_required(t('Relcontext'), 'relcontext'),
-    'category' => array(t('CTools Examples'), -9),
-    'edit form' => 'relcontext_edit_form',
-  );
-}
+$plugin = array(
+  // Used in add content dialogs.
+  'title' => t('CTools example relcontext content type'),
+  'admin info' => 'ctools_plugin_example_relcontext_content_type_admin_info',
+  'content_types' => 'relcontext_content_type',
+  'single' => TRUE,
+  'render callback' => 'relcontext_content_type_render',
+  // Icon goes in the directory with the content type. Here, in plugins/content_types.
+  'icon' => 'icon_example.png',
+  'description' => t('Relcontext content type - works with relcontext context.'),
+  'required context' => new ctools_context_required(t('Relcontext'), 'relcontext'),
+  'category' => array(t('CTools Examples'), -9),
+  'edit form' => 'relcontext_edit_form',
+
+  // this example does not provide 'admin info', which would populate the
+  // panels builder page preview.
+
+);
 
 /**
  * Run-time rendering of the body of the blcok
@@ -56,7 +57,7 @@ function relcontext_content_type_render($subtype, $conf, $args, $context) {
     This is a block of data created by the Relcontent content type.
     Data in the block may be assembled from static text (like this) or from the
     content type settings form (\$conf) for the content type, or from the context
-    that is passed in. <br/>
+    that is passed in. <br />
     In our case, the configuration form (\$conf) has just one field, 'config_item_1;
     and it's configured with:
     ");
@@ -64,10 +65,10 @@ function relcontext_content_type_render($subtype, $conf, $args, $context) {
     $block->content .= '<div style="border: 1px solid red;">' . var_export($conf['config_item_1'], TRUE) . '</div>';
   }
   if (!empty($context)) {
-    $block->content .= '<br/>The args ($args) were <div style="border: 1px solid yellow;" >' .
+    $block->content .= '<br />The args ($args) were <div style="border: 1px solid yellow;" >' .
       var_export($args, TRUE) . '</div>';
   }
-  $block->content .= '<br/>And the relcontext context  ($context->data->description)
+  $block->content .= '<br />And the relcontext context  ($context->data->description)
     (which was created from a
     simplecontext context) was <div style="border: 1px solid green;" >' .
     print_r($context->data->description, TRUE) . '</div>';

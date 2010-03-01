@@ -1,5 +1,5 @@
 <?php
-// $Id: image_gallery.views_default.inc,v 1.1 2009/08/27 12:10:57 joachim Exp $
+// $Id: image_gallery.views_default.inc,v 1.3 2009/09/05 15:13:42 joachim Exp $
 
 /**
  * Implementation of hook_views_default_views().
@@ -199,12 +199,14 @@ function image_gallery_views_default_views() {
   $handler->override_option('title', 'Image galleries');
   $handler->override_option('empty', 'There are no images in this gallery.');
   $handler->override_option('empty_format', '1');
+  $handler->override_option('items_per_page', 12);
+  $handler->override_option('use_pager', '1');  
   $handler->override_option('style_plugin', 'image_gallery');
   $handler->override_option('style_options', array(
     'grouping' => '',
     'type' => 'ul',
   ));
-  $handler = $view->new_display('image_gallery', 'Gallery', 'image_gallery_1');
+  $handler = $view->new_display('image_gallery', 'Gallery page', 'image_gallery_1');
   $handler->override_option('path', 'image');
   $handler->override_option('menu', array(
     'type' => 'none',

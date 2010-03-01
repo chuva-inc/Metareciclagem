@@ -1,4 +1,4 @@
-// $Id: fckeditor.config.js,v 1.5.2.14 2009/02/16 10:38:28 wwalc Exp $
+// $Id: fckeditor.config.js,v 1.5.2.5.2.14 2009/08/16 17:30:44 jorrit Exp $
 
 /*
  WARNING: clear browser's cache after you modify this file.
@@ -14,7 +14,6 @@
 
 //uncomment these three lines to enable teaser break and page break plugins
 //remember to add 'DrupalBreak' and 'DrupalPageBreak' buttons to the toolbar
-FCKConfig.PluginsPath = '../../plugins/' ;
 FCKConfig.Plugins.Add( 'drupalbreak', 'en,pl,ru' ) ;
 FCKConfig.Plugins.Add( 'imgassist' ) ;
 //To enable plugins below you should install additional Drupal modules.
@@ -22,20 +21,17 @@ FCKConfig.Plugins.Add( 'imgassist' ) ;
 //FCKConfig.Plugins.Add( 'drupalpagebreak', 'en,pl,ru' ) ;
 //FCKConfig.Plugins.Add( 'linktonode', 'en,pl' ) ;
 //FCKConfig.Plugins.Add( 'linktomenu', 'en,pl' ) ;
-
 /*
  This toolbar is dedicated to users with "Full HTML" access
  some of commands used here (like 'FontName') use inline styles,
  which unfortunately are stripped by "Filtered HTML" filter
  */
-FCKConfig.ToolbarSets["DrupalFull"] = [
+FCKConfig.ToolbarSets['DrupalFull'] = [
 ['Source'],
 ['Cut','Copy','Paste','PasteText','PasteWord'],
 ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
 ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],
-['OrderedList','UnorderedList','-','Outdent','Indent'],
-//as of FCKeditor 2.5 you can use also 'Blockquote' button
-//['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote'],
+['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote'],
 ['JustifyLeft','JustifyCenter','JustifyRight'],
 /*
  * EXPERIMENTAL
@@ -45,21 +41,21 @@ FCKConfig.ToolbarSets["DrupalFull"] = [
  */
 //['Link','Unlink','LinkToNode','LinkToMenu','Anchor'],
 ['Link','Unlink','Anchor'],
-['Image','Flash','Table','Rule','SpecialChar','DrupalBreak'],
+['Image','Flash','Table','Rule','Smiley','SpecialChar','DrupalBreak'],
 //uncomment this line to enable the page break button
-//remember to load appropriate plugin with FCKConfig.Plugins.Add command a couple of lines above
+//remember to load appropriate plugin with FCKConfig.Plugins.Add
 //['Image','Flash','Table','Rule','SpecialChar','DrupalBreak','DrupalPageBreak'],
 '/',
 ['FontFormat','FontName','FontSize'],
-['TextColor','BGColor']
+['TextColor','BGColor','ShowBlocks']
 ] ;
 
-FCKConfig.ToolbarSets["DrupalBasic"] = [
+FCKConfig.ToolbarSets['DrupalBasic'] = [
 ['FontFormat','-','Bold','Italic','-','OrderedList','UnorderedList','-','Link','Unlink', 'Image']
 ] ;
 
 //This toolbar should work fine with "Filtered HTML" filter
-FCKConfig.ToolbarSets["DrupalFiltered"] = [
+FCKConfig.ToolbarSets['DrupalFiltered'] = [
 ['Source'],
 ['Cut','Copy','Paste','PasteText','PasteWord'],
 ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
@@ -75,13 +71,11 @@ FCKConfig.ToolbarSets["DrupalFiltered"] = [
 '/',
 ['FontFormat'],
 ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],
-['OrderedList','UnorderedList','-','Outdent','Indent'],
-//as of FCKeditor 2.5 you can use also 'Blockquote' button
-//['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote'],
-['JustifyLeft','JustifyCenter','JustifyRight','DrupalBreak'],
-//uncomment this line to enable the page break button
-//remember to load appropriate plugin with FCKConfig.Plugins.Add command a couple of lines above
-//['JustifyLeft','JustifyCenter','JustifyRight','DrupalBreak','DrupalPageBreak'],
+['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote'],
+//uncomment this line to the enable page break button
+//remember to load appropriate plugin with FCKConfig.Plugins.Add
+//['JustifyLeft','JustifyCenter','JustifyRight','DrupalBreak','DrupalPageBreak','ShowBlocks'],
+['JustifyLeft','JustifyCenter','JustifyRight','DrupalBreak','ShowBlocks'],
 ] ;
 
 //helper function to add button at the end of the toolbar
@@ -97,22 +91,15 @@ function addToolbarElement(element, toolbar, pos){
   }
 }
 
-//as of FCKeditor 2.5 ShowBlocks command is available
-//remove this code if you don't need ShowBlocks buttons
-if ( FCK.GetData ) {
-  addToolbarElement('ShowBlocks', 'DrupalFiltered', 0);
-  addToolbarElement('ShowBlocks', 'DrupalFull', 0);
-}
-
 // Protect PHP code tags (<?...?>) so FCKeditor will not break them when
 // switching from Source to WYSIWYG.
 // Uncommenting this line doesn't mean the user will not be able to type PHP
 // code in the source. This kind of prevention must be done in the server side
 // (as does Drupal), so just leave this line as is.
-FCKConfig.ProtectedSource.Add( /<\?[\s\S]*?\?>/g ) ;	// PHP style server side code
+FCKConfig.ProtectedSource.Add( /<\?[\s\S]*?\?>/g ) ; // PHP style server side code
 
-var _FileBrowserLanguage	= 'php' ;
-var _QuickUploadLanguage	= 'php' ;
+var _FileBrowserLanguage = 'php' ;
+var _QuickUploadLanguage = 'php' ;
 
 // This overrides the IndentLength/IndentUnit settings.
 FCKConfig.IndentClasses = ['rteindent1','rteindent2','rteindent3','rteindent4'] ;
@@ -123,4 +110,3 @@ FCKConfig.JustifyClasses = ['rteleft','rtecenter','rteright','rtejustify'] ;
 FCKConfig.EMailProtection = 'none' ;
 // #330286 remove "Red Title" from Styles list.
 FCKConfig.CustomStyles = {};
-FCKConfig.ImageBrowser = true ;

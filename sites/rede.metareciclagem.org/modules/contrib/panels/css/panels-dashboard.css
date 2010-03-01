@@ -1,4 +1,4 @@
-/* $Id: panels-dashboard.css,v 1.1.2.2 2009/07/10 03:03:35 merlinofchaos Exp $ */
+/* $Id: panels-dashboard.css,v 1.1.2.3 2009/10/06 18:47:20 merlinofchaos Exp $ */
 
 .dashboard-entry .dashboard-icon {
   float: left;
@@ -48,7 +48,6 @@
   margin-left: 2em;
   width: 47%;
   float: left;
-  height: 35em;
 }
 
 .dashboard-question {

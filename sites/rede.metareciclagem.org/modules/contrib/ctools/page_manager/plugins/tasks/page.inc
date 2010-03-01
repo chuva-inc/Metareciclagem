@@ -1,5 +1,5 @@
 <?php
-// $Id: page.inc,v 1.17 2009/08/19 01:12:24 merlinofchaos Exp $
+// $Id: page.inc,v 1.17.2.3 2010/01/29 23:06:59 merlinofchaos Exp $
 
 /**
  * @file
@@ -286,10 +286,27 @@ function page_manager_page_execute($subtask_id) {
   if ($page->arguments) {
     foreach ($page->arguments as $name => $argument) {
       // Optional arguments must be converted to contexts too, if they exist.
-      if ($bits[$names[$name]][0] == '!' && isset($args[$count])) {
-        $argument['keyword'] = $name;
+      if ($bits[$names[$name]][0] == '!') {
         ctools_include('context');
-        $context = ctools_context_get_context_from_argument($argument, $args[$count]);
+        $argument['keyword'] = $name;
+        if (isset($args[$count])) {
+          // Hack: use a special argument config variable to learn if we need
+          $plugin = ctools_get_argument($argument['name']);
+          // to use menu_tail style behavior:
+          if (empty($argument['settings']['use_tail'])) {
+            $value = $args[$count];
+          }
+          else {
+            $value = implode('/', array_slice($args, $count));
+          }
+
+          $context = ctools_context_get_context_from_argument($argument, $value);
+        }
+        else {
+          // make sure there is a placeholder context for missing optional contexts.
+          $context = ctools_context_get_context_from_argument($argument, NULL, TRUE);
+          // Force the title to blank for replacements
+        }
         if ($context) {
           $contexts[$context->id] = $context;
         }
@@ -440,25 +457,10 @@ function page_manager_page_delete($page) {
     }
   }
   db_query("DELETE FROM {page_manager_pages} WHERE name = '%s'", $page->name);
-
-  // Check to see if this was the site frontpage. If so, reset the site
-  // frontpage to default.
-  $frontpage = variable_get('site_frontpage', 'node');
-
-  $path = array();
-  if ($page->path) {
-    foreach (explode('/', $page->path) as $bit) {
-      if ($bit[0] != '!') {
-        $path[] = $bit;
-      }
-    }
-  }
-
-  $path = implode('/', $path);
-  if ($path == $frontpage) {
-    variable_del('site_frontpage');
-  }
-
+  // Make sure that the cache is reset so that the menu rebuild does not
+  // rebuild this page again.
+  ctools_include('export');
+  ctools_export_load_object_reset('page_manager_pages');
   menu_rebuild();
 }
 

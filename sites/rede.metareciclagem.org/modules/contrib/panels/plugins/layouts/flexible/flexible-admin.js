@@ -1,4 +1,4 @@
-// $Id: flexible-admin.js,v 1.1.2.3 2009/05/20 20:20:37 merlinofchaos Exp $
+// $Id: flexible-admin.js,v 1.1.2.4 2009/10/07 22:20:29 merlinofchaos Exp $
 
 Drupal.flexible = Drupal.flexible || {};
 
@@ -122,7 +122,7 @@ Drupal.flexible.splitter = function($splitter) {
         splitter.right_min = 25;
         splitter.right_padding = parseInt(splitter.parent.css('padding-right'));
         splitter.right_parent = parseInt(splitter.right.parent().css('margin-right'));
-        splitter.max = splitter.right.width() + splitter.left.parent().width() - 
+        splitter.max = splitter.right.width() + splitter.left.parent().width() -
           (splitter.left.siblings(':not(.panels-flexible-splitter)').length * 25) - 25;
       }
       else {
@@ -183,7 +183,7 @@ Drupal.flexible.splitter = function($splitter) {
 
     return false;
   };
-  
+
   function splitterMove(event) {
     var diff = splitter.startX - event.pageX;
     var moved = 0;
@@ -329,7 +329,7 @@ Drupal.flexible.splitter = function($splitter) {
 
     splitter.putSizes();
     Drupal.flexible.fixHeight();
-    
+
     $(document)
       .unbind("mousemove", splitterMove)
       .unbind("mouseup", splitterEnd);

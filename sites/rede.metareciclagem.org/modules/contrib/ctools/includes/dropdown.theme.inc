@@ -1,5 +1,5 @@
 <?php
-// $Id: dropdown.theme.inc,v 1.5 2009/02/06 22:32:21 merlinofchaos Exp $
+// $Id: dropdown.theme.inc,v 1.5.2.1 2009/10/02 17:44:17 merlinofchaos Exp $
 
 /**
  * @file
@@ -79,7 +79,7 @@ function theme_ctools_dropdown($title, $links, $image = FALSE, $class = '') {
   $output .= '</div>'; // wrapper
   $output .= '<div class="ctools-dropdown-container-wrapper">';
   $output .= '<div class="ctools-dropdown-container">';
-  $output .= theme('links', $links);
+  $output .= theme_links($links);
   $output .= '</div>'; // container
   $output .= '</div>'; // container wrapper
   $output .= '</div>'; // dropdown

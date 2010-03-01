@@ -1,2 +1,2 @@
-FCKLang.DrupalPageBreakTooltip = 'Вставить разрыв страницы' ;
-FCKLang.DrupalPageBreakTitle = 'Страница' ;
+FCKLang.DrupalBreakTooltip = 'Вставить разделитель анонса и основного текста' ;
+FCKLang.DrupalBreakTitle = 'Анонс' ;

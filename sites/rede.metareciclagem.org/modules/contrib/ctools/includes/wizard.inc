@@ -1,5 +1,5 @@
 <?php
-// $Id: wizard.inc,v 1.11 2009/08/19 23:21:55 merlinofchaos Exp $
+// $Id: wizard.inc,v 1.12.2.1 2010/02/01 21:11:15 merlinofchaos Exp $
 
 /**
  * @file
@@ -318,6 +318,10 @@ function ctools_wizard_wrapper(&$form, &$form_state) {
   if (isset($info['wrapper']) && function_exists($info['wrapper'])) {
     $info['wrapper']($form, $form_state);
   }
+
+  if (isset($form_info['wrapper']) && function_exists($form_info['wrapper'])) {
+    $form_info['wrapper']($form, $form_state);
+  }
 }
 
 /**
@@ -342,6 +346,9 @@ function ctools_wizard_submit(&$form, &$form_state) {
       }
       else if (isset($form_state['form_info']['return path'])) {
         $form_state['redirect'] = $form_state['form_info']['return path'];
+      }
+      else if ($type == 'finish' && isset($form_state['form_info']['cancel path'])) {
+        $form_state['redirect'] = $form_state['form_info']['cancel path'];
       }
     }
   }

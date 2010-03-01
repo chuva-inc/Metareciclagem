@@ -1,5 +1,5 @@
 <?php
-// $Id: image_attach_views_handler_field_attached_images.inc,v 1.2 2009/09/05 15:33:18 joachim Exp $
+// $Id: image_attach_views_handler_field_attached_images.inc,v 1.4 2009/11/06 17:05:20 joachim Exp $
 
 /**
  * Field handler to display the attached images on a node.
@@ -62,6 +62,7 @@ class image_attach_views_handler_field_attached_images
    * multiple fields.
    */
   function pre_render(&$values) {
+    $nids = array();
     foreach ($values as $v) {
       if (isset($v->{$this->aliases['image_attach_nid']})) {
         // Make the nid safe.
@@ -70,17 +71,20 @@ class image_attach_views_handler_field_attached_images
         $nids[$nid] = $nid;
       }
     }
-    $nids_string = implode(',', $nids);
-    $result = db_query("SELECT nid, iid FROM {image_attach} WHERE nid IN (" . $nids_string . ") ORDER BY weight");
-    while ($data = db_fetch_object($result)) {
-      // Store all the attached image nids (iid) keyed by attaching nid.
-      $attached_images[$data->nid][] = $data->iid;
-    }
     
-    // Place the data into the $values array for each result.
-    foreach ($values as $id => $v) {
-      if (isset($attached_images[$v->{$this->aliases['image_attach_nid']}])) {
-        $values[$id]->image_attach_iids = $attached_images[$v->{$this->aliases['image_attach_nid']}];
+    if (count($nids)) {
+      $nids_string = implode(',', $nids);
+      $result = db_query("SELECT nid, iid FROM {image_attach} WHERE nid IN (" . $nids_string . ") ORDER BY weight");
+      while ($data = db_fetch_object($result)) {
+        // Store all the attached image nids (iid) keyed by attaching nid.
+        $attached_images[$data->nid][] = $data->iid;
+      }
+      
+      // Place the data into the $values array for each result.
+      foreach ($values as $id => $v) {
+        if (isset($attached_images[$v->{$this->aliases['image_attach_nid']}])) {
+          $values[$id]->image_attach_iids = $attached_images[$v->{$this->aliases['image_attach_nid']}];
+        }
       }
     }
   }
@@ -104,13 +108,13 @@ class image_attach_views_handler_field_attached_images
         
         switch($this->options['as_link']) {
           case 'node':
-            $output .= l($image_img, 'node/' . $values->{$this->aliases['nid']}, array('html' => true));
+            $output = l($image_img, 'node/' . $values->{$this->aliases['nid']}, array('html' => true));
             break;
           case 'image':
-            $output .= l($image_img, 'node/' . $node->nid, array('html' => true));
+            $output = l($image_img, 'node/' . $node->nid, array('html' => true));
             break;
           default:
-            $output .= $image_img;
+            $output = $image_img;
             break;
         }
       }

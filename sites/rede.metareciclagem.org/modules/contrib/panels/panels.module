@@ -1,5 +1,5 @@
 <?php
-// $Id: panels.module,v 1.28.2.39 2009/08/17 21:49:34 merlinofchaos Exp $
+// $Id: panels.module,v 1.28.2.49 2010/02/01 23:05:27 merlinofchaos Exp $
 
 /**
  * @file panels.module
@@ -7,7 +7,11 @@
  * Core functionality for the Panels engine.
  */
 
-define('PANELS_REQUIRED_CTOOLS_API', '1.1.1');
+define('PANELS_REQUIRED_CTOOLS_API', '1.3.2');
+
+define('PANELS_TITLE_FIXED', 0); // Hide title use to be true/false. So false remains old behavior.
+define('PANELS_TITLE_NONE', 1); // And true meant no title.
+define('PANELS_TITLE_PANE', 2); // And this is the new behavior, where the title field will pick from a pane.
 
 /**
  * Returns the API version of Panels. This didn't exist in 1.
@@ -43,8 +47,9 @@ function panels_theme() {
     'file' => 'includes/display-edit.inc',
   );
   $theme['panels_pane'] = array(
-    'arguments' => array('content', 'pane', 'display'),
-    'file' => 'includes/display-render.inc',
+    'arguments' => array('output' => array(), 'pane' => array(), 'display' => array()),
+    'path' => drupal_get_path('module', 'panels') . '/templates',
+    'template' => 'panels-pane',
   );
   $theme['panels_common_content_list'] = array(
     'arguments' => array('display'),
@@ -88,7 +93,7 @@ function panels_theme() {
   foreach ($styles as $name => $data) {
     if (!empty($data['render pane'])) {
       $theme[$data['render pane']] = array(
-        'arguments' => array('content' => NULL, 'pane' => NULL, 'display' => NULL),
+        'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
       );
     }
     if (!empty($data['render panel'])) {
@@ -156,6 +161,9 @@ function panels_menu() {
   $items['panels/ajax/display-settings/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_display_settings',
   ) + $base;
+  $items['panels/ajax/panel-title/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ajax_set_display_title',
+  ) + $base;
   $items['panels/ajax/style-type/%/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_style_type',
     'page arguments' => array(3, 4),
@@ -183,7 +191,6 @@ function panels_menu() {
   $admin_base = array(
     'file' => 'includes/callbacks.inc',
     'access arguments' => array('use panels dashboard'),
-
   );
   // Provide a nice location for a panels admin panel.
   $items['admin/build/panels'] = array(
@@ -447,60 +454,6 @@ function panels_edit_layout($display, $finish, $destination = NULL, $allowed_lay
   return _panels_edit_layout($display, $finish, $destination, $allowed_layouts);
 }
 
-/**
- * API entry point for configuring the layout settings for a given display.
- *
- * For all layouts except Flexible, the layout settings form allows the user to select styles,
- * as defined by .inc files in the panels/styles subdirectory, for the panels in their display.
- * For the Flexible layout, the layout settings form allows the user to provide dimensions
- * for their flexible layout in addition to applying styles to panels.
- *
- * @param object $display instanceof panels_display \n
- *  A fully loaded panels $display object, as returned from panels_load_display().
- *  Merely passing a did is NOT sufficient.
- * @param string $finish
- *  A string that will be used for the text of (one of) the form submission button(s). Note that
- *  panels will NOT wrap $finish in t() for you, so your caller should make sure to do so. \n
- *  The submit behavior of the form is primarily governed by the value of $destination (see
- *  below), but is secondarily governed by $finish as follows:
- *    -# If $finish != t('Save'), then two #submit buttons will be present: one with the button
- *       text t('Save'), and the other with the button text $finish. .
- *      - Clicking the 'Save' button will save any changes on the form to the $display object and
- *        keep the user on the same editing page.
- *      - Clicking the $finish button will also save the $display object, but the user will be
- *        redirected to the URL specified in $destination.
- *    -# If $finish == t('Save'), then there is only one button, still called t('Save'), but it
- *       mimics the behavior of the $finish button above by redirecting the user away from the form.
- * @param mixed $destination
- *  Basic usage is a string containing the URL that the form should redirect to upon submission.
- *  For a discussion of advanced usages that rely on NULL values for $destination, see the
- *  panels_edit() documentation.
- * @param mixed $title
- *  The $title variable has three modes of operation:
- *    -# If $title == FALSE (the default), then no widget will appear on the panels_edit_layout_settings form
- *       allowing the user to select a title, and other means for setting page titles will take precedent. If
- *       no other means are used to provide a title, then the title will be hidden when rendering the $display.
- *    -# If $title == TRUE, then two widgets will appear on the panels_edit_layout_settings form allowing the
- *       user to input a title specific to this $display, as well as a checkbox enabling the user to disable
- *       page titles entirely for this $display object.
- *    -# If $title == (string), then the behavior is very similar to mode 2, but the widget description
- *       on the title textfield will indicate that the $title string will be used as the default page title
- *       if none is provided on this form. When utilizing this option, note that the panels API can only
- *       provide the data for these values; you must implement the appropriate conditionals to make it true.
- *
- * @return
- *  Can return nothing, or a modified $display object, or a redirection string; return values for the
- *  panels_edit* family of functions are quite complex. See panels_edit() for detailed discussion.
- * @see panels_edit()
- */
-function panels_edit_layout_settings($display, $finish, $destination = NULL, $title = FALSE) {
-  panels_load_include('display-layout-settings');
-  ctools_include('ajax');
-  panels_load_include('plugins');
-  return _panels_edit_layout_settings($display, $finish, $destination, $title);
-}
-
-
 // ---------------------------------------------------------------------------
 // panels database functions
 
@@ -641,17 +594,8 @@ function panels_load_displays($dids) {
   ctools_include('export');
   while ($obj = db_fetch_object($result)) {
     $displays[$obj->did] = ctools_export_unpack_object('panels_display', $obj);
+    // Modify the hide_title field to go from a bool to an int if necessary.
   }
-
-  // @TODO
-  //
-  // This code clearly never worked ($content, $layout and $settings are all unset)
-  // where was this supposed to even have been?
-
-//  foreach (module_implements('panels_layout_content_alter') as $module) {
-//    $function = $module . '_panels_layout_content_alter';
-//    $function($content, $layout, $settings);
-//  }
 
   $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (" . db_placeholders($dids) . ") ORDER BY did, panel, position", $dids);
 
@@ -752,6 +696,16 @@ function panels_save_display(&$display) {
         // and put it back so our pids and positions can be used
         unset($display->content[$id]);
         $display->content[$pane->pid] = $pane;
+
+        // If the title pane was one of our panes that just got its ID changed,
+        // we need to change it in the database, too.
+        if (isset($display->title_pane) && $display->title_pane == $old_pid) {
+          $display->title_pane = $pane->pid;
+          // Do a simple update query to write it so we don't have to rewrite
+          // the whole record. We can't just save writing the whole record here
+          // because it was needed to get the did. Chicken, egg, more chicken.
+          db_query("UPDATE {panels_display} SET title_pane = %d WHERE did = %d", $pane->pid, $display->did);
+        }
       }
 
       // re-add this to the list of content for this panel.
@@ -821,15 +775,21 @@ function panels_export_display($display, $prefix = '') {
   ctools_include('export');
   $output = ctools_export_object('panels_display', $display, $prefix);
 
+  // Initialize empty properties.
   $output .= $prefix . '$display->content = array()' . ";\n";
   $output .= $prefix . '$display->panels = array()' . ";\n";
   $panels = array();
 
+  $title_pid = 0;
   if (!empty($display->content)) {
     $pid_counter = 0;
     $region_counters = array();
     foreach ($display->content as $pane) {
-      $pane->pid = 'new-' . ++$pid_counter;
+      $pid = 'new-' . ++$pid_counter;
+      if ($pane->pid == $display->title_pane) {
+        $title_pid = $pid;
+      }
+      $pane->pid = $pid;
       $output .= ctools_export_object('panels_pane', $pane, $prefix . '  ');
       $output .= "$prefix  " . '$display->content[\'' . $pane->pid . '\'] = $pane' . ";\n";
       if (!isset($region_counters[$pane->panel])) {
@@ -838,6 +798,21 @@ function panels_export_display($display, $prefix = '') {
       $output .= "$prefix  " . '$display->panels[\'' . $pane->panel . '\'][' . $region_counters[$pane->panel]++ .'] = \'' . $pane->pid . "';\n";
     }
   }
+  $output .= $prefix . '$display->hide_title = ';
+  switch ($display->hide_title) {
+    case PANELS_TITLE_FIXED:
+      $output .= 'PANELS_TITLE_FIXED';
+      break;
+    case PANELS_TITLE_NONE:
+      $output .= 'PANELS_TITLE_NONE';
+      break;
+    case PANELS_TITLE_PANE:
+      $output .= 'PANELS_TITLE_PANE';
+      break;
+  }
+  $output .= ";\n";
+
+  $output .= $prefix . '$display->title_pane =' . " '$title_pid';\n";
   return $output;
 }
 
@@ -1045,4 +1020,57 @@ function panel_context_panels_cache_set($key, $cache) {
     $page->new_handler->conf['display'] = $cache->display;
   }
   page_manager_set_page_cache($page);
+}
+
+/**
+ * Clean up the panel pane variables for the template.
+ */
+function template_preprocess_panels_pane($vars) {
+  $content = $vars['output'];
+  // basic classes
+  $vars['classes'] = 'panel-pane';
+  $vars['id'] = '';
+
+  // Add some usable classes based on type/subtype
+  ctools_include('cleanstring');
+  $type_class = $content->type ? 'pane-'. ctools_cleanstring($content->type, array('lower case' => TRUE)) : '';
+  $subtype_class = $content->subtype ? 'pane-'. ctools_cleanstring($content->subtype, array('lower case' => TRUE)) : '';
+
+  // Sometimes type and subtype are the same. Avoid redudant classes.
+  if ($type_class != $subtype_class) {
+    $vars['classes'] .= " $type_class $subtype_class";
+  }
+  else {
+    $vars['classes'] .= " $type_class";
+  }
+
+  // Add id and custom class if sent in.
+  if (!empty($content->content)) {
+    if (!empty($content->css_id)) {
+      $vars['id'] = ' id="' . $content->css_id . '"';
+    }
+    if (!empty($content->css_class)) {
+      $vars['classes'] .= ' ' . $content->css_class;
+    }
+  }
+
+  // administrative links, only if there is permission.
+  $vars['admin_links'] = '';
+  if (user_access('view pane admin links') && !empty($content->admin_links)) {
+    $vars['admin_links'] = theme('links', $content->admin_links);
+  }
+
+  $vars['title'] = !empty($content->title) ? $content->title : '';
+
+  $vars['feeds'] = !empty($content->feeds) ? implode(' ', $content->feeds) : '';
+  $vars['content'] = !empty($content->content) ? $content->content : '';
+
+  $vars['links'] = !empty($content->links) ? theme('links', $content->links) : '';
+  $vars['more'] = '';
+  if (!empty($content->more)) {
+    if (empty($content->more['title'])) {
+      $content->more['title'] = t('more');
+    }
+    $vars['more'] = l($content->more['title'], $content->more['href'], $content->more);;
+  }
 }

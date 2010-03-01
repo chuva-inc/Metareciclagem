@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlsitemap_taxonomy.module,v 1.1.2.20 2009/08/21 14:27:27 earnie Exp $
+// $Id: xmlsitemap_taxonomy.module,v 1.1.2.23 2010/01/27 00:10:09 davereid Exp $
 
 /**
  * @file
@@ -20,7 +20,7 @@
  */
 function xmlsitemap_taxonomy_cron() {
   if (($limit = variable_get('xmlsitemap_cron_limit', 100)) != -1) {
-    $sql = "SELECT t.* FROM {term_data} t
+    $sql = "SELECT t.tid, t.vid FROM {term_data} t
       LEFT JOIN {xmlsitemap_taxonomy} xt ON xt.tid = t.tid
       WHERE xt.tid IS NULL";
     $result = db_query_range($sql, 0, $limit);
@@ -43,6 +43,12 @@ function xmlsitemap_taxonomy_cron() {
  * Implementation of hook_form_FORM_ID_alter().
  */
 function xmlsitemap_taxonomy_form_taxonomy_form_term_alter(&$form, &$from_state) {
+  if (!isset($form['identification'])) {
+    // This same form is used for the term delete confirm form, so skip
+    // adding our fieldset if that is the case.
+    return;
+  }
+
   $priority = db_result(db_query("SELECT priority_override
     FROM {xmlsitemap_taxonomy}
     WHERE tid = %d", $form['tid']['#value'])
@@ -57,6 +63,7 @@ function xmlsitemap_taxonomy_form_taxonomy_form_term_alter(&$form, &$from_state)
       '#type' => 'fieldset',
       '#title' => t('XML sitemap'),
       '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
     );
   }
   $form['xmlsitemap']['xmlsitemap_taxonomy_priority'] = array(
@@ -66,8 +73,12 @@ function xmlsitemap_taxonomy_form_taxonomy_form_term_alter(&$form, &$from_state)
     '#default_value' => $priority,
     '#options' => $options,
   );
-  $form['submit']['#weight'] = isset($form['submit']['#weight']) ? $form['submit']['#weight'] + 1 : 1;
-  $form['delete']['#weight'] = isset($form['delete']['#weight']) ? $form['delete']['#weight'] + 1 : 1;
+
+  // The submit and delete buttons need to be weighted down.
+  $form['submit'] += array('#weight' => 100);
+  if (isset($form['delete'])) {
+    $form['delete'] += array('#weight' => 110);
+  }
 }
 
 /**
@@ -203,9 +214,8 @@ function xmlsitemap_taxonomy_xmlsitemap_links() {
 
   $result = db_query(
     db_rewrite_sql(
-      "SELECT t.tid, t.vid, v.module, xt.changed, xt.previously_changed, xt.priority_override
+      "SELECT t.tid, t.vid, t.name, xt.changed, xt.previously_changed, xt.priority_override
         FROM {term_data} t
-        LEFT JOIN {vocabulary} v ON t.vid = v.vid
         LEFT JOIN {xmlsitemap_taxonomy} xt ON t.tid = xt.tid",
       't', 'tid'
     )

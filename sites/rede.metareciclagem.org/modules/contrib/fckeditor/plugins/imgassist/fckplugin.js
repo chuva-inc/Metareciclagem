@@ -150,7 +150,7 @@ FCKTools.ImageAssistCode = function( IAObj )
 {
   var IAString;
   if ( IAObj.getAttribute('nid') ) {
-    var IAString = '[img_assist'; 
+    var IAString = '[img_assist';
     var orderStr = IAObj.getAttribute('order').toString();
     var order = orderStr.split("|");
     for(var i=1;i<order.length;i++) {

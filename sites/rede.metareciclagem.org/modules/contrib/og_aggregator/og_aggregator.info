@@ -5,17 +5,9 @@ dependencies[] = aggregator
 dependencies[] = og
 package = "Organic groups"
 core = 6.x
-
-; Information added by drupal.org packaging script on 2009-07-01
-version = "6.x-1.x-dev"
+; Information added by drupal.org packaging script on 2009-11-12
+version = "6.x-1.4"
 core = "6.x"
 project = "og_aggregator"
-datestamp = "1246451737"
-
-
-; Information added by drupal.org packaging script on 2009-08-11
-version = "6.x-1.1"
-core = "6.x"
-project = "og_aggregator"
-datestamp = "1249964448"
+datestamp = "1258021548"
 

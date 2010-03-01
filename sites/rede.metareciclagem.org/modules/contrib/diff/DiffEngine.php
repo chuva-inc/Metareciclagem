@@ -1,5 +1,5 @@
 <?php
-// $Id: DiffEngine.php,v 1.4.2.1.2.1 2008/04/08 14:01:57 weitzman Exp $
+// $Id: DiffEngine.php,v 1.4.2.1.2.2 2009/11/19 15:40:33 yhahn Exp $
 
 /**
  * A PHP diff engine for phpwiki. (Taken from phpwiki-1.3.3)
@@ -898,7 +898,7 @@ class DiffFormatter {
 
   function _start_block($header) {
     if ($this->show_header) {
-      echo $header;
+      echo $header . "\n";
     }
   }
 
