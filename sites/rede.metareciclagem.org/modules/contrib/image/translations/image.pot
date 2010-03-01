@@ -1,23 +1,25 @@
-# $Id: image.pot,v 1.4 2008/12/27 11:08:36 hass Exp $
+# $Id: image.pot,v 1.5 2010/01/06 11:30:44 goofyx Exp $
 #
-# LANGUAGE translation of Drupal (root)
+# LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  image.admin.inc,v 1.2 2008/12/27 06:58:41 drewish
-#  image.imagemagick.inc,v 1.23 2008/12/27 06:58:41 drewish
-#  image.module,v 1.281 2008/12/27 06:58:41 drewish
+#  image.admin.inc,v 1.9 2009/10/13 08:38:52 joachim
+#  image_handler_relationship_node_image_file.inc,v 1.1 2009/05/01 22:29:47 sun
+#  image_plugin_argument_validate_image_size.inc,v 1.2 2009/08/26 18:41:44 joachim
+#  image.imagemagick.inc,v 1.24 2009/03/06 01:40:09 sun
+#  image.module,v 1.322 2009/09/13 20:21:04 joachim
 #  image.info,v 1.5 2008/01/06 22:15:24 drewish
-#  image_attach.info,v 1.4 2008/01/06 22:15:24 drewish
-#  image_gallery.info,v 1.5 2008/01/06 22:15:25 drewish
-#  image_im_advanced.info,v 1.2 2008/01/06 22:15:25 drewish
-#  image_import.info,v 1.4 2008/01/06 22:15:25 drewish
-#  image.install,v 1.16 2008/12/27 06:58:41 drewish
+#  image.views.inc,v 1.4 2009/08/27 12:10:57 joachim
+#  image.install,v 1.33 2009/09/05 15:12:00 joachim
+#  image_handler_argument_image_node_image_size.inc,v 1.1 2009/08/26 18:41:44 joachim
+#  image_handler_field_image_node_image.inc,v 1.3 2009/08/26 14:42:04 joachim
+#  image_plugin_argument_default_image_size.inc,v 1.1 2009/08/26 18:41:44 joachim
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-12-27 12:04+0100\n"
+"POT-Creation-Date: 2010-01-06 13:21+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -26,84 +28,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: image.admin.inc:18
+#: image.admin.inc:15
 msgid "Image file settings"
 msgstr ""
 
-#: image.admin.inc:22
+#: image.admin.inc:19
 msgid "Default image path"
 msgstr ""
 
-#: image.admin.inc:24
+#: image.admin.inc:21
 msgid "Subdirectory in the directory %dir where pictures will be stored. Do not include trailing slash."
 msgstr ""
 
-#: image.admin.inc:29
+#: image.admin.inc:26
 msgid "Maximum upload size"
 msgstr ""
 
-#: image.admin.inc:31
+#: image.admin.inc:28
 msgid "KB"
 msgstr ""
 
-#: image.admin.inc:33
+#: image.admin.inc:30
 msgid "Maximum file size for image uploads. When a maximum image dimensions is specified for original images the size is checked after resizing."
 msgstr ""
 
-#: image.admin.inc:38
+#: image.admin.inc:35 views/image_handler_relationship_node_image_file.inc:27 views/image_plugin_argument_validate_image_size.inc:31
 msgid "Image sizes"
 msgstr ""
 
-#: image.admin.inc:41
+#: image.admin.inc:38
 msgid "The <em>Scale image</em> operation resizes images so that they fit with in the given dimensions. If only one dimension is specified the other dimension will be computed based on the image's aspect ratio. The <em>Scale and crop image</em> operation resizes images to be exactly the given dimensions. If only one dimension is specified the image will not be cropped, making this is equivalent to <em>Scale image</em>."
 msgstr ""
 
-#: image.admin.inc:42
+#: image.admin.inc:39
 msgid "Note: 'Original' dimensions will only be used to resize images when they are first uploaded. Existing originals will not be modified."
 msgstr ""
 
-#: image.admin.inc:47
+#: image.admin.inc:43
 msgid "Hidden"
 msgstr ""
 
-#: image.admin.inc:48
+#: image.admin.inc:44
 msgid "Same window"
 msgstr ""
 
-#: image.admin.inc:49
+#: image.admin.inc:45
 msgid "New window"
 msgstr ""
 
-#: image.admin.inc:82
+#: image.admin.inc:80
 msgid "Scale image"
 msgstr ""
 
-#: image.admin.inc:82
+#: image.admin.inc:80
 msgid "Scale and crop image"
 msgstr ""
 
-#: image.admin.inc:114
+#: image.admin.inc:117
 msgid "You must specify width, height or both dimensions."
 msgstr ""
 
-#: image.admin.inc:167
+#: image.admin.inc:128;131
+msgid "You have specified an invalid directory."
+msgstr ""
+
+#: image.admin.inc:182
 msgid "Changes to the images sizes mean that the derivative images will need to be regenerated."
 msgstr ""
 
-#: image.admin.inc:173
+#: image.admin.inc:188
 msgid "Label"
 msgstr ""
 
-#: image.admin.inc:173
+#: image.admin.inc:188
 msgid "Operation"
 msgstr ""
 
-#: image.admin.inc:173
+#: image.admin.inc:188
 msgid "Width"
 msgstr ""
 
-#: image.admin.inc:173
+#: image.admin.inc:188
 msgid "Height"
+msgstr ""
+
+#: image.admin.inc:188
+msgid "Link"
 msgstr ""
 
 #: image.imagemagick.inc:19
@@ -155,214 +165,302 @@ msgid "ImageMagick reported an error: %error."
 msgstr ""
 
 #: image.module:18
-msgid "The image module is used to create and administer images for your site. Each image is stored as a post, with thumbnails of the original generated automatically. There are two default thumbnail sizes, thumbnail and preview. The thumbnail size is shown as the preview for image posts and when browsing image galleries. The preview is the default size when first displaying an image node."
+msgid "The Image module is used to create and administer images for your site. Each image is stored as a post, with thumbnails of the original generated automatically. There are two default derivative image sizes, \"thumbnail\" and \"preview\". The \"thumbnail\" size is shown as preview image in posts and when browsing image galleries. The \"preview\" size is the default size when viewing an image node page."
 msgstr ""
 
 #: image.module:19
-msgid "Image administration allows the image directory and the image sizes to be set."
+msgid "The settings page for Image module allows the image directory and the image sizes to be configured."
 msgstr ""
 
 #: image.module:20
-msgid "Image galleries are used to organize and display images in galleries. The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight. The add galleries tab allows you to create a new image gallery defining name, description, parent and weight."
+msgid "Image module ships with contributed modules. Their settings can be accessed from the image settings page."
 msgstr ""
 
-#: image.module:21
-msgid "You are able to:"
+#: image.module:22
+msgid "Image attach is used to add an existing or new image to a node. The selected image will show up in a predefined spot on the selected node."
 msgstr ""
 
 #: image.module:23
-msgid "View image handling messages in <a href=\"@admin_settings\">administer &gt;&gt; settings</a>."
+msgid "Image gallery is used to organize and display images in galleries. The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight. The add galleries tab allows you to create a new image gallery defining name, description, parent and weight. If the <a href=\"@views-url\">Views module</a> is installed, then the Image gallery module settings are mostly replaced by settings of the view."
 msgstr ""
 
 #: image.module:24
-msgid "Configure image sizes and file directories at <a href=\"@admin_settings_image\">administer &gt;&gt; settings &gt;&gt; image</a>."
+msgid "Image import is used to import batches of images. The administration page lets you define the folder from which images will be imported."
 msgstr ""
 
 #: image.module:25
-msgid "Use the <a href=\"@external_http_drupal_org_project_img_assist\">image assist module</a> to upload and insert images into posts."
+msgid "The separate <a href=\"@img-assist-url\">Image assist module</a> can be installed to upload and insert images into posts."
 msgstr ""
 
 #: image.module:27
-msgid "For more information, see the online handbook entry for <a href=\"@image\">Image module</a>."
+msgid "You can:"
 msgstr ""
 
-#: image.module:69;390 image.info:0;0 contrib/image_attach/image_attach.info:0 contrib/image_gallery/image_gallery.info:0 contrib/image_im_advanced/image_im_advanced.info:0 contrib/image_import/image_import.info:0
+#: image.module:29
+msgid "Configure image sizes and file directories at <a href=\"@image-settings-url\">Administer &raquo; Site configuration &raquo; Image</a>."
+msgstr ""
+
+#: image.module:31
+msgid "For more information, see the online handbook entry for <a href=\"@image-url\">Image module</a>."
+msgstr ""
+
+#: image.module:73;355;1126 image.info:0;0 views/image.views.inc:21;36;79;115;117
 msgid "Image"
 msgstr ""
 
-#: image.module:71
+#: image.module:75
 msgid "An image (with thumbnail). This is ideal for publishing photographs or screenshots."
 msgstr ""
 
-#: image.module:154
-msgid "Rebuild image thumbnails"
+#: image.module:163;361
+msgid "Rebuild derivative images"
 msgstr ""
 
-#: image.module:203
-msgid "The original image was resized to fit within the maximum allowed resolution of %width x %height pixels."
-msgstr ""
-
-#: image.module:209
-msgid "The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size."
-msgstr ""
-
-#: image.module:311;320
+#: image.module:260;278
 msgid "Latest image"
 msgstr ""
 
-#: image.module:312;325
+#: image.module:261;284
 msgid "Random image"
 msgstr ""
 
-#: image.module:382
-msgid "Rebuild derivative images."
+#: image.module:267
+msgid "Number of images to display"
 msgstr ""
 
-#: image.module:384
+#: image.module:300;933 image.install:209
+msgid "Thumbnail"
+msgstr ""
+
+#: image.module:357
+msgid "Select an image to upload."
+msgstr ""
+
+#: image.module:363
 msgid "Check this to rebuild the derivative images for this node."
 msgstr ""
 
-#: image.module:392
-msgid "Click \"Browse...\" to select an image to upload."
+#: image.module:376
+msgid "Delete"
 msgstr ""
 
-#: image.module:405
+#: image.module:399
+msgid "The original image was resized to fit within the maximum allowed resolution of %width x %height pixels."
+msgstr ""
+
+#: image.module:405;1059
+msgid "The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size."
+msgstr ""
+
+#: image.module:424
 msgid "You must upload an image."
 msgstr ""
 
-#: image.module:479
-msgid "%title's has an unneeded %key derivative images. The derivatives will be rebuilt to remove it."
-msgstr ""
-
-#: image.module:491
-msgid "%title's %key derivative image %filepath was missing. The derivatives will be rebuilt to regenerate it."
-msgstr ""
-
-#: image.module:497
-msgid "%title's %key derivative image had a timestamp (%filetime) that predates the last changes to the image size settings (%vartime). The derivatives will be rebuilt to regenerate it."
-msgstr ""
-
-#: image.module:506
+#: image.module:528
 msgid "view"
 msgstr ""
 
-#: image.module:583
-msgid "The derivative images for <a href=\"@link\">@title</a> have been regenerated."
-msgstr ""
-
-#: image.module:741 image.install:72
+#: image.module:780 image.install:82
 msgid "No image toolkit is currently enabled. Without one the image module will not be able to resize your images. You can select one from the <a href=\"@link\">image toolkit settings page</a>."
 msgstr ""
 
-#: image.module:824
+#: image.module:863
 msgid "Unable to create scaled %label image."
 msgstr ""
 
-#: image.module:880 image.install:114
+#: image.module:932 image.install:124
 msgid "Original"
 msgstr ""
 
-#: image.module:882 image.install:196
+#: image.module:934 image.install:206
 msgid "Preview"
 msgstr ""
 
-#: image.module:506;110;0
+#: image.module:1127
+msgid "Image display."
+msgstr ""
+
+#: image.module:528;119
 msgid "image"
 msgstr ""
 
-#: image.module:506
+#: image.module:528
 msgid "Derivative images were regenerated for %title."
 msgstr ""
 
-#: image.module:80
-msgid "create images"
-msgstr ""
-
-#: image.module:80
+#: image.module:84
 msgid "view original images"
 msgstr ""
 
-#: image.module:80
+#: image.module:84
+msgid "create images"
+msgstr ""
+
+#: image.module:84
 msgid "edit own images"
 msgstr ""
 
-#: image.module:80
-msgid "edit images"
+#: image.module:84
+msgid "edit any images"
 msgstr ""
 
-#: image.module:116
-msgid "Images"
+#: image.module:84
+msgid "delete own images"
 msgstr ""
 
-#: image.module:117
-msgid "Configure the location of image files and image sizes. Also, if enabled, configure image attachments and options for image galleries and image imports."
+#: image.module:84
+msgid "delete any images"
 msgstr ""
 
 #: image.module:125
-msgid "Files and sizes"
+msgid "Images"
 msgstr ""
 
 #: image.module:126
+msgid "Configure the location of image files and image sizes. Also, if enabled, configure image attachments and options for image galleries and image imports."
+msgstr ""
+
+#: image.module:134
+msgid "Files and sizes"
+msgstr ""
+
+#: image.module:135
 msgid "Configure the location of image files and image sizes."
 msgstr ""
 
-#: image.install:9
-msgid "Stores image files information."
-msgstr ""
-
-#: image.install:12
-msgid "Primary Key: The {node}.nid of the image node."
-msgstr ""
-
-#: image.install:18
-msgid "Index: The {files}.fid of the image file."
-msgstr ""
-
-#: image.install:24
-msgid "Primary Key: The {files}.filename of the image file. For image module this indicates the file size."
-msgstr ""
-
-#: image.install:64
+#: image.install:74
 msgid "The %toolkit_name toolkit is installed."
 msgstr ""
 
-#: image.install:70
+#: image.install:80
 msgid "Not installed."
 msgstr ""
 
-#: image.install:75
+#: image.install:85
 msgid "Image toolkit"
 msgstr ""
 
-#: image.install:83
+#: image.install:93
 msgid "Missing directory."
 msgstr ""
 
-#: image.install:85
+#: image.install:95
 msgid "The image module's image directory %image_dir is missing."
 msgstr ""
 
-#: image.install:90
+#: image.install:100
 msgid "Missing temp directory."
 msgstr ""
 
-#: image.install:92
+#: image.install:102
 msgid "The image module's temp directory %temp_dir is missing."
 msgstr ""
 
-#: image.install:97
+#: image.install:107
 msgid "Exists (%path)."
 msgstr ""
 
-#: image.install:101
+#: image.install:111
 msgid "Image module directories"
 msgstr ""
 
-#: image.install:189
+#: image.install:199
 msgid "The original image size was missing so no changes were made. See this <a href='@link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n</pre>"
+msgstr ""
+
+#: image.install:333
+msgid "If you see a message of the form \"Failed: ALTER TABLE {image} DROP PRIMARY KEY\" or \"DROP INDEX image_fid\" here it is harmless."
 msgstr ""
 
 #: image.info:0
 msgid "Allows uploading, resizing and viewing of images."
+msgstr ""
+
+#: views/image.views.inc:46
+msgid "Image preset size"
+msgstr ""
+
+#: views/image.views.inc:47
+msgid "The preset image size of an image, e.g. <em>Original</em>, <em>Thumbnail</em>, etc."
+msgstr ""
+
+#: views/image.views.inc:64
+msgid "Node"
+msgstr ""
+
+#: views/image.views.inc:65
+msgid "Image node"
+msgstr ""
+
+#: views/image.views.inc:66
+msgid "A relationship to gain access to the corresponding node of an image file uploaded via Image module."
+msgstr ""
+
+#: views/image.views.inc:92
+msgid "File"
+msgstr ""
+
+#: views/image.views.inc:93
+msgid "Image file"
+msgstr ""
+
+#: views/image.views.inc:94
+msgid "A relationship to gain access to the corresponding file(s) of an image node."
+msgstr ""
+
+#: views/image.views.inc:118
+msgid "The rendered image of an Image node, shown at a chosen size. This field can be added without a relationship."
+msgstr ""
+
+#: views/image.views.inc:122;185;192
+msgid "Image size"
+msgstr ""
+
+#: views/image.views.inc:123
+msgid "Allows the size of the Image node image field to be set with the argument."
+msgstr ""
+
+#: views/image.views.inc:171
+msgid "Displays items in a fluid grid."
+msgstr ""
+
+#: views/image_handler_argument_image_node_image_size.inc:32
+msgid "Ignore and use the field setting"
+msgstr ""
+
+#: views/image_handler_argument_image_node_image_size.inc:37
+msgid "Hide view / Page not found (404)"
+msgstr ""
+
+#: views/image_handler_argument_image_node_image_size.inc:42
+msgid "Display empty text"
+msgstr ""
+
+#: views/image_handler_argument_image_node_image_size.inc:47
+msgid "Provide default argument"
+msgstr ""
+
+#: views/image_handler_argument_image_node_image_size.inc:85
+msgid "The @argument argument requires the \"Image: Image\" field."
+msgstr ""
+
+#: views/image_handler_field_image_node_image.inc:65
+msgid "Image size to show"
+msgstr ""
+
+#: views/image_handler_field_image_node_image.inc:68
+msgid "Pick an image derivative to display."
+msgstr ""
+
+#: views/image_handler_relationship_node_image_file.inc:31
+msgid "Which image sizes to join on. You can select none (to include all sizes), one, or multiple; Every size will introduce a new row. Example: If the result are 5 image nodes and you selected 2 sizes; The result will be 10 rows. There is no fallback; if a size does not exist (because the original is smaller) then no data will be obtained."
+msgstr ""
+
+#: views/image_plugin_argument_default_image_size.inc:21
+msgid "Default argument"
+msgstr ""
+
+#: views/image_plugin_argument_validate_image_size.inc:38
+msgid "Which image sizes are allowed to be passed through this argument. Both 'original' and '_original' are valid."
 msgstr ""
 

@@ -1,5 +1,5 @@
 <?php
-// $Id: term.inc,v 1.6 2009/07/13 17:55:56 merlinofchaos Exp $
+// $Id: term.inc,v 1.6.2.3 2010/01/29 20:18:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -8,22 +8,20 @@
  */
 
 /**
- * Implementation of specially named hook_ctools_arguments().
+ * Plugins are described by creating a $plugin array which will be used
+ * by the system that includes this file.
  */
-function ctools_term_ctools_arguments() {
-  $args['term'] = array(
-    'title' => t("Taxonomy term"),
-    // keyword to use for %substitution
-    'keyword' => 'term',
-    'description' => t('Creates a single taxonomy term from a taxonomy ID or taxonomy term name.'),
-    'context' => 'ctools_term_context',
-    'default' => array('input_form' => 'tid', 'breadcrumb' => TRUE),
-    'settings form' => 'ctools_term_settings_form',
-    'placeholder form' => 'ctools_term_ctools_argument_placeholder',
-    'breadcrumb' => 'ctools_term_breadcrumb',
-  );
-  return $args;
-}
+$plugin = array(
+  'title' => t("Taxonomy term: ID"),
+  // keyword to use for %substitution
+  'keyword' => 'term',
+  'description' => t('Creates a single taxonomy term from a taxonomy ID or taxonomy term name.'),
+  'context' => 'ctools_term_context',
+  'default' => array('input_form' => 'tid', 'breadcrumb' => TRUE),
+  'settings form' => 'ctools_term_settings_form',
+  'placeholder form' => 'ctools_term_ctools_argument_placeholder',
+  'breadcrumb' => 'ctools_term_breadcrumb',
+);
 
 /**
  * Discover if this argument gives us the term we crave.
@@ -128,7 +126,7 @@ function ctools_term_breadcrumb($conf, $context) {
     $current = array_shift($parents);
     $breadcrumb[] = l($current->name, 'taxonomy/term/' . $current->tid);
   }
-  
+
   $breadcrumb = array_merge(drupal_get_breadcrumb(), array_reverse($breadcrumb));
   drupal_set_breadcrumb($breadcrumb);
 }

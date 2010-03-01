@@ -1,286 +1,248 @@
-// $Id: fckeditor.utils.js,v 1.2.2.33 2009/05/14 08:43:31 wwalc Exp $
-var fckIsRunning = new Array;
-var fckIsLaunching = new Array;
-var fckLaunchedTextareaId = new Array;
-var fckLaunchedJsId = new Array;
-var fckFirstrun = new Array;
+// $Id: fckeditor.utils.js,v 1.2.2.8.2.32 2009/10/04 16:47:50 jorrit Exp $
+// map of instancename -> FCKeditor object
+var fckInstances = {};
 var fckActiveId = false;
-var fckIsIE = ( /*@cc_on!@*/false ) ? true : false ;
+// this object will store teaser information
+var fckTeaser = { lookup : {}, lookupSetup : false, cache : {} };
 
-function Toggle(js_id, textareaID, textTextarea, TextRTE, xss_check)
-{
-  var eFCKeditorDiv  = document.getElementById( 'fck_' + js_id ) ;
-  var teaser = false;
-  var teaserCheckbox = false;
-
-  for (var i in Drupal.settings.teaser) {
-    if (Drupal.settings.teaser[i] == textareaID)
-      teaser = i;
-      teaserCheckbox = Drupal.settings.teaserCheckbox[i];
+/**
+ * Drupal behavior that adds FCKeditors to textareas
+ */
+Drupal.behaviors.fckeditor = function(context) {
+  // make sure the textarea behavior is run first, to get a correctly sized grippie
+  // the textarea behavior requires the teaser behavior, so load that one as well
+  if (Drupal.behaviors.teaser && Drupal.behaviors.textarea) {
+    Drupal.behaviors.teaser(context);
+    Drupal.behaviors.textarea(context);
   }
+  
+  $('textarea.fckeditor:not(.fckeditor-processed)', context).each(function() {
+    var textarea = $(this).addClass('fckeditor-processed');
 
-  if (!fckIsRunning[js_id])
-  {
-    if (!fckIsLaunching[js_id])
-    {
-      //display is set to '' at this stage because of IE 800a025e bug
-      if (fckIsIE)
-        eFCKeditorDiv.style.display = '' ;
-      fckIsLaunching[js_id] = true;
-      $(".img_assist-button").hide();
-      if (xss_check && $('#' + textareaID).attr('class').indexOf("filterxss2") != -1) {
-        $.post(Drupal.settings.basePath + 'index.php?q=fckeditor/xss', {
-            text: $('#' + textareaID).val(),
-            'filters[]': Drupal.settings.fckeditor_filters[js_id]
-          },
-          function(text) {
-            $('#' + textareaID).val(text);
-            $('#' + js_id).val(text);
-            window[js_id].ReplaceTextarea();
-          }
-        );
+    var taid = textarea.attr('id');
+    if (fckInstances[taid]) {
+      var editorInstance = fckInstances[taid];
+
+      if (editorInstance.defaultState == 1) {
+        if (textarea.attr('class').indexOf("filterxss1") != -1 || textarea.attr('class').indexOf("filterxss2") != -1) {
+          $.post(Drupal.settings.basePath + 'index.php?q=fckeditor/xss', {
+            text: $('#' + taid).val(),
+            'filters[]': Drupal.settings.fckeditor_filters[fckInstances[taid].DrupalId]
+            },
+            function(text) {
+              textarea.val(text);
+              $('#img_assist-link-' + taid).hide();
+              $(".img_assist-button").hide();
+              editorInstance.ReplaceTextarea();
+            }
+          );
+        }
+        else {
+          editorInstance.ReplaceTextarea();
+          $('#img_assist-link-' + taid).hide();
+          $(".img_assist-button").hide();
+        }
       }
-      else {
-        eval(js_id + '.ReplaceTextarea();');
-      }
-      $('#img_assist-link-' + textareaID).hide();
     }
-    setTimeout("Toggle('" + js_id + "','" + textareaID + "','" + textTextarea + "','" + TextRTE + "'," + xss_check + ");",1000);
-    return ;
+  });
+}
+
+/**
+ * This method takes care of replacing a textarea with an FCKeditor
+ * and vice versa.
+ */
+function Toggle(textareaID, TextTextarea, TextRTE, xss_check)
+{
+  var swtch = $('#switch_'+textareaID);
+
+  // check if this FCKeditor was initially disabled
+  if (fckInstances[textareaID].defaultState == 0) {
+    fckInstances[textareaID].defaultState = 2;
+    if ($('#' + textareaID).attr('class').indexOf("filterxss2") != -1) {
+      $.post(Drupal.settings.basePath + 'index.php?q=fckeditor/xss', {
+        text: $('#' + textareaID).val(),
+        'filters[]': Drupal.settings.fckeditor_filters[fckInstances[textareaID].DrupalId]
+        },
+        function(text) {
+          $('#' + textareaID).val(text);
+          fckInstances[textareaID].ReplaceTextarea();
+        }
+      );
+    }
+    else {
+      fckInstances[textareaID].ReplaceTextarea();
+    }
+    swtch.text(TextTextarea);
+    $(".img_assist-button").hide();
+    // simply return: ReplaceTextarea will take the contents of the textarea for us
+    return;
   }
 
-  var oEditor ;
-  if ( typeof( FCKeditorAPI ) != 'undefined' )
-    oEditor = FCKeditorAPI.GetInstance( js_id );
-
-  // Get the _Textarea and _FCKeditor DIVs.
-  var eTextarea  = document.getElementById( textareaID );
-  var eFCKeditor  = document.getElementById( js_id );
+  var textArea = $('#'+textareaID);
+  var textAreaContainer = textArea.parents('.resizable-textarea');
+  var editorFrame = $('#'+textareaID+'___Frame');
+  var editorInstance = FCKeditorAPI.GetInstance(textareaID);
   var text;
 
-  // If the _Textarea DIV is visible, switch to FCKeditor.
-  if ( eTextarea.style.display != 'none' )
-  {
-    if (typeof( imceInitiateFCK ) != 'undefined')
-      imceInitiateFCK();
-    document.getElementById('switch_' + js_id).innerHTML = textTextarea;
+  // execute the switch
+  if (textArea.is(':hidden')) {
+    // switch from fck to textarea
+    swtch.text(TextRTE);
 
-    // Switch the DIVs display.
-    eFCKeditorDiv.style.display = '';
-
-    text = eTextarea.value;
-    if (teaser && $('input[@class=teaser-button]').attr('value') == Drupal.t('Join summary')) {
-      var val = $('#' + teaser).val();
-      if (val && val.length) {
-        text = val + '<!--break-->' + text;
-      }
-    }
-
-    // This is a hack for Gecko 1.0.x ... it stops editing when the editor is hidden.
-    if (oEditor && !document.all)
-    {
-      if (oEditor.EditMode == FCK_EDITMODE_WYSIWYG)
-      oEditor.MakeEditable() ;
-    }
-
-    if ( text.length ) {
-      oEditor.SetHTML( text, false);
-    }
-    eTextarea.style.display = 'none';
-    $('#img_assist-link-' + textareaID).hide();
-    $(".img_assist-button").hide();
-
-    if (teaser) {
-      $('div[@class=teaser-button-wrapper]').hide();
-      $('#' + teaser).parent().hide();
-      $('#' + teaserCheckbox).parent().show();
-    }
-  }
-  else
-  {
-    if (fckFirstrun[js_id]) {
-      fckFirstrun[js_id] = false;
-    }
-    if (document.getElementById('switch_' + js_id)) {
-      document.getElementById('switch_' + js_id).innerHTML = TextRTE;
-    }
-
-    var text = oEditor.GetHTML(true);
+    text = editorInstance.GetData(true);
     // #372150 and #374386
     if (text == '<br />' || text == '<p>&#160;</p>' || text == '<div>&#160;</div>') {
-      text = '';
+        text = '';
     }
 
+    // check if we have to take care of teasers
+    var teaser = FCKeditor_TeaserInfo(textareaID);
     if (teaser) {
       var t = text.indexOf('<!--break-->');
       if (t != -1) {
-        $('#' + teaser).val(text.slice(0,t));
-        $('#' + textareaID).val(text.slice(t+12));
-        $('#' + teaser).parent().show();
-        $('#' + teaser).attr('disabled', '');
-        if ($('input[@class=teaser-button]').attr('value') != Drupal.t('Join summary')) {
-          try {$('input[@class=teaser-button]').click();} catch(e) {$('input[@class=teaser-button]').val(Drupal.t('Join summary'));}
-        }
-      }
-      else {
-        $('#' + teaser).attr('disabled', 'disabled');
-        if ($('input[@class=teaser-button]').attr('value') != Drupal.t('Split summary at cursor')) {
-          try {$('input[@class=teaser-button]').click();} catch(e) {$('input[@class=teaser-button]').val(Drupal.t('Split summary at cursor'));}
-        }
-        // Set the textarea value to the editor value.
-        $('#' + textareaID).val(text);
-      }
-    }
-    else {
-      // Set the textarea value to the editor value.
-      $('#' + textareaID).val(text);
-    }
+        teaser.textarea.val(FCKeditor_trim(text.slice(0,t)));
+        text = FCKeditor_trim(text.slice(t+12));
 
+        teaser.textareaContainer.show();
+        teaser.textarea.attr('disabled', '');
+        if (teaser.button.attr('value') != Drupal.t('Join summary')) {
+          try {teaser.button.click();} catch(e) {teaser.button.val(Drupal.t('Join summary'));}
+        }
+      } else {
+        teaser.textarea.attr('disabled', 'disabled');
+        if (teaser.button.attr('value') != Drupal.t('Split summary at cursor')) {
+          try {teaser.button.click();} catch(e) {teaser.button.val(Drupal.t('Split summary at cursor'));}
+        }
+      }
+
+      teaser.buttonContainer.show();
+    }
+    textArea.val(text);
+
+    textArea.show();
+    textAreaContainer.show();
+    editorFrame.hide();
     $('#img_assist-link-' + textareaID).show();
     $(".img_assist-button").show();
-    // Switch the DIVs display.
-    eTextarea.style.display = '';
-    eFCKeditorDiv.style.display = 'none';
+    $(textArea).parent().children(".grippie").show();
+  } else {
+    // switch from textarea to fck
+    swtch.text(TextTextarea);
+
+    // check if we have to take care of teasers
+    var teaser = FCKeditor_TeaserInfo(textareaID);
+
     if (teaser) {
-      $('div[@class=teaser-button-wrapper]').show();
-    }
-  }
-}
-
-function CreateToggle(elId, jsId, fckeditorOn)
-{
-  var ta = document.getElementById(elId);
-  var ta2 = document.getElementById('fck_' + jsId);
-
-  if (!ta || !ta2)
-    return ;
-
-  ta2.value = ta.value;
-  ta.parentNode.insertBefore(ta2, ta);
-  if (fckeditorOn) {
-    ta.style.display = 'none';
-    $('#img_assist-link-' + elId).hide();
-  }
-  else
-    ta2.style.display = 'none';
-}
-
-function doFCKeditorSave(){
-  DoFCKeditorTeaserStuff();
-  return true; //continue submitting
-}
-
-function DoFCKeditorTeaserStuff()
-{
-  //bad hack for #248146
-  if ($('#ahah-progress-edit-attach').length) {
-    return false;
-  }
-    for( var i = 0 ; i < fckLaunchedJsId.length ; i++ ) {
-      if ( document.getElementById( fckLaunchedTextareaId[i] ).style.display == 'none' )
-      {
-        var text = FCKeditorAPI.GetInstance( fckLaunchedJsId[i] ).GetXHTML(true);
-        var teaser = false;
-
-        // #372150 and #374386
-        if (text == '<br />' || text == '<p>&#160;</p>' || text == '<div>&#160;</div>') {
-          text = '';
-        }
-
-        for (var k in Drupal.settings.teaser) {
-          if (Drupal.settings.teaser[k] == fckLaunchedTextareaId[i])
-            teaser = k;
-        }
-
-        if (teaser) {
-          var t = text.indexOf('<!--break-->');
-          if (t != -1) {
-            $('#' + teaser).val(text.slice(0,t));
-            document.getElementById( fckLaunchedTextareaId[i] ).value = text.slice(t+12);
-          }
-          else {
-            $('#' + teaser).val('');
-            $('#' + teaser).attr('disabled', 'disabled');
-            document.getElementById( fckLaunchedTextareaId[i] ).value = text;
-            if ($('input[@class=teaser-button]').attr('value') == Drupal.t('Join summary')) {
-              try {$('input[@class=teaser-button]').click();} catch(e) {$('input[@class=teaser-button]').val(Drupal.t('Join summary'));}
-            }
-          }
-        }
-        else {
-          document.getElementById( fckLaunchedTextareaId[i] ).value = text;
-        }
+      if (teaser.textarea.val().length > 0) {
+        text = teaser.textarea.val() + '\n<!--break-->\n' + textArea.val();
+      } else {
+        text = textArea.val();
       }
+      teaser.textarea.attr('disabled', '');
+      teaser.buttonContainer.hide();
+      teaser.textareaContainer.hide();
+      teaser.checkboxContainer.show();
+    } else {
+      text = textArea.val();
     }
+
+    editorInstance.SetData(text, true);
+
+    // Switch the DIVs display.
+    textArea.hide();
+    textAreaContainer.show();
+    textArea.parent().children('.grippie').hide();
+    editorFrame.show();
+    $('#img_assist-link-' + textareaID).hide();
+    $(".img_assist-button").hide();
+  }
 }
 
 // Update a global variable containing the active FCKeditor ID.
-function DoFCKeditorUpdateId( editorInstance )
-{
+function DoFCKeditorUpdateId(editorInstance) {
   fckActiveId = editorInstance.Name;
 }
 
-// The FCKeditor_OnComplete function is a special function called everytime an
-// editor instance is completely loaded and available for API interactions.
-function FCKeditor_OnComplete( editorInstance )
-{
-  fckIsRunning[editorInstance.Name] = true ;
-  fckLaunchedTextareaId.push(editorInstance.Config['TextareaID']) ;
-  fckLaunchedJsId.push(editorInstance.Name) ;
-  fckFirstrun[editorInstance.Name] = true;
-
+/**
+ * The FCKeditor_OnComplete function is a special function called everytime an
+ * editor instance is completely loaded and available for API interactions.
+ */
+function FCKeditor_OnComplete(editorInstance) {
   // Enable the switch button. It is disabled at startup, waiting the editor to be loaded.
-  var oElem = document.getElementById('switch_' + editorInstance.Name);
-  if (oElem != null) {
-    oElem.style.display = '';
-  }
+  $('#switch_' + editorInstance.Name).show();
+  editorInstance.Events.AttachEvent('OnAfterLinkedFieldUpdate', FCKeditor_OnAfterLinkedFieldUpdate);
+  editorInstance.Events.AttachEvent('OnFocus', DoFCKeditorUpdateId);
 
-  // If the textarea isn't visible update the content from the editor.
-  $(editorInstance.LinkedField.form).submit(DoFCKeditorTeaserStuff);
-
-  editorInstance.Events.AttachEvent( 'OnAfterLinkedFieldUpdate', DoFCKeditorTeaserStuff );
-  editorInstance.Events.AttachEvent( 'OnFocus', DoFCKeditorUpdateId );
-
-  var teaser = false;
-  var teaserCheckbox = false;
-
-  for (var k in Drupal.settings.teaser) {
-    if (Drupal.settings.teaser[k] == editorInstance.Config['TextareaID']) {
-      teaser = k;
-      teaserCheckbox = Drupal.settings.teaserCheckbox[k];
-    }
-  }
+  var teaser = FCKeditor_TeaserInfo(editorInstance.Name);
 
   if (teaser) {
-    $('#' + teaser).attr('disabled', '');
-    $('div[@class=teaser-button-wrapper]').hide();
-    $('#' + teaser).parent().hide();
-    $('#' + teaserCheckbox).parent().show();
+    // if there is a teaser, prepend it to the text, only when switched to FCKeditor using toggle
+    //if (fckInstances[editorInstance.Name].defaultState == 2) {
+      if (teaser.textarea.val().length > 0 && editorInstance.GetData(true).indexOf('<!--break-->') == -1 ) {
+        var text = teaser.textarea.val() + '\n<!--break-->\n' + editorInstance.GetData(true);
+        editorInstance.SetData(text);
+      }
+    //}
+    // hide the teaser
+    teaser.textarea.attr('disabled', '');
+    teaser.buttonContainer.hide();
+    teaser.textareaContainer.hide();
+    teaser.checkboxContainer.show();
   }
 
-  //Img_Assist integration
+  // jQuery's hide() does not work when the field is not visible, for instance because it is in a collapsed field set
+  $(editorInstance.LinkedField).parent().children('.grippie').each(function() {
+    this.style.display = 'none';
+  });
+
+  // very ugly hack to circumvent FCKeditor from re-updating textareas on submission. We do that ourselves
+  // FCKeditor will happily update the fake textarea while we will use the proper one
+  editorInstance.LinkedField2 = editorInstance.LinkedField;
+  editorInstance.LinkedField = $('<textarea></textarea>');
+
+  // Img_Assist integration
   IntegrateWithImgAssist();
 }
 
-function FCKeditorReplaceTextarea(textarea_id, oFCKeditor, xss_check)
-{
-  if ($('#' + oFCKeditor.Config['TextareaID']).length === 0) {
-    return;
-  }
-  $(".img_assist-button").hide();
-  if (xss_check && $('#' + oFCKeditor.Config['TextareaID']).attr('class').indexOf("filterxss") != -1) {
-    $.post(Drupal.settings.basePath + 'index.php?q=fckeditor/xss', {
-      text: $('#' + textarea_id).val(),
-      'filters[]': Drupal.settings.fckeditor_filters[textarea_id]
-      },
-      function(text) {
-        $('#' + textarea_id).val(text);
-        oFCKeditor.ReplaceTextarea();
+/**
+ * This method is executed for every FCKeditor instance just after the underlying text field is updated
+ * before the form is submitted.
+ */
+function FCKeditor_OnAfterLinkedFieldUpdate(editorInstance) {
+  var textArea = editorInstance.LinkedField2;
+  var taid = textArea.id;
+
+  var teaser = FCKeditor_TeaserInfo(taid);
+
+  // when textArea is hidden, FCKeditor is visible
+  if ($(textArea).is(':hidden')) {
+    var text = editorInstance.GetData(true);
+    // #372150 and #374386
+    if (text == '<br />' || text == '<p>&#160;</p>' || text == '<div>&#160;</div>') {
+        text = '';
+    }
+    textArea.value = text;
+    // only update the teaser field if this field is associated with a teaser field
+    if (teaser) {
+      var t = text.indexOf('<!--break-->');
+      if (t != -1) {
+        teaser.textarea.val(FCKeditor_trim(text.slice(0,t)));
+        textArea.value = FCKeditor_trim(text.slice(t+12));
+      } else {
+        teaser.textarea.val('');
+        teaser.textarea.attr('disabled', 'disabled');
+
+        var teaserbuttontxt = Drupal.t('Join summary');
+
+        if (teaser.button.attr('value') == teaserbuttontxt) {
+          try {
+            teaser.button.click();
+          } catch(e) {
+            teaserbutton.val(teaserbuttontxt);
+          }
+        }
       }
-    );
-  }
-  else {
-    oFCKeditor.ReplaceTextarea();
+    }
   }
 }
 
@@ -295,6 +257,74 @@ function IntegrateWithImgAssist()
   }
 }
 
+/**
+ * Removes leading and trailing whitespace from the input
+ */
+function FCKeditor_trim(text) {
+  return text.replace(/^\s+/g, '').replace(/\s+$/g, '');
+}
+
+/**
+ * This function retrieves information about a possible teaser field
+ * associated with the mentioned field.
+ *
+ * @param taid string HTML id of the main text area
+ */
+function FCKeditor_TeaserInfo(taid) {
+  // if the result is cached, return it
+  if (fckTeaser.cache[taid]) {
+    return fckTeaser.cache[taid];
+  }
+
+  // build a lookup table
+  if (!fckTeaser.lookupSetup) {
+    fckTeaser.lookupSetup = true;
+    for(var x in Drupal.settings.teaser) {
+      fckTeaser.lookup[Drupal.settings.teaser[x]] = x;
+    }
+  }
+
+  // find the elements
+  if (fckTeaser.lookup[taid]) {
+    var obj = {
+      textarea : $('#'+fckTeaser.lookup[taid]),
+      checkbox : $('#'+Drupal.settings.teaserCheckbox[fckTeaser.lookup[taid]])
+    };
+
+    obj.textareaContainer = obj.textarea.parent();
+    obj.checkboxContainer = obj.checkbox.parent();
+
+    obj.button = $('input.teaser-button', obj.checkbox.parents('div.teaser-checkbox').get(0));
+    obj.buttonContainer = obj.button.parent();
+
+    fckTeaser.cache[taid] = obj;
+  } else {
+    fckTeaser.cache[taid] = null;
+  }
+
+  return fckTeaser.cache[taid];
+}
+
+/**
+ * Creates a screen wide popup window containing an FCKeditor
+ */
+function FCKeditor_OpenPopup(popupUrl, jsID, textareaID, width) {
+  popupUrl = popupUrl + '?var='+ jsID + '&el=' + textareaID;
+
+  var teaser = FCKeditor_TeaserInfo(textareaID);
+  if (teaser) {
+    popupUrl = popupUrl + '&teaser=' + teaser.textarea.attr('id');
+  }
+
+  var percentPos = width.indexOf('%');
+  if (percentPos != -1) {
+    width = width.substr(0, percentPos);
+    width = width / 100 * screen.width;
+  }
+
+  window.open(popupUrl, null, 'width=' + width + ',toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=1,dependent=yes');
+}
+
 // Probably JsMin was used to compress the code.
 // In such case, in IE FCKeditor_IsCompatibleBrowser() will always return false.
 if (typeof(FCKeditor_IsCompatibleBrowser) == 'function' && !FCKeditor_IsCompatibleBrowser()) {
@@ -307,5 +337,14 @@ if (typeof(FCKeditor_IsCompatibleBrowser) == 'function' && !FCKeditor_IsCompatib
       return ( sBrowserVersion >= 5.5 ) ;
     }
     return false;
+  }
+}
+
+/**
+ * Integration for ajax.module
+ */
+function doFCKeditorSave() {
+  for(var textareaid in fckInstances) {
+    FCKeditor_OnAfterLinkedFieldUpdate(FCKeditorAPI.GetInstance(textareaid));
   }
 }

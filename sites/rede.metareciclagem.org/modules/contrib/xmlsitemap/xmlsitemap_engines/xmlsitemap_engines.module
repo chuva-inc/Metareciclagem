@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlsitemap_engines.module,v 1.5.2.50 2009/07/24 17:59:27 earnie Exp $
+// $Id: xmlsitemap_engines.module,v 1.5.2.54 2010/01/27 00:33:17 davereid Exp $
 
 /**
  * @file
@@ -26,7 +26,7 @@ function xmlsitemap_engines_cron() {
   $last_ping = variable_get('xmlsitemap_engines_cron_timestamp_submit', 0);
   $submit_on_change = variable_get('xmlsitemap_engines_submit', FALSE);
   $content_changed = variable_get('xmlsitemap_sitemap_is_changed', FALSE);
-  $ping_engines = ($submit_on_change && $content_changed) ||
+  $ping_engines = (!$submit_on_change || $content_changed) &&
     ((REQUEST_TIME - $last_ping) >= $frequency);
   if ($ping_engines) {
     xmlsitemap_engines_ping_sitemap();
@@ -39,7 +39,6 @@ function xmlsitemap_engines_cron() {
  * Implementation of hook_menu().
  */
 function xmlsitemap_engines_menu() {
-  $items = array();
   $items['admin/settings/xmlsitemap/engines'] = array(
     'title' => 'Search engines',
     'description' => 'Configure the submission settings of the XML sitemap to the search engines.',
@@ -49,36 +48,6 @@ function xmlsitemap_engines_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'xmlsitemap_engines.admin.inc',
   );
-  if ($verify = variable_get("xmlsitemap_engines_google_verify", '')) {
-    $items[$verify] = array(
-      'title' => 'Google verification page',
-      'page callback' => 'xmlsitemap_engines_verify',
-      'page arguments' => array('google'),
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'xmlsitemap_engines.pages.inc',
-    );
-  }
-  if ($verify = variable_get("xmlsitemap_engines_yahoo_verify", '')) {
-    $items[$verify] = array(
-      'title' => 'Yahoo! verification page',
-      'page callback' => 'xmlsitemap_engines_verify',
-      'page arguments' => array('yahoo'),
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'xmlsitemap_engines.pages.inc',
-    );
-  }
-  if ($verify = variable_get("xmlsitemap_engines_bing_verify", '')) {
-    $items[$verify] = array(
-      'title' => 'Bing verification page',
-      'page callback' => 'xmlsitemap_engines_verify',
-      'page arguments' => array('bing'),
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'xmlsitemap_engines.pages.inc',
-    );
-  }
   return $items;
 }
 
@@ -150,9 +119,15 @@ function xmlsitemap_engines_ping_sitemap($engine = NULL) {
     ),
   );
 
-  // Get a list of enabled languages.
-  $languages = language_list('enabled');
-  $languages = $languages[1];
+  if (variable_get('xmlsitemap_all_links_to_default_language', 0)) {
+    // Only submit the default language sitemap since it contains every link.
+    $languages = array(language_default());
+  }
+  else {
+    // Get a list of enabled languages.
+    $languages = language_list('enabled');
+    $languages = $languages[1];
+  }
 
   foreach ($languages as $language) {
     if (!isset($engine)) {
@@ -185,19 +160,19 @@ function xmlsitemap_engines_submit_sitemap($engine, $url_var, $default_url, $lan
   if (!is_null($language)) {
     $url_options['language'] = $language;
   }
-  
+
   $url = url('sitemap.xml', $url_options);
   $url = strtr(variable_get($url_var, $default_url), array('[sitemap]' => $url));
-  
+
   $result = drupal_http_request($url);
   if ($result->code == 200) {
-    watchdog('xmlsitemap', 'Sitemap successfully submitted to !engine.',
-      array('!engine' => $engine)
+    watchdog('xmlsitemap', 'Sitemap successfully submitted to @engine.<br />Request: @url',
+      array('@engine' => $engine, '@url' => $url)
     );
   }
   else {
-    watchdog('xmlsitemap', 'Error occurred submitting sitemap to !engine: !code.',
-      array('!engine' => $engine, '!code' => 0 + $result->code), WATCHDOG_ERROR
+    watchdog('xmlsitemap', 'Error occurred submitting sitemap to @engine: @code.<br />Request: @url',
+      array('@engine' => $engine, '@code' => 0 + $result->code, '@url' => $url), WATCHDOG_ERROR
     );
   }
 }

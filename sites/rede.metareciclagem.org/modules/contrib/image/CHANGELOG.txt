@@ -1,11 +1,98 @@
-// $Id: CHANGELOG.txt,v 1.80 2009/08/27 12:26:31 joachim Exp $
+// $Id: CHANGELOG.txt,v 1.142 2010/01/16 11:41:40 joachim Exp $
 
 Image x.x-x.x, xxxx-xx-xx
--------------------------
+------------------------
 
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+
+
+Image 6.x-1.0-BETA5, 2010-01-16
+-------------------------------
+#625666 by joachim: Added note about what happens when no image title is given.
+#581174 by jonathan1055, joachim | skyredwang: Added ability to limit the number
+  of attached images.
+#680672 by joachim: Fixed mention of 'upload' when user can't create images.
+#680644 by joachim: Cleaned up code in image attach's hook_form_alter().
+by joachim: Added tests for image attach.
+#580864 by joachim: Fixed new nodes not respecting the 'don't attach existing 
+  images' setting.
+#273426 by joachim: Added test for image thumbnails in teasers.
+#575374 by joachim: Fixed image import allowing selection of too big images. 
+#662252 by joachim: Changed description text in image attach form to be plural.
+
+
+Image 6.x-1.0-BETA4, 2009-12-21
+-------------------------------
+#659182 by jonathan1055, joachim: Fixed removal of first attached image on
+  programmatic node save.
+#232557 by joachim: Added thumbnails to list on image import page.
+#630546 by jonathan1055: Fixed attached image not appearing in teaser preview.
+#620234 by unjello: Fixed undefined variable in Views image attach handler.
+#602740 by Vin7: Fixed theme function to take $form by value.
+#592852 by joachim: Fixed SQL error when View attached images field is empty.
+#579320 by joachim: Fixed link to node in attached images block.
+#226121 by sp3boy: Fixed bad logic from previous patch to this issue.
+
+
+Image 6.x-1.0-BETA3, 2009-09-13
+-------------------------------
+#567630 by joachim: Fixed bad call to url() on image gallery settings page.
+#544970 by joachim: Added image attach views relationships.
+#571434 by joachim: Fixed views gallery count label showing for empty galleries.
+#569526 by 2noame: Fixed mistaken commit to image.module from #569258.
+by joachim: Changed image attach CCK label to plural.
+by joachim: Removed obsolete hook_help module description key.
+#561686 by roderik: Fixed VARCHAR in image attach database update.
+#569766 by patryk: Fixed views module not loaded in image gallery update.
+#561362 by joachim: Fixed attached image CCK weight not being used.
+
+
+Image 6.x-1.0-BETA2, 2009-09-05
+-------------------------------
+#564488 by joachim: Fixed missing variables in Views image gallery template.
+#72579 by David Stosik: Added more granular permissions to image attach, and
+  fixed attaching images when 'Attach existing images' is disabled.
+#445074 by joachim: Added a theme function for the attached images block.
+#569334 by joachim: Fixed security issue with attached images Views field.
+by joachim: Added messages for update functions.
+#569258 by alanburke: Changed name of Gallery display to 'Gallery page'.
+#569198 by David Stosik: Fixed selecting <None> in image attach inserting a 0
+  value into $node->iids. Update function cleans up any nonsense data this may 
+  have created.
+#565774 by alanburke: Fixed thickbox on galleries.
+#561362 by David Stosik: Fixed attached image weights to hide if CCK present.
+#357793 by joachim: Fixed update from 5 error due to old pre-5 {image} table.
+#561832 by joachim: Fixed foreach on empty array in image attach node form.
+#569138 by joachim: Moved image_attach_views_handlers() to inc file.
+#567226 by joachim: Fixed attached images views field to handle multiple images.
+#566642 by joachim: Fixed new default views not getting picked up by clearing
+ the view cache on update.
+#207557 by Ibn al-Hazardous: Fixed update errors due to duplicate data in 
+  Drupal 5 files table.
+#568734 by David Stosik: Fixed escaping in update_sql queries in updates.
+#568078 by joachim: Moved gallery page code to a new image_gallery.pages.inc.
+#568078 by joachim: Moved admin code to a new image_gallery.admin.inc.
+#567170 by joachim: Fixed wrong link on attached images on teasers.
+#566040 by joachim: Changed formatting of 'None' in the attach form.
+
+
+Image 6.x-1.0-BETA1, 2009-09-02
+-------------------------------
+#166145 by joachim: Fixed checking of image path on validation not form display.
+#225014 by David Stosik: Added ability to import images into galleries 
+  corresponding to the directory tree.
+#226121 by joachim, sp3boy: Changed image derivative rebuilding so it doesn't 
+  happen in admin and batch operations.
+#564614 by joachim: Fixed un-t()'d image gallery count string.
+#470720 by joachim: Fixed (again) Image Gallery vocabulary broken after 
+  re-enabling the module.
+#562810 by datune: Fixed error messages from updates on systems that don't have
+  the primary keys or indexes present.
+#563988 by joachim: Fixed missing paging in image gallery default view.
+#561686 by jandd: Fixed bad query in image_attach_update_6101().
+#561854 by joachim: Fixed missing note about Views on gallery settings page. 
 
 
 Image 6.x-1.0-ALPHA6, 2009-08-27

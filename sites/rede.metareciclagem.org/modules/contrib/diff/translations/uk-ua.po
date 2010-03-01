@@ -30,7 +30,7 @@ msgid "The diff module overwrites the normal revisions view. The revisions table
 msgstr "Модуль diff змінює стандартний переглядач ревізій, привносячи в нього можливість переглядати рядково зміни між ревізіями. Тільки користувачі з правами %view_revisions будуть мати доступ до цього функціоналу."
 
 #: diff.module:20;658;669;670
-msgid "Preview changes"
+msgid "View changes"
 msgstr "Попередній перегляд змін"
 
 #: diff.module:20

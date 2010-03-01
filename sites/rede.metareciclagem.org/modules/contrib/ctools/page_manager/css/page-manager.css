@@ -1,4 +1,4 @@
-/* $Id: page-manager.css,v 1.10 2009/08/06 00:08:45 merlinofchaos Exp $ */
+/* $Id: page-manager.css,v 1.10.2.2 2009/10/15 20:15:20 merlinofchaos Exp $ */
 body form#page-manager-list-pages-form {
   margin: 0 0 20px 0;
 }
@@ -38,6 +38,20 @@ body form#page-manager-list-pages-form {
 
 #page-manager-list-pages tr.page-manager-disabled {
   color: #999;
+}
+
+#page-manager-list-pages tr.page-manager-locked td.page-manager-page-name {
+  font-style: italic;
+  color: green;
+  padding-left: 22px; /* LTR */
+  background: url(../images/locked.png) no-repeat scroll left center; /* LTR */
+}
+
+#page-manager-list-pages tr.page-manager-locked-other td.page-manager-page-name {
+  font-style: italic;
+  color: red;
+  padding-left: 22px; /* LTR */
+  background: url(../images/locked-other.png) no-repeat scroll left center; /* LTR */
 }
 
 #page-manager-edit .page-manager-wrapper {
@@ -219,6 +233,10 @@ body form#page-manager-list-pages-form {
   border-right: 1px solid #aaa;
 }
 
+#page-manager-edit .handler-title .actions ul {
+  border-right: none;
+}
+
 #page-manager-edit .actions li {
   float: left; /* LTR */
   background: none;
@@ -226,6 +244,10 @@ body form#page-manager-list-pages-form {
   border-left: 1px solid #aaa;
   margin: 0;
   padding: 0;
+}
+
+#page-manager-edit .actions ul li.operation-last {
+  border-right: none;
 }
 
 #page-manager-edit .actions li a:hover {

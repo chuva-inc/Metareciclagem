@@ -1,5 +1,5 @@
 <?php
-// $Id: plugins.inc,v 1.13.2.11 2009/08/17 21:49:34 merlinofchaos Exp $
+// $Id: plugins.inc,v 1.13.2.15 2010/01/12 23:18:44 merlinofchaos Exp $
 
 /**
  * @file
@@ -45,10 +45,10 @@ function panels_get_panels($layout, $display) {
  * @param $incoming_content
  *   Any incoming content if this display is a wrapper.
  */
-function panels_get_pane_content($display, $pane, $keywords, $args = array(), $context = NULL, $incoming_content = '') {
+function panels_get_pane_content($display, $pane, $keywords, $args = array(), $context = array(), $incoming_content = '') {
   ctools_include('context');
-  if (!$context) {
-    $context = new ctools_context;
+  if (!is_array($context)) {
+    $context = array();
   }
 
   if (!$incoming_content === '') {
@@ -70,6 +70,7 @@ function panels_get_pane_content($display, $pane, $keywords, $args = array(), $c
       $cache = new panels_cache_object();
       $cache->set_content($content);
       panels_set_cached_content($cache, $display, $args, $context, $pane);
+      $content->content = $cache->content;
     }
   }
 
@@ -83,6 +84,11 @@ function panels_get_pane_content($display, $pane, $keywords, $args = array(), $c
  *   The cached content, or FALSE to indicate no cached content exists.
  */
 function panels_get_cached_content($display, $args, $context, $pane = NULL) {
+  // Never use cache on a POST
+  if (!empty($_POST)) {
+    return FALSE;
+  }
+
   $method = $pane ? $pane->cache['method'] : $display->cache['method'];
   $function = panels_plugin_get_function('cache', $method, 'cache get');
 
@@ -105,6 +111,11 @@ function panels_get_cached_content($display, $args, $context, $pane = NULL) {
  * Store cached content for a given display and possibly pane.
  */
 function panels_set_cached_content($cache, $display, $args, $context, $pane = NULL) {
+  // Never use cache on a POST
+  if (!empty($_POST)) {
+    return FALSE;
+  }
+
   $method = $pane ? $pane->cache['method'] : $display->cache['method'];
   $function = panels_plugin_get_function('cache', $method, 'cache set');
 

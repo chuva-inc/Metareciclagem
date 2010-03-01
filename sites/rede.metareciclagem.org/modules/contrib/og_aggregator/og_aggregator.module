@@ -61,13 +61,13 @@ function og_aggregator_menu() {
     'access arguments' => array('administer og_aggregator'),
     'type' => MENU_CALLBACK,
   );
-  $items['og_aggregator/sources/%'] = array(
-    'title' => 'sources',
+  $items['og_aggregator/sources'] = array(
+    'title' => 'Sources',
     'description' => 'OG Aggregator',
     'page callback' => 'og_aggregator_page_sources',
     'page arguments' => array(2),
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access arguments' => array('access og_aggregator'),
    );
 
   $items['node/%node/aggregator'] = array(
@@ -141,18 +141,18 @@ function og_aggregator_menu() {
  * Implementation of hook_perm().
  */
 function og_aggregator_perm() {
-  return array('access og_aggregator', 'administer og_aggregator');
+  return array('access og_aggregator', 'administer og_aggregator', 'view all og_aggregator sources');
 }
 
 function og_aggregator_access($type, $object) {
   switch ($type) {
     case 'group update':
-      if ((node_access('update', $object)) && ($object->type == 'group')) {
+      if ((node_access('update', $object)) && (og_is_group_type($object->type))) {
         return TRUE;
       }
       break;
     case 'group':
-      if($object->type == 'group') {
+      if((node_access('view', $object)) && og_is_group_type($object->type)) {
         return TRUE;
       }
   }
@@ -169,7 +169,7 @@ function og_aggregator_block($op, $delta = 0, $edit = array()) {
    Please manually fix the parameters on the l() or url() function on the next line.
    Typically, this was not changed because of a function call inside an array call like
    array('title' => t('View user profile.')).*/
-  if (user_access('access news feeds')) {
+  if (user_access('access og_aggregator')) {
     if ($op == 'list') {
       $blocks[0]['info'] = t('Group aggregator');
      return $blocks;
@@ -361,7 +361,7 @@ function og_aggregator_overview($og) {
   og_set_group_context($og);
   $query = 'SELECT f.*, COUNT(i.iid) AS items FROM {og_aggregator_feed} f LEFT JOIN {og_aggregator_item} i ON f.fid = i.fid ';
 
-  $query .= ' where f.nid = '.$og->nid;
+  $query .= " WHERE f.nid = '".$og->nid."'";
 
   $query .= ' GROUP BY f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.etag, f.modified, f.image, f.block ORDER BY f.title';
   
@@ -695,7 +695,7 @@ function _og_aggregator_newsstream($og) {
   $nodes_per_page = variable_get('default_nodes_main', 10);
   $query_string = "SELECT f.*, i.* FROM {og_aggregator_feed} f
   JOIN {og_aggregator_item} i ON i.fid = f.fid
-  WHERE f.nid = $og
+  WHERE f.nid = '".$og->nid."'
   ORDER BY i.timestamp desc";
   $query = pager_query($query_string, $nodes_per_page);
 
@@ -790,25 +790,41 @@ function og_aggregator_theme() {
  * Menu callback; displays all the feeds used by the aggregator.
  */
 function og_aggregator_page_sources($fid=NULL) {
-    if ($fid){
-        $feed = db_fetch_object(db_query('SELECT * FROM {og_aggregator_feed} WHERE fid = %d', $fid));
-        $info = theme('og_aggregator_feed', $feed);
-        return _aggregator_page_list('SELECT * FROM {og_aggregator_item} WHERE fid = '. $feed->fid .' ORDER BY timestamp DESC, iid DESC', arg(3), $info);
+  if ($fid){
+    $feed = db_fetch_object(db_query('SELECT * FROM {og_aggregator_feed} WHERE fid = %d', $fid));
+  
+    $node = node_load($feed->nid);
+    if(user_access('view all og_aggregator sources') || node_access('view', $node)){
+      $info = theme('og_aggregator_feed', $feed);
+
+    #module_load_include('inc', 'aggregator', 'aggregator.pages');
+    # $result = db_query("SELECT * FROM {og_aggregator_item} WHERE fid = '%d' ORDER BY timestamp DESC, iid DESC", $feed->fid);
+      return $info;
     }
     else{
-        $nodes_per_page = variable_get('default_nodes_main', 10);
-        $query_string = 'SELECT f.*, COUNT(i.iid) AS items FROM {og_aggregator_feed} f LEFT JOIN {og_aggregator_item} i ON f.fid = i.fid GROUP BY f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.etag, f.modified, f.image, f.block ORDER BY f.title';  
-        $result = pager_query($query_string, $nodes_per_page);
-        $output .= '<h3>'. t('Feed overview') .'</h3>';
-        $header = array(t('Title'), t('Items'), t('Last update'), t('Next update'));
-        $rows = array();
-        while ($feed = db_fetch_object($result)) {
-            $rows[] = array(l($feed->title, 'og_aggregator/sources/'.$feed->fid), format_plural($feed->items, '1 item', '@count items'), ($feed->checked ? t('%time ago', array('%time' => format_interval(time() - $feed->checked))) : t('never')), ($feed->checked ? t('%time left', array('%time' => format_interval($feed->checked + $feed->refresh - time()))) : t('never')));
-        }
-        $output .= theme('table', $header, $rows);
-        $pager_string = theme('pager', NULL, $nodes_per_page);
-        return $output.$pager_string;
+      drupal_access_denied();
     }
+    #return _aggregator_page_list('SELECT * FROM {og_aggregator_item} WHERE fid = '. $feed->fid .' ORDER BY timestamp DESC, iid DESC', arg(3), $info);
+  }
+  else{
+    if(user_access('view all og_aggregator sources')){
+      $nodes_per_page = variable_get('default_nodes_main', 10);
+      $query_string = 'SELECT f.*, COUNT(i.iid) AS items FROM {og_aggregator_feed} f LEFT JOIN {og_aggregator_item} i ON f.fid = i.fid GROUP BY f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.etag, f.modified, f.image, f.block ORDER BY f.title';  
+      $result = pager_query($query_string, $nodes_per_page, null, 'SELECT COUNT(*) FROM {og_aggregator_feed}');
+      $output .= '<h3>'. t('Feed overview') .'</h3>';
+      $header = array(t('Title'), t('Items'), t('Last update'), t('Next update'));
+      $rows = array();
+      while ($feed = db_fetch_object($result)) {
+        $rows[] = array(l($feed->title, 'og_aggregator/sources/'.$feed->fid), format_plural($feed->items, '1 item', '@count items'), ($feed->checked ? t('%time ago', array('%time' => format_interval(time() - $feed->checked))) : t('never')), ($feed->checked ? t('%time left', array('%time' => format_interval($feed->checked + $feed->refresh - time()))) : t('never')));
+        }
+      $output .= theme('table', $header, $rows);
+      $pager_string = theme('pager', NULL, $nodes_per_page);
+      return $output.$pager_string;
+    }
+    else{
+      drupal_access_denied();
+    }
+  }
 }
 
 
@@ -872,24 +888,25 @@ function theme_og_aggregator_page_item($item) {
  * @ingroup themeable
  */
 function theme_og_aggregator_feed($feed) {
-  $og = db_fetch_object(db_query('SELECT * FROM {node} WHERE nid = %d AND type="og"', $feed->nid));
-  $output  = '<div class="feed-source">';
-  $output .= theme('feed_icon', $feed->url) ."\n";
-  $output .= $feed->image;
-  $output .= '<div class="feed-description">'. aggregator_filter_xss($feed->description) ."</div>\n";
-  $output .= '<div class="feed-url"><em>'. t('URL:') .'</em> '. l($feed->link, $feed->link, array('absolute' => TRUE)) ."</div>\n";
-
-  if ($feed->checked) {
-    $updated = t('%time ago', array('%time' => format_interval(time() - $feed->checked)));
+  if($feed->nid){
+    $og = db_fetch_object(db_query('SELECT * FROM {node} WHERE nid = %d', $feed->nid));
+    $output  = '<div class="feed-source">';
+    $output .= '<h3>'.$feed->title.'</h3>'.theme('feed_icon', $feed->url, $feed->title) ."\n";
+    $output .= $feed->image;
+    $output .= '<div class="feed-description">'. aggregator_filter_xss($feed->description) ."</div>\n";
+    $output .= '<div class="feed-url"><em>'. t('URL:') .'</em> '. l($feed->link, $feed->link, array('absolute' => TRUE)) ."</div>\n";
+  
+    if ($feed->checked) {
+      $updated = t('%time ago', array('%time' => format_interval(time() - $feed->checked)));
+    }
+    else {
+      $updated = t('never');
+    }
+  
+    $output .= '<div class="feed-updated"><em>'. t('Updated:') . "</em> $updated</div>";
+    $output .= '<div class="feed-description"><em>'. t('From Group:') .'</em> '. l($og->title,"node/$og->nid") ."</div>\n";
+    $output .= "</div>\n";
   }
-  else {
-    $updated = t('never');
-  }
-
-  $output .= '<div class="feed-updated"><em>'. t('Updated:') . "</em> $updated</div>";
-  $output .= '<div class="feed-description"><em>'. t('From Group:') .'</em> '. l($og->title,"node/$og->nid") ."</div>\n";
-  $output .= "</div>\n";
-
   return $output;
 }
-?>
+

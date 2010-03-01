@@ -1,5 +1,5 @@
 <?php
-// $Id: terms.inc,v 1.3 2009/07/11 01:17:45 merlinofchaos Exp $
+// $Id: terms.inc,v 1.3.2.3 2010/01/29 20:18:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -8,25 +8,23 @@
  */
 
 /**
- * Implementation of specially named hook_ctools_arguments().
+ * Plugins are described by creating a $plugin array which will be used
+ * by the system that includes this file.
  */
-function ctools_terms_ctools_arguments() {
-  $args['terms'] = array(
-    'title' => t("Taxonomy term (multiple)"),
-    // keyword to use for %substitution
-    'keyword' => 'term',
-    'description' => t('Creates a group of taxonomy terms from a list of tids separated by a comma or a plus sign. In general the first term of the list will be used for panes.'),
-    'context' => 'ctools_terms_context',
-    'default' => array('breadcrumb' => TRUE),
-    'settings form' => 'ctools_terms_settings_form',
-    'placeholder form' => array(
-      '#type' => 'textfield',
-      '#description' => t('Enter a term ID or a list of term IDs separated by a + or a ,'),
-    ),
-    'breadcrumb' => 'ctools_terms_breadcrumb',
-  );
-  return $args;
-}
+$plugin = array(
+  'title' => t("Taxonomy term (multiple): ID"),
+  // keyword to use for %substitution
+  'keyword' => 'term',
+  'description' => t('Creates a group of taxonomy terms from a list of tids separated by a comma or a plus sign. In general the first term of the list will be used for panes.'),
+  'context' => 'ctools_terms_context',
+  'default' => array('breadcrumb' => TRUE),
+  'settings form' => 'ctools_terms_settings_form',
+  'placeholder form' => array(
+    '#type' => 'textfield',
+    '#description' => t('Enter a term ID or a list of term IDs separated by a + or a ,'),
+  ),
+  'breadcrumb' => 'ctools_terms_breadcrumb',
+);
 
 /**
  * Discover if this argument gives us the term we crave.
@@ -73,7 +71,7 @@ function ctools_terms_breadcrumb($conf, $context) {
     $current = array_shift($parents);
     $breadcrumb[] = l($current->name, 'taxonomy/term/' . $current->tid);
   }
-  
+
   $breadcrumb = array_merge(drupal_get_breadcrumb(), array_reverse($breadcrumb));
   drupal_set_breadcrumb($breadcrumb);
 }

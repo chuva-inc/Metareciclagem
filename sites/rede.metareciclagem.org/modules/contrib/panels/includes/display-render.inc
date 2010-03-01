@@ -1,5 +1,5 @@
 <?php
-// $Id: display-render.inc,v 1.5.2.10 2009/07/21 01:21:21 merlinofchaos Exp $
+// $Id: display-render.inc,v 1.5.2.15 2009/10/28 16:55:34 merlinofchaos Exp $
 
 /**
  * @file
@@ -217,7 +217,20 @@ function panels_render_pane_content(&$display, &$pane, $keywords) {
  * $display
  *   The display.
  */
-function panels_render_pane($content, $pane, $display) {
+function panels_render_pane($content, $pane, &$display) {
+  if ($display->hide_title == PANELS_TITLE_PANE && !empty($display->title_pane) && $display->title_pane == $pane->pid) {
+
+    // If the user selected to override the title with nothing, and selected
+    // this as the title pane, assume the user actually wanted the original
+    // title to bubble up to the top but not actually be used on the pane.
+    if (empty($content->title) && !empty($content->original_title)) {
+      $display->stored_pane_title = $content->original_title;
+    }
+    else {
+      $display->stored_pane_title = !empty($content->title) ? $content->title : '';
+    }
+  }
+
   if (!empty($pane->style['style'])) {
     $style = panels_get_style($pane->style['style']);
 
@@ -231,7 +244,7 @@ function panels_render_pane($content, $pane, $display) {
     }
   }
 
-  if (!empty($content)) {
+  if (!empty($content->content)) {
     // fallback
     return theme('panels_pane', $content, $pane, $display);
   }
@@ -294,57 +307,31 @@ function panels_render_panel($display, $panel, $panes) {
 }
 
 /**
- * Render a panel pane like a block.
+ * Get the title from a display.
  *
- * A panel pane can have the following fields:
+ * The display must have already been rendered, or the setting to set the display's title
+ * from a pane's title will not have worked.
  *
- * $pane->type -- the content type inside this pane
- * $pane->subtype -- The subtype, if applicable. If a view it will be the
- *   view name; if a node it will be the nid, etc.
- * $content->title -- The title of the content
- * $content->content -- The actual content
- * $content->links -- Any links associated with the content
- * $content->more -- An optional 'more' link (destination only)
- * $content->admin_links -- Administrative links associated with the content
- * $content->feeds -- Any feed icons or associated with the content
+ * @param $display
+ *   The display to get the title from.
+ *
+ * @return
+ *   The title to use. If NULL, this means to let any default title that may be in use
+ *   pass through. i.e, do not actually set the title.
  */
-function theme_panels_pane($content, $pane, $display) {
-  if (!empty($content->content)) {
-    $idstr = $classstr = '';
-    if (!empty($content->css_id)) {
-      $idstr = ' id="' . $content->css_id . '"';
-    }
-    if (!empty($content->css_class)) {
-      $classstr = ' ' . $content->css_class;
-    }
+function panels_display_get_title($display) {
+  switch ($display->hide_title) {
+    case PANELS_TITLE_NONE:
+      return '';
 
-    $output = "<div class=\"panel-pane$classstr\"$idstr>\n";
-    if (user_access('view pane admin links') && !empty($content->admin_links)) {
-      $output .= "<div class=\"admin-links panel-hide\">" . theme('links', $content->admin_links) . "</div>\n";
-    }
-    if (!empty($content->title)) {
-      $output .= "<h2 class=\"pane-title\">$content->title</h2>\n";
-    }
+    case PANELS_TITLE_PANE:
+      return isset($display->stored_pane_title) ? $display->stored_pane_title : '';
 
-    if (!empty($content->feeds)) {
-      $output .= "<div class=\"feed\">" . implode(' ', $content->feeds) . "</div>\n";
-    }
-
-    $output .= "<div class=\"pane-content\">$content->content</div>\n";
-
-    if (!empty($content->links)) {
-      $output .= "<div class=\"links\">" . theme('links', $content->links) . "</div>\n";
-    }
-
-
-    if (!empty($content->more)) {
-      if (empty($content->more['title'])) {
-        $content->more['title'] = t('more');
+    case PANELS_TITLE_FIXED:
+    case FALSE; // For old exported panels that are not in the database.
+      if (!empty($display->title)) {
+        return filter_xss_admin(ctools_context_keyword_substitute($display->title, array(), $display->context));
       }
-      $output .= "<div class=\"more-link\">" . l($content->more['title'], $content->more['href']) . "</div>\n";
-    }
-
-    $output .= "</div>\n";
-    return $output;
+      return NULL;
   }
 }

@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlsitemap.pages.inc,v 1.1.4.4 2009/07/02 14:20:24 earnie Exp $
+// $Id: xmlsitemap.pages.inc,v 1.1.4.5 2009/09/06 16:28:48 davereid Exp $
 
 
 /**
@@ -193,12 +193,13 @@ function _xmlsitemap_create_cache_chunk($fp, $chunk_size, $chunk = 0) {
     }
     drupal_alter('xmlsitemap_data', $link);
     if (($link->status & XMLSITEMAP_LINK_DISABLED) != XMLSITEMAP_LINK_DISABLED) {
-      fwrite($fp, '  <url>' . "\n");
-      fwrite($fp, '    <loc>'. check_url($link->url) .'</loc>' . "\n");
-      fwrite($fp, '    <lastmod>'. gmdate(DATE_W3C, $link->changed) .'</lastmod>' . "\n");
-      fwrite($fp, '    <changefreq>'. xmlsitemap_sitemap_frequency($link->changefreq) .'</changefreq>' . "\n");
-      fwrite($fp, '    <priority>'. number_format($link->priority, 1) .'</priority>' . "\n");
-      fwrite($fp, '  </url>' . "\n");
+      $link->output = "<url>\n";
+      $link->output .= "\t<loc>". check_url($link->url) ."</loc>\n";
+      $link->output .= "\t<lastmod>". gmdate(DATE_W3C, $link->changed) ."</lastmod>\n";
+      $link->output .= "\t<changefreq>". xmlsitemap_sitemap_frequency($link->changefreq) ."</changefreq>\n";
+      $link->output .= "\t<priority>". number_format($link->priority, 1) ."</priority>\n";
+      $link->output .= "</url>\n";
+      fwrite($fp, $link->output);
     }
   }
   fwrite($fp, '</urlset>');
@@ -292,4 +293,3 @@ function _xmlsitemap_create_cache_files() {
 /**
  * @} End of "addtogroup xmlsitemap".
  */
-

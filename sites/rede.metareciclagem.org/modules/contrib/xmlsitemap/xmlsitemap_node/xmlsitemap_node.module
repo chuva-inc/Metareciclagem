@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlsitemap_node.module,v 1.19.2.130 2009/08/21 14:27:27 earnie Exp $
+// $Id: xmlsitemap_node.module,v 1.19.2.131 2009/09/06 16:54:15 davereid Exp $
 
 /**
  * @file
@@ -67,7 +67,7 @@ function xmlsitemap_node_cron() {
     $sql = "SELECT n.* FROM {node} n
       LEFT JOIN {xmlsitemap_node} xn ON xn.nid = n.nid
       WHERE xn.nid IS NULL
-        AND n.status <> 0";
+        AND n.status = 1";
     $result = db_query_range($sql, 0, $limit);
     $sitemap_changed = FALSE;
     while ($node = db_fetch_object($result)) {

@@ -1,26 +1,23 @@
 <?php
-// $Id: flexible.inc,v 1.1.2.16 2009/08/06 01:18:11 merlinofchaos Exp $
+// $Id: flexible.inc,v 1.1.2.18 2010/01/13 06:25:15 merlinofchaos Exp $
 
 /**
  * Implementation of hook_panels_layouts()
  */
-function panels_flexible_panels_layouts() {
-  $items['flexible'] = array(
-    'title' => t('Flexible'),
-    'icon' => 'flexible.png',
-    'theme' => 'panels_flexible',
-    'admin theme' => 'panels_flexible_admin',
-    'css' => 'flexible.css',
-    'admin css' => 'flexible-admin.css',
-    'settings form' => 'panels_flexible_settings_form',
-    'settings submit' => 'panels_flexible_settings_submit',
-    'settings validate' => 'panels_flexible_settings_validate',
-    'panels function' => 'panels_flexible_panels',
-    'hook menu' => 'panels_flexible_menu',
-  );
-
-  return $items;
-}
+// Plugin definition
+$plugin = array(
+  'title' => t('Flexible'),
+  'icon' => 'flexible.png',
+  'theme' => 'panels_flexible',
+  'admin theme' => 'panels_flexible_admin',
+  'css' => 'flexible.css',
+  'admin css' => 'flexible-admin.css',
+  'settings form' => 'panels_flexible_settings_form',
+  'settings submit' => 'panels_flexible_settings_submit',
+  'settings validate' => 'panels_flexible_settings_validate',
+  'panels function' => 'panels_flexible_panels',
+  'hook menu' => 'panels_flexible_menu',
+);
 
 /**
  * Delegated implementation of hook_menu().
@@ -223,7 +220,6 @@ function panels_flexible_panels($display, $settings) {
  * Draw the flexible layout.
  */
 function theme_panels_flexible($id, $content, $settings, $display) {
-  // TEMP
   panels_flexible_convert_settings($settings);
 
   $renderer = new stdClass;
@@ -231,7 +227,6 @@ function theme_panels_flexible($id, $content, $settings, $display) {
   $renderer->content = $content;
   $renderer->css_id = $id;
   $renderer->did = $display->did;
-//  $renderer->cache_key = $display->cache_key;
   $renderer->id_str = $id ? 'id="' . $id . '"' : '';
   $renderer->admin = FALSE;
 
@@ -373,6 +368,10 @@ function panels_flexible_render_item($renderer, $item, $base, $content, $id, $po
   }
   if ($clear) {
     $output .= ' clear-block';
+  }
+
+  if (isset($item['class'])) {
+    $output .= ' ' . check_plain($item['class']);
   }
 
   $output .= '">' . "\n";
@@ -772,6 +771,13 @@ function panels_flexible_config_item_form(&$form_state) {
       '#default_value' => $item['title'],
       '#required' => TRUE,
     );
+
+    $form['class'] = array(
+      '#title' => t('Region class'),
+      '#type' => 'textfield',
+      '#default_value' => isset($item['class']) ? $item['class'] : '',
+      '#description' => t('Enter a CSS class that will be used for this region. This can be used to apply automatic styling from your theme, for example.'),
+    );
   }
 
   if ($item['type'] != 'row') {
@@ -832,6 +838,7 @@ function panels_flexible_config_item_form_submit(&$form, &$form_state) {
   $item = &$form_state['item'];
   if ($item['type'] == 'region') {
     $item['title'] = $form_state['values']['title'];
+    $item['class'] = $form_state['values']['class'];
   }
 
   if ($item['type'] != 'row') {

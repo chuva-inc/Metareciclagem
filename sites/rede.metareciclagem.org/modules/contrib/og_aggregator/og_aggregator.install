@@ -38,5 +38,5 @@ function og_aggregator_install() {
   drupal_install_schema('og_aggregator');
 }
 function og_aggregator_uninstall() {
-  drupal_install_schema('og_aggregator');
+  drupal_uninstall_schema('og_aggregator');
 }

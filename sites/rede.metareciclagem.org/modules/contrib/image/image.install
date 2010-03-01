@@ -1,5 +1,5 @@
 <?php
-// $Id: image.install,v 1.27 2009/08/08 22:37:14 joachim Exp $
+// $Id: image.install,v 1.33 2009/09/05 15:12:00 joachim Exp $
 
 /**
  * Implementation of hook_schema().
@@ -234,6 +234,14 @@ function image_update_5() {
  */
 function image_update_5200() {
   $ret = array();
+  
+  // Versions prior to 5 had an {image} table which is no longer used on 5.1
+  // but not removed.
+  if (db_table_exists('image')) {
+    db_rename_table($ret, 'image', 'image_old');    
+    // Notify the user that their table has been moved. 
+    drupal_set_message('Your existing {image} table has been renamed {image_old}.');
+  }  
 
   switch ($GLOBALS['db_type']) {
     case 'mysql':
@@ -262,13 +270,15 @@ function image_update_5200() {
   $cond = " IN ('". implode("', '",  $args) ."')";
 
   // Upgrade from 5.x-1.x to 5.x-2.x.
+  // Group by clause prevents duplicate insertions from bad data:
+  // @see http://drupal.org/node/207557
   if (db_table_exists('file_revisions')) {
-    $ret[] = update_sql("INSERT INTO {image} SELECT DISTINCT f.nid, f.fid, f.filename FROM {files} f INNER JOIN {node} n ON f.nid = n.nid WHERE n.type = 'image' AND f.filename" . $cond);
+    $ret[] = update_sql("INSERT INTO {image} SELECT DISTINCT f.nid, f.fid, f.filename FROM {files} f INNER JOIN {node} n ON f.nid = n.nid WHERE n.type = 'image' AND f.filename" . $cond . " GROUP BY nid,filename");
     $ret[] = update_sql("DELETE FROM {file_revisions} WHERE EXISTS (SELECT * FROM {image} WHERE {image}.fid = {file_revisions}.fid)");
   }
   // Upgrade from 5.x to 6.x-1.x.
   else {
-    $ret[] = update_sql("INSERT INTO {image} SELECT DISTINCT u.nid, f.fid, f.filename FROM {upload} u INNER JOIN {files} f ON u.fid = f.fid INNER JOIN {node} n ON u.nid = n.nid WHERE n.type = 'image' AND f.filename" . $cond);
+    $ret[] = update_sql("INSERT INTO {image} SELECT DISTINCT u.nid, f.fid, f.filename FROM {upload} u INNER JOIN {files} f ON u.fid = f.fid INNER JOIN {node} n ON u.nid = n.nid WHERE n.type = 'image' AND f.filename" . $cond . " GROUP BY nid,filename");
     $ret[] = update_sql("DELETE FROM {upload} WHERE EXISTS (SELECT * FROM {image} WHERE {image}.fid = {upload}.fid)");
   }
 
@@ -306,10 +316,21 @@ function image_update_6100() {
     'not null' => TRUE,
     'default' => 0,
   ));
-  db_drop_primary_key($ret, 'image');
+  
+  /**
+   * We remove and re-add primary keys and indexes because the column types
+   * are changed.
+   * Sometimes however these don't exist in the first place (@see 
+   * <http://drupal.org/node/562810>; the @ takes care of suppressing the 
+   * error message this causes.
+   */  
+  @db_drop_primary_key($ret, 'image');
   db_add_primary_key($ret, 'image', array('nid', 'image_size'));
-  db_drop_index($ret, 'image', 'image_fid');
+  @db_drop_index($ret, 'image', 'image_fid');
   db_add_index($ret, 'image', 'fid', array('fid'));
+  
+  // Notify the user that they may get harmless fail messages here.
+  $ret[] = array('success' => TRUE, 'query' => t('If you see a message of the form "Failed: ALTER TABLE {image} DROP PRIMARY KEY" or "DROP INDEX image_fid" here it is harmless.'));
   return $ret;
 }
 
@@ -346,7 +367,11 @@ function image_update_6103() {
       'edit own images' => 'edit own images, delete own images',
     ));
     if ($renamed_permission != $role->perm) {
-      $ret[] = update_sql("UPDATE {permission} SET perm = '$renamed_permission' WHERE rid = $role->rid");
+      $args = array($renamed_permission, $role->rid);
+      $query = "UPDATE {permission} SET perm = '%s' WHERE rid = %d";
+      _db_query_callback($args, TRUE);
+      $query = preg_replace_callback(DB_QUERY_REGEXP, '_db_query_callback', $query);
+      $ret[] = update_sql($query);
     }
   }
   return $ret;

@@ -6,9 +6,9 @@ dependencies[] = taxonomy
 dependencies[] = xmlsitemap
 core = "6.x"
 
-; Information added by drupal.org packaging script on 2009-08-25
-version = "6.x-1.1"
+; Information added by drupal.org packaging script on 2010-01-27
+version = "6.x-1.2"
 core = "6.x"
 project = "xmlsitemap"
-datestamp = "1251219738"
+datestamp = "1264572909"
 

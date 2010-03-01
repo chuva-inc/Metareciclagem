@@ -1,5 +1,5 @@
 <?php
-// $Id: page_manager.module,v 1.16 2009/08/17 20:16:36 merlinofchaos Exp $
+// $Id: page_manager.module,v 1.17.2.3 2010/01/30 00:00:13 merlinofchaos Exp $
 
 /**
  * @file
@@ -56,6 +56,13 @@ function page_manager_ctools_plugin_directory($module, $plugin) {
  * Delegated implementation of hook_menu().
  */
 function page_manager_menu() {
+  // For some reason, some things can activate modules without satisfying
+  // dependencies. I don't know how, but this helps prevent things from
+  // whitescreening when this happens.
+  if (!module_exists('ctools')) {
+    return;
+  }
+
   $items = array();
   $base = array(
     'access arguments' => array('use page manager'),
@@ -128,6 +135,13 @@ function page_manager_menu() {
  * Get a list of all tasks and delegate to them.
  */
 function page_manager_menu_alter(&$items) {
+  // For some reason, some things can activate modules without satisfying
+  // dependencies. I don't know how, but this helps prevent things from
+  // whitescreening when this happens.
+  if (!module_exists('ctools')) {
+    return;
+  }
+
   $tasks = page_manager_get_tasks();
 
   foreach ($tasks as $task) {
@@ -149,6 +163,13 @@ function page_manager_menu_alter(&$items) {
  * Implementation of hook_theme()
  */
 function page_manager_theme() {
+  // For some reason, some things can activate modules without satisfying
+  // dependencies. I don't know how, but this helps prevent things from
+  // whitescreening when this happens.
+  if (!module_exists('ctools')) {
+    return;
+  }
+
   $base = array(
     'path' => drupal_get_path('module', 'page_manager') . '/theme',
     'file' => 'page_manager.theme.inc',
@@ -316,6 +337,7 @@ function page_manager_save_page_cache($cache) {
     // Force a menu rebuild to make sure the menu entries are set.
     menu_rebuild();
   }
+  cache_clear_all();
 }
 
 /**
@@ -843,6 +865,16 @@ function pm_arg_load($value, $subtask, $argument) {
 }
 
 /**
+ * Special arg_load function to use %menu_tail like functionality to
+ * get everything after the arg together as a single value.
+ */
+function pm_arg_tail_load($value, $subtask, $argument, $map) {
+  $value = implode('/', array_slice($map, $argument));
+  page_manager_get_task('page');
+  return _pm_arg_load($value, $subtask, $argument);
+}
+
+/**
  * Special menu _load() function for the user:uid argument.
  *
  * This is just the normal page manager argument. It only exists so that
@@ -1059,4 +1091,32 @@ function page_manager_page_manager_pages_to_hook_code($names = array(), $name = 
     $code .= "}\n";
     return $code;
   }
+}
+
+/**
+ * Get the current page information.
+ *
+ * @return $page
+ *   An array containing the following information.
+ *
+ * - 'name': The name of the page as used in the page manager admin UI.
+ * - 'task': The plugin for the task in use. If this is a system page it
+ *   will contain information about that page, such as what functions
+ *   it uses.
+ * - 'subtask': The plugin for the subtask. If this is a custom page, this
+ *   will contain information about that custom page. See 'subtask' in this
+ *   array to get the actual page object.
+ * - 'handler': The actual handler object used. If using panels, see
+ *   $page['handler']->conf['display'] for the actual panels display
+ *   used to render.
+ * - 'contexts': The context objects used to render this page.
+ * - 'arguments': The raw arguments from the URL used on this page.
+ */
+function page_manager_get_current_page($page = NULL) {
+  static $current = array();
+  if (isset($page)) {
+    $current = $page;
+  }
+
+  return $current;
 }

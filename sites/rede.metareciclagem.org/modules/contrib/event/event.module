@@ -1,5 +1,5 @@
 <?php
-// $Id: event.module,v 1.405 2009/07/05 00:34:15 killes Exp $ 
+// $Id: event.module,v 1.407 2010/02/26 10:20:50 killes Exp $ 
 
 define('EVENT_API', '5.2');
 define('EVENT_PATH', drupal_get_path('module', 'event'));
@@ -9,14 +9,15 @@ define('EVENT_PATH', drupal_get_path('module', 'event'));
  * @ingroup event_support
  */
 function event_include_files() {
-  include_once(EVENT_PATH .'/event.theme');
-  global $db_type;
-  include_once(EVENT_PATH ."/event_database.$db_type.inc");
-  
-  if (file_exists($file = path_to_theme() .'/event.css')) {
-    drupal_add_css($file);
-  }
-  else {
+  static $first = TRUE;
+
+  if ($first) {
+    $first = FALSE;
+    include_once(EVENT_PATH .'/event.theme');
+    global $db_type;
+    include_once(EVENT_PATH ."/event_database.$db_type.inc");
+    // Any theme my override this by adding to its .info file:
+    // stylesheets[all][] = event.css
     drupal_add_css(EVENT_PATH .'/event.css');
   }
 }
@@ -733,7 +734,7 @@ function event_calendar_week($op, $date, $types = NULL, $terms = NULL, $rewrite_
     $month_name = event_format_date($cur_date, 'custom', 'M');
 
     $row[$x] = array(
-      'class' => strtolower("$month_name ". $weekdays[$x]['day'] . ($date == $today ? ' today' : '') . ($cur_date['day'] == $date['day'] ? ' selected' : '')),
+      'class' => strtolower("$month_name ". $weekdays[$x]['day'] . ($cur_date == $today ? ' today' : '') . ($cur_date['day'] == $date['day'] ? ' selected' : '')),
       'id' => strtolower($month_name . $cur_date['day']),
       'data' => event_render_day($cur_date, 'week', $types, $terms, $rewrite_parameter));
     $cur_date = event_date_later($cur_date, 1);
@@ -1571,6 +1572,7 @@ function _event_user_date() {
     $now = _event_user_time();
     $now['hour'] = '00';
     $now['minute'] = '00';
+    $now['second'] = '00';
   }
   return $now;
 }

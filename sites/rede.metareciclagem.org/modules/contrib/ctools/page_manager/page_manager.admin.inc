@@ -1,5 +1,5 @@
 <?php
-// $Id: page_manager.admin.inc,v 1.27 2009/08/19 22:30:00 merlinofchaos Exp $
+// $Id: page_manager.admin.inc,v 1.27.2.8 2010/02/01 21:11:15 merlinofchaos Exp $
 
 /**
  * @file
@@ -18,18 +18,32 @@ function page_manager_list_page($js = NULL) {
     return drupal_not_found();
   }
 
-  if (module_exists('advanced_help')) {
+  // TRUE if 'ajax', FALSE if otherwise.
+  $js = $js == 'ajax';
+
+  if (module_exists('advanced_help') && !$js) {
     drupal_set_message(theme('advanced_help_topic', 'page_manager', 'getting-started', t('See the getting started guide for more information.')));
   }
 
-  // TRUE if 'ajax', FALSE if otherwise.
-
-  $js = $js == 'ajax';
-
   $tasks = page_manager_get_tasks_by_type('page');
-  $pages = array('operations' => array());
+  $pages = array('operations' => array(), 'tasks' => array());
 
   page_manager_get_pages($tasks, $pages);
+
+  // Add lock icon to all locked tasks.
+  global $user;
+  ctools_include('object-cache');
+  $locks = ctools_object_cache_test_objects('page_manager_page', $pages['tasks']);
+  foreach ($locks as $task_name => $lock) {
+    if ($lock->uid == $user->uid) {
+      $pages['rows'][$task_name]['class'] .= ' page-manager-locked';
+      $pages['rows'][$task_name]['title'] = t('This page is currently locked for editing by you. Nobody else may edit this page until these changes are saved or canceled.');
+    }
+    else {
+      $pages['rows'][$task_name]['class'] .= ' page-manager-locked-other';
+      $pages['rows'][$task_name]['title'] = t('This page is currently locked for editing by another user. You may not edit this page without breaking the lock.');
+    }
+  }
 
   $input = $_POST;
 
@@ -130,18 +144,21 @@ function page_manager_get_pages($tasks, &$pages, $task_id = NULL) {
     }
 
     $path = array();
-    foreach (explode('/', $task['admin path']) as $bit) {
-      if ($bit[0] != '!') {
-        $path[] = $bit;
+    $visible_path = '';
+    if (!empty($task['admin path'])) {
+      foreach (explode('/', $task['admin path']) as $bit) {
+        if ($bit[0] != '!') {
+          $path[] = $bit;
+        }
       }
-    }
 
-    $path = implode('/', $path);
-    if (empty($task['disabled']) && strpos($path, '%') === FALSE) {
-      $visible_path = l('/' . $task['admin path'], $path);
-    }
-    else {
-      $visible_path = '/' . $task['admin path'];
+      $path = implode('/', $path);
+      if (empty($task['disabled']) && strpos($path, '%') === FALSE) {
+        $visible_path = l('/' . $task['admin path'], $path);
+      }
+      else {
+        $visible_path = '/' . $task['admin path'];
+      }
     }
 
     $row = array('data' => array(), 'class' => $class, 'title' => strip_tags($task['admin description']));
@@ -195,6 +212,7 @@ function page_manager_get_pages($tasks, &$pages, $task_id = NULL) {
     $row['data']['operations'] = array('data' => theme('links', $operations), 'class' => 'page-manager-page-operations');
 
     $pages['disabled'][$task_name] = !empty($task['disabled']);
+    $pages['tasks'][] = $task_name;
     $pages['rows'][$task_name] = $row;
   }
 }
@@ -805,6 +823,8 @@ function _page_manager_get_operation_content($js, &$page, $active, $operation, $
       'finish callback' => 'page_manager_edit_page_finish',
       // Items specific to the 'edit' routines that will get moved over:
       'path' => page_manager_edit_url($page->task_name, $active) . "/%step",
+      // wrapper function to add an extra finish button.
+      'wrapper' => 'page_manager_operation_wrapper',
     );
 
     // If $operation['form'] is simply a string, then it is the function
@@ -922,12 +942,29 @@ function _page_manager_get_operation_content($js, &$page, $active, $operation, $
   return $return;
 }
 
+function page_manager_operation_wrapper(&$form, &$form_state) {
+  if (!empty($form['buttons']['return']['#wizard type']) && $form['buttons']['return']['#wizard type']) {
+    $form['buttons']['save'] = array(
+      '#type' => 'submit',
+      '#value' => t('Update and save'),
+      '#wizard type' => 'finish',
+      '#attributes' => $form['buttons']['return']['#attributes'],
+      '#save' => TRUE,
+    );
+  }
+}
+
 /**
  * Callback generated when the add page process is finished.
  */
 function page_manager_edit_page_finish(&$form_state) {
   if (empty($form_state['operation']['silent'])) {
-    drupal_set_message(t('The page has been updated. Changes will not be permanent until you save.'));
+    if (empty($form_state['clicked_button']['#save'])) {
+      drupal_set_message(t('The page has been updated. Changes will not be permanent until you save.'));
+    }
+    else {
+      drupal_set_message(t('The page has been updated and saved.'));
+    }
     $path = array();
     foreach ($form_state['trail'] as $operation) {
       $path[] = $operation;
@@ -947,8 +984,16 @@ function page_manager_edit_page_finish(&$form_state) {
     drupal_set_message(t('Unable to update changes due to lock.'));
   }
 
-  if (empty($form_state['do not cache'])) {
-    page_manager_set_page_cache($form_state['page']);
+  // If the 'Update and Save' button was selected, write our cache out.
+  if (!empty($form_state['clicked_button']['#save'])) {
+    page_manager_save_page_cache($form_state['page']);
+    $form_state['page']->changed = FALSE;
+//    $form_state['page'] = page_manager_get_page_cache($form_state['task_name']);
+  }
+  else {
+    if (empty($form_state['do not cache'])) {
+      page_manager_set_page_cache($form_state['page']);
+    }
   }
 
   if (isset($form_state['new trail']) && empty($form_state['ajax'])) {
@@ -1288,6 +1333,12 @@ function page_manager_handler_add_cancel(&$form_state) {
 function page_manager_handler_add_form(&$form, $form_state, $features = array()) {
   $task = $form_state['task'];
   $task_handler_plugins = page_manager_get_task_handler_plugins($task);
+  if (empty($task_handler_plugins)) {
+    drupal_set_message(t('There are currently no variants available and a page may not be added. Perhaps you need to install the Panels module to get a variant?'), 'error');
+    $form['buttons']['return']['#disabled'] = TRUE;
+    return;
+  }
+
   foreach ($task_handler_plugins as $id => $plugin) {
     $options[$id] = $plugin['title'];
     if (isset($plugin['add features'])) {
@@ -1358,9 +1409,8 @@ function page_manager_handler_import(&$form, &$form_state) {
  * Make sure that an import actually provides a handler.
  */
 function page_manager_handler_import_validate($form, &$form_state) {
-  $export = page_manager_export_task_handler($form_state['values']['object']);
   ob_start();
-  eval($export);
+  eval($form_state['values']['object']);
   ob_end_clean();
 
   if (empty($handler)) {
@@ -1379,14 +1429,14 @@ function page_manager_handler_import_validate($form, &$form_state) {
  * Clone an existing task handler into a new handler.
  */
 function page_manager_handler_import_submit($form, &$form_state) {
-  $export = page_manager_export_task_handler($form_state['handler']);
+  $handler = $form_state['handler'];
 
   page_manager_handler_add_to_page($form_state['page'], $handler, $form_state['values']['title']);
 
   $plugin = page_manager_get_task_handler($handler->handler);
   // It has no forms at all. Add the variant and go to its first operation.
   $keys = array_keys($plugin['operations']);
-  $form_state['new trail'] = array('handlers', $name, reset($keys));
+  $form_state['new trail'] = array('handlers', $handler->name, reset($keys));
 }
 
 /**
@@ -1537,7 +1587,7 @@ function page_manager_handler_enable_submit(&$form, &$form_state) {
   $form_state['handler']->disabled = FALSE;
   $form_state['page']->handler_info[$form_state['handler_id']]['disabled'] = FALSE;
   $form_state['page']->handler_info[$form_state['handler_id']]['changed'] |= PAGE_MANAGER_CHANGED_STATUS;
-  $form_state['new trail'] = array('handlers', $form_state['handler_id'], 'disable');
+  $form_state['new trail'] = array('handlers', $form_state['handler_id'], 'actions', 'disable');
 }
 
 /**
@@ -1569,7 +1619,7 @@ function page_manager_handler_disable_submit(&$form, &$form_state) {
   $form_state['handler']->disabled = TRUE;
   $form_state['page']->handler_info[$form_state['handler_id']]['disabled'] = TRUE;
   $form_state['page']->handler_info[$form_state['handler_id']]['changed'] |= PAGE_MANAGER_CHANGED_STATUS;
-  $form_state['new trail'] = array('handlers', $form_state['handler_id'], 'enable');
+  $form_state['new trail'] = array('handlers', $form_state['handler_id'], 'actions', 'enable');
 }
 
 /**
@@ -1718,8 +1768,8 @@ function page_manager_enable_page($disable, $js, $page) {
 
       // We want to re-cache this if it's changed so that status is properly
       // updated on the changed form.
-      if (!empty($cache->changed)) {
-        page_manager_set_page_cache($cache);
+      if (!empty($page->changed)) {
+        page_manager_set_page_cache($page);
       }
     }
   }

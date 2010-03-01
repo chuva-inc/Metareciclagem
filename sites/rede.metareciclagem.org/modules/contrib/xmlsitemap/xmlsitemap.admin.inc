@@ -1,5 +1,5 @@
 <?php
-// $Id: xmlsitemap.admin.inc,v 1.1.4.2 2009/06/22 15:06:06 earnie Exp $
+// $Id: xmlsitemap.admin.inc,v 1.1.4.3 2009/09/05 00:44:53 davereid Exp $
 
 
 /**
@@ -42,10 +42,10 @@ function xmlsitemap_settings() {
   $form['general']['xmlsitemap_cache_directory'] = array(
     '#type' => 'textfield',
     '#title' => t('Cache directory'),
-    '#default_value' => variable_get('xmlsitemap_cache_directory', file_directory_path() .'/xmlsitemap'),
+    '#value' => variable_get('xmlsitemap_cache_directory', file_directory_path() .'/xmlsitemap'),
     '#size' => 60,
-    '#maxlength' => 150,
     '#description' => t('The directory where the cache files are created; change it only if you are having problems with the default setting.'),
+    '#disabled' => TRUE,
   );
   $form['general']['xmlsitemap_use_stylesheet'] = array(
     '#type' => 'checkbox',
@@ -150,4 +150,3 @@ function xmlsitemap_tools_submit($form, &$form_state) {
 /**
  * @} End of "addtogroup xmlsitemap".
  */
-

@@ -1,5 +1,5 @@
 <?php
-// $Id: vid.inc,v 1.4 2009/04/22 22:31:29 merlinofchaos Exp $
+// $Id: vid.inc,v 1.4.2.3 2010/01/29 20:18:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -8,22 +8,20 @@
  */
 
 /**
- * Implementation of specially named hook_ctools_arguments().
+ * Plugins are described by creating a $plugin array which will be used
+ * by the system that includes this file.
  */
-function ctools_vid_ctools_arguments() {
-  $args['vid'] = array(
-    'title' => t("Vocabulary ID"),
-    // keyword to use for %substitution
-    'keyword' => 'vocabulary',
-    'description' => t('Creates a vocabulary context from a vocabulary ID argument.'),
-    'context' => 'ctools_vid_context',
-    'placeholder form' => array(
-      '#type' => 'textfield',
-      '#description' => t('Enter the vocabulary ID for this argument'),
-    ),
-  );
-  return $args;
-}
+$plugin = array(
+  'title' => t("Vocabulary: ID"),
+  // keyword to use for %substitution
+  'keyword' => 'vocabulary',
+  'description' => t('Creates a vocabulary context from a vocabulary ID argument.'),
+  'context' => 'ctools_vid_context',
+  'placeholder form' => array(
+    '#type' => 'textfield',
+    '#description' => t('Enter the vocabulary ID for this argument'),
+  ),
+);
 
 /**
  * Discover if this argument gives us the vocabulary we crave.
