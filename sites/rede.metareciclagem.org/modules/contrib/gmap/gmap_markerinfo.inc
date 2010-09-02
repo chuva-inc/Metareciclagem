@@ -1,5 +1,5 @@
 <?php
-// $Id: gmap_markerinfo.inc,v 1.3 2008/07/15 20:09:17 bdragon Exp $
+// $Id: gmap_markerinfo.inc,v 1.3.2.1 2010/06/13 08:50:02 rooby Exp $
 
 /**
  * @file
@@ -244,7 +244,7 @@ function _gmap_get_marker_titles() {
   $titles = array();
   foreach ($inis as $ini => $inidata) {
     foreach ($inidata as $k => $v) {
-      $titles[$k] = $inis[$ini][$k]['name'];
+      $titles[$k] = t($inis[$ini][$k]['name']);
     }
   }
   return $titles;

@@ -1,4 +1,25 @@
-$Id: CHANGELOG.txt,v 1.2.2.27.2.137 2010/01/31 14:50:24 jorrit Exp $
+$Id: CHANGELOG.txt,v 1.2.2.27.2.145 2010/03/13 19:38:38 jorrit Exp $
+
+-- 2010-03-13 version 6.x-2.x-dev
+* Update German translation
+* Tag as version 6.x-2.1
+
+-- 2010-03-10 version 6.x-2.x-dev
+* Update POT file and Dutch translation
+* Tag as version 6.x-2.1-rc1
+
+-- 2010-03-08 version 6.x-2.x-dev
+* #575626 Activating Fckeditor breaks existing node formatting
+* #627514 Link to node icon appears not activated
+
+-- 2010-02-25 version 6.x-2.x-dev
+* #724584 Three small typos in the file 'fckeditor.config.js'
+
+-- 2010-02-23 version 6.x-2.x-dev
+* #716274 Clone Profile incompatible with PCRE <7.0
+
+-- 2010-02-21 version 6.x-2.x-dev
+* #701736 warning after update from fck-editor 6.x-1.4 to fck-editor 6.x-2.0 and update.php
 
 -- 2010-01-31 version 6.x-2.x-dev
 * #678170 Loading fckeditor.config.js from theme path won't always work

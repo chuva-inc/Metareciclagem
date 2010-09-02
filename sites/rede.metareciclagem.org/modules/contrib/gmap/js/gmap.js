@@ -1,4 +1,4 @@
-/* $Id: gmap.js,v 1.13 2009/02/11 18:08:53 bdragon Exp $ */
+/* $Id: gmap.js,v 1.16.2.1 2010/04/08 13:40:19 rooby Exp $ */
 
 /**
  * @file
@@ -14,6 +14,7 @@
 (function () { // BEGIN closure
   var handlers = {};
   var maps = {};
+  var ajaxoffset = 0;
 
   Drupal.gmap = {
 
@@ -56,7 +57,7 @@
       }
     },
 
-    setup: function () {
+    setup: function (settings) {
       var obj = this;
 
       var initcallback = function (mapid) {
@@ -74,8 +75,16 @@
         });
       };
 
-      if (Drupal.settings && Drupal.settings.gmap) {
+      if (settings || (Drupal.settings && Drupal.settings.gmap)) {
         var mapid = obj.id.split('-');
+        if (Drupal.settings['gmap_remap_widgets']) {
+          if (Drupal.settings['gmap_remap_widgets'][obj.id]) {
+            jQuery.each(Drupal.settings['gmap_remap_widgets'][obj.id].classes, function() {
+              jQuery(obj).addClass(this);
+            });
+            mapid = Drupal.settings['gmap_remap_widgets'][obj.id].id.split('-');
+          }
+        }
         var instanceid = mapid.pop();
         mapid.shift();
         mapid = mapid.join('-');
@@ -83,7 +92,12 @@
 
         // Lazy init the map object.
         if (!maps[mapid]) {
-          maps[mapid] = new Drupal.gmap.map(Drupal.settings.gmap[mapid]);
+          if (settings) {
+            maps[mapid] = new Drupal.gmap.map(settings);
+          }
+          else {
+            maps[mapid] = new Drupal.gmap.map(Drupal.settings.gmap[mapid]);
+          }
           // Prepare the initialization callback.
           var callback = initcallback(mapid);
           setTimeout(callback, 0);
@@ -100,6 +114,28 @@
       }
     }
   };
+
+  jQuery.fn.createGMap = function (settings, mapid) {
+    return this.each(function () {
+      if (!mapid) {
+        mapid = 'auto' + ajaxoffset + 'ajax';
+        ajaxoffset++;
+      }
+      settings.id = mapid;
+      $(this)
+        .attr('id', 'gmap-' + mapid + '-gmap0')
+        .css('width', settings.width)
+        .css('height', settings.height)
+        .addClass('gmap-control')
+        .addClass('gmap-gmap')
+        .addClass('gmap')
+        .addClass('gmap-map')
+        .addClass('gmap-' + mapid + '-gmap')
+        .addClass('gmap-processed')
+        .each(function() {Drupal.gmap.setup.call(this, settings)});
+    });
+  };
+
 })(); // END closure
 
 Drupal.gmap.factory = {};
@@ -263,6 +299,9 @@ Drupal.gmap.addHandler('gmap', function (elem) {
 
     if (obj.vars.behavior.overview) {
       map.addControl(new GOverviewMapControl());
+    }
+    if (obj.vars.behavior.googlebar) {
+      map.enableGoogleBar();
     }
     if (obj.vars.behavior.scale) {
       map.addControl(new GScaleControl());
@@ -495,5 +534,10 @@ if (Drupal.jsEnabled) {
 }
 
 Drupal.behaviors.GMap = function (context) {
-  $('.gmap-control:not(.gmap-processed)', context).addClass('gmap-processed').each(Drupal.gmap.setup);
+  if (Drupal.settings && Drupal.settings['gmap_remap_widgets']) {
+    jQuery.each(Drupal.settings['gmap_remap_widgets'], function(key, val) {
+      $('#'+ key).addClass('gmap-control');
+    });
+  }
+  $('.gmap-control:not(.gmap-processed)', context).addClass('gmap-processed').each(function () {Drupal.gmap.setup.call(this)});
 };

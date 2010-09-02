@@ -1,5 +1,5 @@
 <?php
-// $Id: fckeditor.help.inc,v 1.1.2.19 2009/12/10 07:32:38 jorrit Exp $
+// $Id: fckeditor.help.inc,v 1.1.2.20 2010/03/10 07:43:32 jorrit Exp $
 /**
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2008 Frederico Caldeira Knabben
@@ -101,7 +101,7 @@ function fckeditor_help_delegate($path, $arg) {
         array(
           '!filterlink' => l(t('filters'), 'admin/settings/filters'),
         )) .
-        '<br /><code>'. htmlspecialchars('<a> <p> <span> <div> <h1> <h2> <h3> <h4> <h5> <h6> <img> <map> <area> <hr> <br> <br /> <ul> <ol> <li> <dl> <dt> <dd> <table> <tr> <td> <em> <b> <u> <i> <strong> <font> <del> <ins> <sub> <sup> <quote> <blockquote> <pre> <address> <code> <cite> <embed> <object> <param> <strike> <caption>') .'</code></li>';
+        '<br /><code>'. htmlspecialchars('<a> <p> <span> <div> <h1> <h2> <h3> <h4> <h5> <h6> <img> <map> <area> <hr> <br /> <ul> <ol> <li> <dl> <dt> <dd> <table> <tr> <td> <em> <b> <u> <i> <strong> <font> <del> <ins> <sub> <sup> <quote> <blockquote> <pre> <address> <code> <cite> <embed> <object> <param> <strike> <caption>') .'</code></li>';
       $output .= '<li>'. t('To have a better control over line breaks, you should disable %settingname in the chosen filter (recommended).',
         array(
           '%settingname' => t('Line break converter'),

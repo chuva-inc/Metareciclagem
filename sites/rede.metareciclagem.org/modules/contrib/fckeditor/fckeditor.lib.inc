@@ -1,5 +1,5 @@
 <?php
-// $Id: fckeditor.lib.inc,v 1.1.2.5 2008/09/22 20:21:21 hass Exp $
+// $Id: fckeditor.lib.inc,v 1.1.2.7 2010/03/10 07:43:32 jorrit Exp $
 /**
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2008 Frederico Caldeira Knabben
@@ -259,4 +259,27 @@ function fckeditor_load_lang_options() {
   asort($arr);
 
   return $arr;
+}
+
+/**
+ * Determines if the supplied text doesn't contain
+ * any HTML
+ *
+ * @param string $text 
+ * @return bool
+ */
+function fckeditor_is_plaintext($text) {
+  if (strpos($text, '<p>') !== FALSE) {
+    return FALSE;
+  }
+
+  if (strpos($text, '<div>') !== FALSE) {
+    return FALSE;
+  }
+
+  if (strpos($text, '<br') !== FALSE) {
+    return FALSE;
+  }
+
+  return TRUE;
 }

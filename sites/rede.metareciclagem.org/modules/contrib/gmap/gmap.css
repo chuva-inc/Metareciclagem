@@ -1,4 +1,4 @@
-/* $Id: gmap.css,v 1.7 2009/02/12 18:23:12 bdragon Exp $ */
+/* $Id: gmap.css,v 1.7.2.1 2010/04/08 13:40:19 rooby Exp $ */
 
 /**
  * @file
@@ -31,4 +31,13 @@
 .gmap-map {
   /* Don't let long copyright texts stick out the side of the map div. */
   overflow: hidden;
+}
+
+/* Clean up unwanted styling for google toolbar */
+.gmap-map .gmnoprint table {
+  margin: 0;
+}
+
+.gmap-map .gmnoprint tbody {
+  border-top: none;
 }

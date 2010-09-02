@@ -1,5 +1,5 @@
 <?php
-// $Id: gmap_parse_macro.inc,v 1.1 2008/11/07 20:17:50 bdragon Exp $
+// $Id: gmap_parse_macro.inc,v 1.2.2.1 2010/06/08 17:40:59 bdragon Exp $
 
 /**
  * @file
@@ -61,7 +61,7 @@ function _gmap_str2coord($str) {
 function _gmap_parse_macro($instring, $ver = 2) {
   // Get a list of keys that are "multiple."
   $m = array();
-  $multiple = module_invoke_all('gmap', 'macro_multiple', $m);
+  $multiple = gmap_module_invoke('macro_multiple', $m);
 
   // Remove leading and trailing tags
   if (substr(trim($instring), -1)==']') {
@@ -145,7 +145,7 @@ function _gmap_parse_macro($instring, $ver = 2) {
       }
       $tmp = explode('+', $shape);
       $s['radius'] = $tmp[1] ? $tmp[1] : 100;
-      if ($tmp[2]) $s['numpoints'] = trim($tmp[2]);
+      if (isset($tmp[2]) && $tmp[2]) $s['numpoints'] = trim($tmp[2]);
       $tmp = _gmap_str2coord($tmp[0]);
       $s['center'] = $tmp[0];
       $m['shapes'][] = $s;
@@ -347,6 +347,12 @@ function _gmap_parse_macro($instring, $ver = 2) {
   }
 
   // The macro can now be manipulated by reference.
+  // Note: We do NOT use gmap_module_invoke here,
+  // as this $op has weird semantics for backwards
+  // compatibility / convenience reasons.
+  // (Specifically, modules are allowed to do arbitrary
+  // manipulations on $m OR return the changes
+  // they want to apply to $m.)
   foreach (module_implements('gmap') as $module) {
     $additions = call_user_func_array($module .'_gmap', array('parse_macro', &$m));
     if (!empty($additions)) {

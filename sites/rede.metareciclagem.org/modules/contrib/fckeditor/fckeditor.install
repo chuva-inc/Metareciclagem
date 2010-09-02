@@ -1,5 +1,5 @@
 <?php
-// $Id: fckeditor.install,v 1.2.2.10.2.44 2009/12/10 07:32:38 jorrit Exp $
+// $Id: fckeditor.install,v 1.2.2.10.2.45 2010/03/08 11:06:44 jorrit Exp $
 /*
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2008 Frederico Caldeira Knabben
@@ -90,6 +90,7 @@ function fckeditor_install() {
   $arr['quickupload'] = "f";
   $arr['user_choose'] = "f";
   $arr['show_fieldnamehint'] = "t";
+  $arr['autofixplaintext'] = 'f';
 
   db_query("INSERT INTO {fckeditor_settings} (name, settings) VALUES ('%s', '%s')", "Default", serialize($arr));
 
@@ -602,6 +603,25 @@ function fckeditor_update_6201() {
     if ($data->settings) {
       $settings = unserialize($data->settings);
       $settings['show_fieldnamehint'] = 't';
+
+      db_query("UPDATE {fckeditor_settings} SET settings='%s' WHERE name='%s'", serialize($settings), $data->name);
+    }
+  }
+
+  return $ret;
+}
+
+/**
+  * Add autofixplaintext setting, defaults to f ( = false)
+ */
+function fckeditor_update_6202() {
+  $ret = array();
+
+  $result = db_query("SELECT * FROM {fckeditor_settings}");
+  while (($data = db_fetch_object($result))) {
+    if ($data->settings) {
+      $settings = unserialize($data->settings);
+      $settings['autofixplaintext'] = 'f';
 
       db_query("UPDATE {fckeditor_settings} SET settings='%s' WHERE name='%s'", serialize($settings), $data->name);
     }

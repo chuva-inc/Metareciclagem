@@ -1,5 +1,5 @@
 <?php
-// $Id: fckeditor.module,v 1.20.2.34.2.88 2010/01/31 14:48:16 jorrit Exp $
+// $Id: fckeditor.module,v 1.20.2.34.2.91 2010/03/10 07:43:32 jorrit Exp $
 /**
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2008 Frederico Caldeira Knabben
@@ -575,6 +575,15 @@ function fckeditor_process_textarea($element) {
       // Make sure to append to #suffix so it isn't completely overwritten
       $element['#suffix'] .= $wysiwyg_link;
     }
+
+    //convert contents to HTML if necessary
+    if ($conf['autofixplaintext'] == 't') {
+      module_load_include('lib.inc', 'fckeditor');
+      if (fckeditor_is_plaintext($element['#value'])) {
+        $element['#value'] = _filter_autop($element['#value']);
+      }
+    }
+
     // setting some variables
     $module_drupal_path = drupal_get_path('module', 'fckeditor');
     $module_full_path   = $host . $module_drupal_path;
@@ -1132,12 +1141,17 @@ function fckeditor_get_nodetype($get_q) {
 }
 
 function fckeditor_path_to_theme() {
-	global $theme_key;
-	static $themepath;
-	
-	if(empty($themepath)) {
-		$themepath = drupal_get_path('theme', $theme_key);
-	}
-	
-	return $themepath;
+  global $theme_key;
+  static $themepath;
+  
+  if (empty($themepath) && !empty($theme_key)) {
+    $themepath = drupal_get_path('theme', $theme_key);
+  }
+
+  // fall back
+  if (empty($themepath)) {
+    return path_to_theme();
+  }
+  
+  return $themepath;
 }

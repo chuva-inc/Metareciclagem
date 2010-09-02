@@ -1,4 +1,4 @@
-/* $Id: clustermarker_marker.js,v 1.1 2009/02/12 23:45:23 bdragon Exp $ */
+/* $Id: clustermarker_marker.js,v 1.2 2009/12/12 00:14:17 bdragon Exp $ */
 
 /**
  * @file
@@ -46,5 +46,9 @@ Drupal.gmap.addHandler('gmap', function (elem) {
 
   obj.bind('clearmarkers', function () {
     obj.clusterMarker.removeMarkers();
+  });
+
+  obj.bind('markersready', function () {
+    obj.clusterMarker.refresh();
   });
 });

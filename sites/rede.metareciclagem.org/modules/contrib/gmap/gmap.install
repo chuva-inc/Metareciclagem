@@ -1,9 +1,9 @@
 <?php
-// $Id: gmap.install,v 1.5 2009/02/12 23:45:23 bdragon Exp $
+// $Id: gmap.install,v 1.5.2.1 2010/01/10 02:11:02 bdragon Exp $
 
 /**
  * @file
- *  GMap install file
+ *  GMap install/uninstall routines.
  */
 
 /**

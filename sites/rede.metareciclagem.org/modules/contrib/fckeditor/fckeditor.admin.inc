@@ -1,5 +1,5 @@
 <?php
-// $Id: fckeditor.admin.inc,v 1.1.2.51 2010/01/31 14:49:58 jorrit Exp $
+// $Id: fckeditor.admin.inc,v 1.1.2.53 2010/03/08 11:06:44 jorrit Exp $
 /**
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2008 Frederico Caldeira Knabben
@@ -249,7 +249,7 @@ function fckeditor_admin_profile_form($form_state, $profile = NULL) {
     $maxsize=128;   //default max name length
 
     $res=array();
-    $pat = "/^(?<name>.*?)_(?<n>[0-9]*)$/";
+    $pat = "/^(?P<name>.*?)_(?P<n>[0-9]*)$/";
     if (preg_match_all($pat, $oldname, $res)) {     // oldname like 'name_nr'
       $name=$res['name'][0];
       $num=$res['n'][0]+1;
@@ -596,6 +596,21 @@ function fckeditor_admin_profile_form($form_state, $profile = NULL) {
     ),
     '#description' =>
       t('When set to %true the editor will format the XHTML output by inserting line breaks on some tags endings and indenting paragraphs, tables and lists.',
+      array(
+        '%true' => t('Yes'),
+      )),
+  );
+
+  $form['output']['autofixplaintext'] = array(
+    '#type' => 'radios',
+    '#title' => t('Automatically detect and convert plain text'),
+    '#default_value' => !empty($profile->settings['autofixplaintext']) ? $profile->settings['autofixplaintext'] : 'f',
+    '#options' => array(
+      't' => t('Yes'),
+      'f' => t('No')
+    ),
+    '#description' =>
+      t('When set to %true the editor will try to detect if a field was created using the plain text editor and convert line breaks to &lt;br /&gt; and &lt;p&gt; tags. This will alter the field contents and is not reversible.',
       array(
         '%true' => t('Yes'),
       )),

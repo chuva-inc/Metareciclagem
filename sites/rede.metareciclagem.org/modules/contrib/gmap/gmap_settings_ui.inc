@@ -1,5 +1,5 @@
 <?php
-// $Id: gmap_settings_ui.inc,v 1.12 2009/02/12 23:45:23 bdragon Exp $
+// $Id: gmap_settings_ui.inc,v 1.12.2.5 2010/06/08 20:49:13 bdragon Exp $
 
 /**
  * @file
@@ -17,24 +17,25 @@ function gmap_admin_settings(&$form_state) {
     '#type' => 'fieldset',
     '#title' => t('Google Map Initialize'),
   );
-  if (!module_exists('keys_api')) {
+
+  if (!module_exists('keys_api') && !module_exists('keys')) {
     $form['initialization']['googlemap_api_key'] = array(
       '#type' => 'textfield',
-      '#title' => t('Google Maps API Key'),
       '#default_value' => variable_get('googlemap_api_key', ''),
       '#size' => 50,
       '#maxlength' => 255,
-      '#description' => t('Your personal Googlemaps API key.  You must get this for each separate website at <a href="http://www.google.com/apis/maps/">Google Map API website</a>.'),
     );
   }
   else {
     $form['initialization']['googlemap_api_key'] = array(
       '#type' => 'item',
       '#title' => t('Google Maps API Key'),
-      '#description' => t('Your personal Googlemaps API key.  You must get this for each separate website at <a href="http://www.google.com/apis/maps/">Google Map API website</a>.'),
-      '#value' => t("Managed by <a href='@url'>keys api</a>.", array('@url' => url('admin/settings/keys'))),
+      '#value' => t('Managed by <a href="@url">Keys</a>.', array('@url' => url('admin/settings/keys'))),
     );
   }
+
+  $form['initialization']['googlemap_api_key']['#title'] = t('Google Maps API Key');
+  $form['initialization']['googlemap_api_key']['#description'] = t('Your personal Googlemaps API key.  You must get this for each separate website at <a href="http://www.google.com/apis/maps/">Google Map API website</a>.');
 
   if (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) != FILE_DOWNLOADS_PUBLIC) {
     $form['initialization']['gmap_private_markerfile'] = array(
@@ -78,7 +79,7 @@ function gmap_admin_settings(&$form_state) {
 
   // Allow previewable behaviors to affect the preview map.
   $m = array();
-  $behaviors = module_invoke_all('gmap', 'behaviors', $m);
+  $behaviors = gmap_module_invoke('behaviors', $m);
   foreach ($behaviors as $k => $v) {
     if (isset($v['previewable']) && $v['previewable']) {
       $form['gmap_default']['map']['#settings']['behavior'][$k] = $defaults['behavior'][$k];
@@ -143,6 +144,15 @@ function gmap_admin_settings(&$form_state) {
     '#description' => t('Polygons without a specific style defined will fall back to this style'),
     '#default_value' => $defaults['styles']['poly_default'],
   );
+  $form['gmap_default']['styles']['highlight_color'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Highlight color'),
+    '#size' => 6,
+    '#maxlength' => 6,
+    '#field_prefix' => '#',
+    '#description' => t('This sets the color of the marker highlight when the "highlight : Highlight marker on rollover" behaviour is enabled. Hex color value. Example: #00AA33'),
+    '#default_value' => $defaults['styles']['highlight_color'],
+  );
 
   $form['gmap_default']['controltype'] = array(
     '#type' => 'select',
@@ -171,9 +181,7 @@ function gmap_admin_settings(&$form_state) {
 
   $baselayers = array();
 
-  foreach (module_implements('gmap') as $module) {
-    call_user_func_array($module .'_gmap', array('baselayers', &$baselayers));
-  }
+  gmap_module_invoke('baselayers', $baselayers);
 
   $options = array();
   foreach ($baselayers as $name => $layers) {
@@ -218,7 +226,7 @@ function gmap_admin_settings(&$form_state) {
     '#description' => t('Behavior flags modify how a map behaves. Grayed out flags are not settable here, but may be set on a map by map basis via code or a macro. Changes to behaviors will not affect the preview map shown above until changes are saved.'),
   );
   $m = array();
-  $behaviors = module_invoke_all('gmap', 'behaviors', $m);
+  $behaviors = gmap_module_invoke('behaviors', $m);
   foreach ($behaviors as $k => $v) {
     $form['gmap_default']['behavior'][$k] = array(
       '#type' => 'checkbox',
@@ -276,6 +284,9 @@ function gmap_admin_settings(&$form_state) {
   if (!isset($opts['markermanager']) || !is_array($opts['markermanager'])) {
     $opts['markermanager'] = array();
   }
+  if (!isset($opts['markerclusterer']) || !is_array($opts['markerclusterer'])) {
+    $opts['markerclusterer'] = array();
+  }
   if (!isset($opts['clusterer']) || !is_array($opts['clusterer'])) {
     $opts['clusterer'] = array();
   }
@@ -303,6 +314,13 @@ function gmap_admin_settings(&$form_state) {
     'markerMinZoom' => 4,
     'markerMaxZoom' => 0,
   ), $opts['markermanager']);
+  
+  $opts['markerclusterer'] = array_merge(array(
+    'filename' => 'markerclusterer_packed.js',
+    'gridSize' => 60,
+    'maxZoom' => 17,
+    // @@@ Some way of representing MarkerStyleOptions?
+  ), $opts['markerclusterer']);
 
   $opts['clusterer'] = array_merge(array(
     'filename' => 'Clusterer2.js',
@@ -335,7 +353,8 @@ function gmap_admin_settings(&$form_state) {
     '#options' => array(
       'gmap' => t('No manager (use GMap API directly)'),
       'gmarkermanager' => t("Google's GMarkerManager"),
-      'markermanager' => t('Gmaps Utility Library MarkerManager'),
+      'markermanager' => t('GMaps Utility Library MarkerManager'),
+      'markerclusterer' => t('GMaps Utility Library MarkerClusterer'),
       'clusterer' => t("Jef Poskanzer's Clusterer"),
       'clustermarker' => t("Martin Pearman's ClusterMarker"),
     ),
@@ -403,7 +422,7 @@ function gmap_admin_settings(&$form_state) {
     '#parents' => array('gmap_markermanager', 'gmarkermanager', 'markerMaxZoom'),
   );
 
-  // Gmaps Utility Library -- MarkerManager
+  // GMaps Utility Library -- MarkerManager
   $form['gmap_markermanager']['markermanager'] = array(
     '#type' => 'fieldset',
     '#title' => t('MarkerManager settings'),
@@ -461,11 +480,41 @@ function gmap_admin_settings(&$form_state) {
     '#parents' => array('gmap_markermanager', 'markermanager', 'markerMaxZoom'),
   );
 
+  // GMaps Utility Library -- MarkerClusterer
+  $form['gmap_markermanager']['markerclusterer'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('MarkerClusterer settings'),
+    '#description' => t('MarkerClusterer creates and manages per-zoom-level clusters for large amounts of markers (hundreds or thousands.) To use, you must download it from <a href="@url">here</a> and place it in the <em>thirdparty</em> folder.', array('@url' => 'http://gmaps-utility-library-dev.googlecode.com/svn/tags/markerclusterer/1.0/src/')),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['gmap_markermanager']['markerclusterer']['filename'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Filename'),
+    '#description' => t('Name of downloaded file in the thirdparty folder. Default: %default', array('%default' => 'markerclusterer_packed.js')),
+    '#default_value' => $opts['markerclusterer']['filename'],
+  );
+  $form['gmap_markermanager']['markerclusterer']['gridSize'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Grid Size'),
+    '#description' => t('The grid size of a cluster in pixels. Each cluster will be a square. If you want the algorithm to run faster, you can set this value larger.'),
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#default_value' => $opts['markerclusterer']['gridSize'],
+  );
+  $form['gmap_markermanager']['markerclusterer']['maxZoom'] = array(
+    '#type' => 'select',
+    '#title' => t('Maximum zoom'),
+    '#options' => drupal_map_assoc(range(0, 17)),
+    '#description' => t('At this zoom and above, all markers will be shown without clustering.'),
+    '#default_value' => $opts['markerclusterer']['maxZoom'],
+  );
+
   // Jef Poskanzer's Clusterer
   $form['gmap_markermanager']['clusterer'] = array(
     '#type' => 'fieldset',
     '#title' => t('Clusterer settings'),
-    '#description' => t("Clusterer is a marker manager written by Jef Poskanzer of acme.com. To use, you must place Clusterer2.js (available ".'<a href="@url">here</a>) into the "thirdparty" folder.', array('@url' => 'http://acme.com/javascript/Clusterer2.js')),
+    '#description' => t('Clusterer is a marker manager written by Jef Poskanzer of acme.com. To use, you must place Clusterer2.js (available <a href="@url">here</a>) into the "thirdparty" folder.', array('@url' => 'http://acme.com/javascript/Clusterer2.js')),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );

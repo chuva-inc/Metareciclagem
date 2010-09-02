@@ -1,1917 +1,982 @@
 # German translation of fckeditor (6.x-2.x-dev)
-# Copyright (c) 2009 by the German translation team
-# Generated from files:
-#  fckeditor.admin.inc,v 1.1.2.46 2009/10/26 19:53:09 jorrit
-#  fckeditor.user.inc,v 1.1.2.17 2009/10/24 09:48:27 jorrit
-#  fckeditor.install,v 1.2.2.10.2.42 2009/10/04 16:45:10 jorrit
-#  fckeditor.help.inc,v 1.1.2.18 2009/10/24 09:48:27 jorrit
-#  fckeditor.utils.js,v 1.2.2.8.2.32 2009/10/04 16:47:50 jorrit
-#  fckeditor.module,v 1.20.2.34.2.86 2009/10/24 09:48:27 jorrit
-#  fckeditor.info,v 1.2.2.2 2008/03/18 13:50:45 wwalc
-#  img_assist_fckeditor.js,v 1.1.4.3.2.6 2009/08/02 20:31:21 jorrit
+# Copyright (c) 2010 by the German translation team
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: fckeditor (6.x-2.x-dev)\n"
-"POT-Creation-Date: 2009-11-01 19:47+0100\n"
-"PO-Revision-Date: 2009-11-01 18:11+0100\n"
+"POT-Creation-Date: 2010-03-13 15:37+0100\n"
+"PO-Revision-Date: 2010-03-13 15:37+0100\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"Last-Translator: Tobias Bähr <info@tobiasbaehr.de>\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
 
-#: fckeditor.admin.inc:1281
 msgid "Delete"
 msgstr "Löschen"
 
-#: fckeditor.admin.inc:1287
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: fckeditor.admin.inc:852
 msgid "Save"
 msgstr "Speichern"
 
-#: fckeditor.admin.inc:733
 msgid "None"
 msgstr "Keine"
 
-#: fckeditor.admin.inc:157,113
 msgid "Operations"
 msgstr "Operationen"
 
-#: fckeditor.user.inc:146,92,80,68; fckeditor.admin.inc:1146,828,822,763,596,590,581,575,466,301
 msgid "Yes"
 msgstr "Ja"
 
-#: fckeditor.user.inc:147,91,81,69; fckeditor.admin.inc:1147,823,762,591,576,465,300
 msgid "No"
 msgstr "Nein"
 
-#: fckeditor.admin.inc:455
 msgid "Hide"
 msgstr "Ausblenden"
 
-#: fckeditor.install:209
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: fckeditor.admin.inc:654
 msgid "Style"
 msgstr "Design"
 
-#: fckeditor.help.inc:102
 msgid "filters"
 msgstr "Filter"
 
-#: fckeditor.admin.inc:155,126
 msgid "edit"
 msgstr "Bearbeiten"
 
-#: fckeditor.admin.inc:155,128
 msgid "delete"
 msgstr "Löschen"
 
-#: fckeditor.user.inc:58; fckeditor.admin.inc:525,444
 msgid "Disabled"
 msgstr "Deaktiviert"
 
-#: fckeditor.user.inc:135; fckeditor.admin.inc:513
 msgid "Language"
 msgstr "Sprache"
 
-#: fckeditor.admin.inc:157,113
 msgid "Profile"
 msgstr "Profil"
 
-#: fckeditor.admin.inc:113
 msgid "Roles"
 msgstr "Rollen"
 
-#: fckeditor.admin.inc:813
 msgid "Advanced options"
 msgstr "Erweiterte Einstellungen"
 
-#: fckeditor.admin.inc:1170,800,783
 msgid "Username"
 msgstr "Benutzername"
 
-#: fckeditor.user.inc:57; fckeditor.admin.inc:524,443
 msgid "Enabled"
 msgstr "Aktiviert"
 
-#: fckeditor.utils.js:0
 msgid "Split summary at cursor"
 msgstr "Anrisstext an Cursorposition trennen"
 
-#: fckeditor.utils.js:0
 msgid "Join summary"
 msgstr "Anrisstext zusammenfügen"
 
-#: fckeditor.help.inc:107
 msgid "Line break converter"
 msgstr "Zeilenumbruchkonverter"
 
-#: fckeditor.user.inc:118; fckeditor.admin.inc:496
 msgid "Expanded"
 msgstr "Geöffnet"
 
-#: fckeditor.help.inc:182
 msgid "profile"
 msgstr "Profil"
 
-#: fckeditor.admin.inc:133
 msgid "Profiles"
 msgstr "Profile"
 
-#: fckeditor.help.inc:98,93
 msgid "Administer"
 msgstr "Verwalten"
 
-#: fckeditor.help.inc:98
 msgid "Site configuration"
 msgstr "Einstellungen"
 
-#: fckeditor.admin.inc:152
 msgid "Global settings"
 msgstr "Globale Einstellungen"
 
-#: fckeditor.help.inc:181,69; fckeditor.admin.inc:1034,290,218
 msgid "permission"
 msgstr "Berechtigung"
 
-#: fckeditor.help.inc:93
 msgid "User management"
 msgstr "Benutzerverwaltung"
 
-#: fckeditor.help.inc:93
 msgid "Permissions"
 msgstr "Berechtigungen"
 
-#: fckeditor.help.inc:36
-msgid ""
-"Enables the usage of FCKeditor (WYSIWYG editor) instead of plain text "
-"fields."
-msgstr ""
-"Ermöglicht die Benutzung des FCKeditors (WYSIWYG-Editor) anstelle der "
-"normalen Textfelder."
+msgid "Enables the usage of FCKeditor (WYSIWYG editor) instead of plain text fields."
+msgstr "Ermöglicht die Benutzung des FCKeditors (WYSIWYG-Editor) anstelle der normalen Textfelder."
 
-#: fckeditor.help.inc:87,80,62; fckeditor.admin.inc:43
 msgid "FCKeditor homepage"
 msgstr "FCKeditor-Homepage"
 
-#: fckeditor.help.inc:81,63
 msgid "FCKeditor userguide"
 msgstr "FCKeditor-Benutzerhandbuch"
 
-#: fckeditor.module:83; fckeditor.help.inc:68; fckeditor.admin.inc:1034,289,217,92,60
 msgid "access fckeditor"
 msgstr "Zugriff auf den FCKeditor"
 
-#: fckeditor.help.inc:160; fckeditor.admin.inc:738,725
 msgid "IMCE"
 msgstr "IMCE"
 
-#: fckeditor.module:83; fckeditor.help.inc:181
 msgid "allow fckeditor file uploads"
 msgstr "Datei-Uploads mit dem FCKeditor erlauben"
 
-#: fckeditor.help.inc:182; fckeditor.admin.inc:719
 msgid "File browser settings"
 msgstr "Dateibrowser-Einstellungen"
 
-#: fckeditor.user.inc:158; fckeditor.admin.inc:879
 msgid "If FCKeditor is enabled by default, popup window must be disabled."
-msgstr ""
-"Wenn der FCKeditor standardmäßig aktiviert ist, muss das "
-"Popup-Fenster deaktiviert werden."
+msgstr "Wenn der FCKeditor standardmäßig aktiviert ist, muss das Popup-Fenster deaktiviert werden."
 
-#: fckeditor.user.inc:162; fckeditor.admin.inc:883
 msgid "If toggle is enabled, popup window must be disabled."
-msgstr ""
-"Wenn der Umschalter aktiviert ist, muss das Popup-Fenster deaktiviert "
-"werden."
+msgstr "Wenn der Umschalter aktiviert ist, muss das Popup-Fenster deaktiviert werden."
 
-#: fckeditor.admin.inc:887
 msgid "You must give a profile name."
 msgstr "Es muss ein Profilname angegeben werden."
 
-#: fckeditor.admin.inc:909
 msgid "Double quotes are not allowed in CSS path."
 msgstr "Doppelte Anführungszeichen sind im CSS-Pfad nicht erlaubt."
 
-#: fckeditor.admin.inc:938,925,912
 msgid "Enter valid path, do not surround it with quotes."
-msgstr ""
-"Einen gültigen Pfad eingeben, dieser darf nicht mit "
-"Anführungszeichen umschlossen werden."
+msgstr "Einen gültigen Pfad eingeben, dieser darf nicht mit Anführungszeichen umschlossen werden."
 
-#: fckeditor.admin.inc:935,922
 msgid "Double quotes are not allowed in path."
 msgstr "Doppelte Anführungszeichen sind im Pfad nicht erlaubt."
 
-#: fckeditor.admin.inc:944
-msgid ""
-"Enter valid, semicolon separated, list of HTML font formats (no "
-"semicolon at the end of list expected)."
-msgstr ""
-"Es muss eine mit Semikolon getrennte Liste von HTML-Schriftformaten "
-"eingegeben werden (kein Semikolon am Ende der Liste angeben)."
+msgid "Enter valid, semicolon separated, list of HTML font formats (no semicolon at the end of list expected)."
+msgstr "Es muss eine mit Semikolon getrennte Liste von HTML-Schriftformaten eingegeben werden (kein Semikolon am Ende der Liste angeben)."
 
-#: fckeditor.admin.inc:950
 msgid "Path to uploaded files is required."
 msgstr "Der Pfad zu den hochgeladenen Dateien wird benötigt."
 
-#: fckeditor.admin.inc:953
 msgid "Absolute path to uploaded files is required."
 msgstr "Absoluter Pfad zu den hochgeladenen Dateien wird benötigt."
 
-#: fckeditor.module:315
 msgid "Edit FCKeditor profile"
 msgstr "FCKeditor-Profil bearbeiten"
 
-#: fckeditor.admin.inc:964
 msgid "Your FCKeditor profile has been updated."
 msgstr "Ihr FCKeditor-Profil wurde aktualisiert."
 
-#: fckeditor.admin.inc:967,175
 msgid "Your FCKeditor profile has been created."
 msgstr "Ihr FCKeditor-Profil wurde erstellt."
 
-#: fckeditor.admin.inc:1005
 msgid "Create global profile"
 msgstr "Globales Profil erstellen"
 
-#: fckeditor.admin.inc:1008
 msgid "Update global profile"
 msgstr "Globales Profil aktualisieren"
 
-#: fckeditor.admin.inc:1235
 msgid "FCKeditor global profile has been saved."
 msgstr "Globales FCKeditor-Profil wurde gespeichert."
 
-#: fckeditor.admin.inc:80
-msgid ""
-"No FCKeditor profiles found. At this moment, nobody is able to use "
-"FCKeditor. Create new profile below."
-msgstr ""
-"Kein FCKeditor-Profil gefunden. Zum diesem Zeitpunkt kann niemand den "
-"FCKeditor benutzen. Unten kann ein neues Profil erstellt werden."
+msgid "No FCKeditor profiles found. At this moment, nobody is able to use FCKeditor. Create new profile below."
+msgstr "Kein FCKeditor-Profil gefunden. Zum diesem Zeitpunkt kann niemand den FCKeditor benutzen. Unten kann ein neues Profil erstellt werden."
 
-#: fckeditor.admin.inc:135
 msgid "Create new profile"
 msgstr "Neues Profil erstellen"
 
-#: fckeditor.admin.inc:140
 msgid "create a new profile"
 msgstr "ein neues Profil zu erstellen"
 
-#: fckeditor.admin.inc:148
 msgid "create the global profile"
 msgstr "das globale Profil zu erstellen"
 
-#: fckeditor.admin.inc:807,805,154,51
 msgid "FCKeditor Global Profile"
 msgstr "Globale FCKeditor-Profil"
 
-#: fckeditor.module:572,571
 msgid "Switch to plain text editor"
 msgstr "Zum einfachen Text-Editor umschalten"
 
-#: fckeditor.module:572,571
 msgid "Switch to rich text editor"
 msgstr "Zum Rich-Text-Editor umschalten"
 
-#: fckeditor.module:896
 msgid "excluding or including"
 msgstr "Ausschließen oder Einschließen"
 
-#: fckeditor.user.inc:54; fckeditor.admin.inc:440
 msgid "Default state"
 msgstr "Standardmodus"
 
-#: fckeditor.user.inc:60
-msgid ""
-"Should rich-text editing be enabled or disabled by default in textarea "
-"fields? If disabled, rich text editor may still be enabled using "
-"toggle or popup window."
-msgstr ""
-"Soll die Rich-Text-Bearbeitung in Textfeldern standardmäßig "
-"aktiviert oder deaktiviert sein? Wenn deaktiviert, kann er noch durch "
-"den Umschalter oder das Popup-Fenster aktiviert werden."
+msgid "Should rich-text editing be enabled or disabled by default in textarea fields? If disabled, rich text editor may still be enabled using toggle or popup window."
+msgstr "Soll die Rich-Text-Bearbeitung in Textfeldern standardmäßig aktiviert oder deaktiviert sein? Wenn deaktiviert, kann er noch durch den Umschalter oder das Popup-Fenster aktiviert werden."
 
-#: fckeditor.user.inc:65; fckeditor.admin.inc:451
 msgid "Show disable/enable rich text editor toggle"
 msgstr "Rich-Text-Editor-Umschalter anzeigen"
 
-#: fckeditor.user.inc:88; fckeditor.admin.inc:462
 msgid "Use FCKeditor in a popup window"
 msgstr "FCKeditor im Popup-Fenster verwenden"
 
-#: fckeditor.user.inc:94; fckeditor.admin.inc:468
-msgid ""
-"If this option is enabled a link to a popup window will be used "
-"instead of a textarea replace."
-msgstr ""
-"Wenn diese Option aktiviert ist, wird ein Link zum Popup-Fenster "
-"verwendet anstatt einen Textbereich zu ersetzen."
+msgid "If this option is enabled a link to a popup window will be used instead of a textarea replace."
+msgstr "Wenn diese Option aktiviert ist, wird ein Link zum Popup-Fenster verwendet anstatt einen Textbereich zu ersetzen."
 
-#: fckeditor.user.inc:99; fckeditor.admin.inc:473
 msgid "Skin"
 msgstr "Oberfläche"
 
-#: fckeditor.user.inc:102
 msgid "Choose a FCKeditor skin."
 msgstr "Auswahl der FCKeditor-Oberfläche."
 
-#: fckeditor.user.inc:107; fckeditor.admin.inc:481
 msgid "Toolbar"
 msgstr "Werkzeugleiste"
 
-#: fckeditor.user.inc:110
 msgid "Choose a FCKeditor toolbar set."
 msgstr "Auswahl eines FCKeditor-Werkzeugleisten-Sets."
 
-#: fckeditor.user.inc:115; fckeditor.admin.inc:493
 msgid "Start the toolbar expanded"
 msgstr "Werkzeugleiste ausgeklappt starten"
 
-#: fckeditor.user.inc:121; fckeditor.admin.inc:499
 msgid "The toolbar start expanded or collapsed."
 msgstr "Die Werkzeugleiste ausgeklappt oder eingeklappt starten."
 
-#: fckeditor.user.inc:126; fckeditor.admin.inc:504
 msgid "Width"
 msgstr "Breite"
 
-#: fckeditor.user.inc:138; fckeditor.admin.inc:516
 msgid "The language for the FCKeditor interface."
 msgstr "Die Sprache für die FCKeditor-Oberfläche."
 
-#: fckeditor.user.inc:143; fckeditor.admin.inc:521
 msgid "Auto-detect language"
 msgstr "Automatische Erkennung der Sprache"
 
-#: fckeditor.user.inc:149; fckeditor.admin.inc:527
 msgid "Use auto detect user language feature."
 msgstr "Die automatische Erkennung der Sprache des Benutzer verwenden."
 
-#: fckeditor.admin.inc:1001
 msgid "Global profile already exist. Only one global profile is allowed."
-msgstr ""
-"Globales Profil ist bereits vorhanden. Es ist nur ein globales Profil "
-"erlaubt."
+msgstr "Globales Profil ist bereits vorhanden. Es ist nur ein globales Profil erlaubt."
 
-#: fckeditor.admin.inc:1013
 msgid "Main setup"
 msgstr "Haupteinstellung"
 
-#: fckeditor.admin.inc:1026
 msgid "Role precedence"
 msgstr "Vorrang der Rollen"
 
-#: fckeditor.admin.inc:61
 msgid "permissions"
 msgstr "Berechtigungen"
 
-#: fckeditor.admin.inc:1039,359
 msgid "Visibility settings"
 msgstr "Sichtbarkeitseinstellungen"
 
-#: fckeditor.help.inc:119; fckeditor.admin.inc:1047,374
 msgid "Use inclusion or exclusion mode"
 msgstr "Einschließen- oder Ausschließen-Modus verwenden"
 
-#: fckeditor.admin.inc:1053,380
-msgid ""
-"Choose the way of disabling/enabling FCKeditor on selected "
-"fields/paths (see below). Use exclude to disable FCKeditor on selected "
-"fields/paths. Use include if you want to load FCKeditor only on "
-"selected paths/fields."
-msgstr ""
-"Auswahl der Art und Weise wie der FCKeditor bei den eingegebenen "
-"Feldern/Pfaden (siehe unten) aktiviert bzw. deaktiviert werden soll. "
-"Im Ausschließen-Modus wird der FCKeditor bei den eingegebenen "
-"Feldern/Pfaden deaktiviert. Beim Einschließen-Modus wird der "
-"FCKeditor nur bei den eingegebenen Feldern/Pfaden aktiviert."
+msgid "Choose the way of disabling/enabling FCKeditor on selected fields/paths (see below). Use exclude to disable FCKeditor on selected fields/paths. Use include if you want to load FCKeditor only on selected paths/fields."
+msgstr "Auswahl der Art und Weise wie der FCKeditor bei den eingegebenen Feldern/Pfaden (siehe unten) aktiviert bzw. deaktiviert werden soll. Im Ausschließen-Modus wird der FCKeditor bei den eingegebenen Feldern/Pfaden deaktiviert. Beim Einschließen-Modus wird der FCKeditor nur bei den eingegebenen Feldern/Pfaden aktiviert."
 
-#: fckeditor.admin.inc:1062,390
 msgid "Fields to exclude/include"
 msgstr "Felder zum Ausschließen/Einschließen"
 
-#: fckeditor.admin.inc:1087,415
 msgid "Force simplified toolbar on the following fields"
 msgstr "Für die folgenden Felder die einfache Werkzeugleiste erzwingen"
 
-#: fckeditor.module:295
 msgid "Add new FCKeditor profile"
 msgstr "Neues FCKeditor-Profil hinzufügen"
 
-#: fckeditor.admin.inc:236,93
 msgid "Basic setup"
 msgstr "Grundeinstellung"
 
-#: fckeditor.admin.inc:274
 msgid "Profile name"
 msgstr "Profilname"
 
-#: fckeditor.admin.inc:278
-msgid ""
-"Enter a name for this profile. This name is only visible within the "
-"fckeditor administration page."
-msgstr ""
-"Es muss ein Name für dieses Profil eingegeben werden. Dieser Name ist "
-"nur innerhalb der Verwaltungsseiten vom FCKeditor sichtbar."
+msgid "Enter a name for this profile. This name is only visible within the fckeditor administration page."
+msgstr "Es muss ein Name für dieses Profil eingegeben werden. Dieser Name ist nur innerhalb der Verwaltungsseiten vom FCKeditor sichtbar."
 
-#: fckeditor.admin.inc:284,94
 msgid "Roles allowed to use this profile"
 msgstr "Rollen, die dieses Profil verwenden dürfen"
 
-#: fckeditor.admin.inc:297
 msgid "Allow users to customize FCKeditor appearance"
 msgstr "Benutzern erlauben, die Darstellung des FCKeditors anzupassen"
 
-#: fckeditor.admin.inc:367
 msgid "Minimum rows"
 msgstr "Minimale Zeilen"
 
-#: fckeditor.admin.inc:369
-msgid ""
-"FCKeditor will be triggered if the textarea has more rows than entered "
-"here. Enter '1' if you do not want to use this feature."
-msgstr ""
-"Der FCKeditor wird erst angezeigt, wenn das Textfeld mehr als die "
-"angebenen Zeilen besitzt. Wenn eine ‚1‘ eingegeben wird, wird "
-"diese Funktion nicht genutzt."
+msgid "FCKeditor will be triggered if the textarea has more rows than entered here. Enter '1' if you do not want to use this feature."
+msgstr "Der FCKeditor wird erst angezeigt, wenn das Textfeld mehr als die angebenen Zeilen besitzt. Wenn eine ‚1‘ eingegeben wird, wird diese Funktion nicht genutzt."
 
-#: fckeditor.admin.inc:433,303
 msgid "Editor appearance"
 msgstr "Editor-Darstellung"
 
-#: fckeditor.admin.inc:446
-msgid ""
-"Default editor state. If disabled, rich text editor may still be "
-"enabled using toggle or popup window."
-msgstr ""
-"Standardzustand des Editors. Wenn deaktiviert, kann der "
-"Rich-Text-Editor weiterhin mit dem aktivierten Umschalter oder dem "
-"Popup-Fenster genutzt werden."
+msgid "Default editor state. If disabled, rich text editor may still be enabled using toggle or popup window."
+msgstr "Standardzustand des Editors. Wenn deaktiviert, kann der Rich-Text-Editor weiterhin mit dem aktivierten Umschalter oder dem Popup-Fenster genutzt werden."
 
-#: fckeditor.user.inc:71; fckeditor.admin.inc:457
-msgid ""
-"Whether or not to show the disable/enable rich text editor toggle "
-"below the textarea. Works only if FCKeditor is not running in a popup "
-"window (see below)."
-msgstr ""
-"Diese Einstellung bewirkt, dass der Rich-Text-Editor-Umschalter unter "
-"dem Textbereich angezeigt wird oder nicht. Diese Funktion steht nicht "
-"zur Verfügung, wenn der FCKeditor im Popup-Fenster verwendet wird "
-"(siehe unten)."
+msgid "Whether or not to show the disable/enable rich text editor toggle below the textarea. Works only if FCKeditor is not running in a popup window (see below)."
+msgstr "Diese Einstellung bewirkt, dass der Rich-Text-Editor-Umschalter unter dem Textbereich angezeigt wird oder nicht. Diese Funktion steht nicht zur Verfügung, wenn der FCKeditor im Popup-Fenster verwendet wird (siehe unten)."
 
-#: fckeditor.admin.inc:476
 msgid "Choose a default skin."
 msgstr "Auswahl einer Standard-Oberfläche."
 
-#: fckeditor.admin.inc:532
 msgid "Cleanup and output"
 msgstr "Säuberung und Ausgabe"
 
-#: fckeditor.admin.inc:539
 msgid "Enter mode"
 msgstr "Enter-Modus"
 
-#: fckeditor.admin.inc:546
 msgid "Set which tag FCKeditor should use when [Enter] key is pressed."
-msgstr ""
-"Welchen Tag soll der FCKeditor verwenden, wenn die [Enter] Taste "
-"gedrückt wurde."
+msgstr "Welchen Tag soll der FCKeditor verwenden, wenn die [Enter] Taste gedrückt wurde."
 
-#: fckeditor.admin.inc:551
 msgid "Shift + Enter mode"
 msgstr "Shift+Enter-Modus"
 
-#: fckeditor.admin.inc:558
 msgid "Set which tag FCKeditor should use when [Shift] + [Enter] is pressed."
-msgstr ""
-"Welchen Tag soll der FCKeditor verwenden, wenn die Tasten [Shift] + "
-"[Enter] gedrückt wurden."
+msgstr "Welchen Tag soll der FCKeditor verwenden, wenn die Tasten [Shift] + [Enter] gedrückt wurden."
 
-#: fckeditor.admin.inc:563
 msgid "Font formats"
 msgstr "Schriftformate"
 
-#: fckeditor.admin.inc:572
 msgid "Apply source formatting"
 msgstr "Quelltext-Formatierung anwenden"
 
-#: fckeditor.admin.inc:587
 msgid "Format output"
 msgstr "Ausgabe formatieren"
 
-#: fckeditor.admin.inc:906,609
 msgid "Editor CSS"
 msgstr "Editor-CSS"
 
-#: fckeditor.admin.inc:684,648,620,614
 msgid "FCKeditor default"
 msgstr "Standardvorgaben des FCKeditor"
 
-#: fckeditor.admin.inc:625
 msgid "CSS path"
 msgstr "Pfad zur CSS-Datei"
 
-#: fckeditor.admin.inc:919,643
 msgid "Predefined styles"
 msgstr "Vordefinierte Styles"
 
-#: fckeditor.admin.inc:662
 msgid "Predefined styles path"
 msgstr "Pfad zu den vordefinierten Styles"
 
-#: fckeditor.admin.inc:773
 msgid "Path to uploaded files"
 msgstr "Pfad zu den hochgeladenen Dateien"
 
-#: fckeditor.admin.inc:789
 msgid "Absolute path to uploaded files"
 msgstr "Absoluter Pfad zu den hochgeladenen Dateien"
 
-#: fckeditor.admin.inc:834
 msgid "Custom javascript configuration"
 msgstr "Benutzerdefinierte JavaScript-Konfiguration"
 
-#: fckeditor.admin.inc:842
 msgid "FCKeditor documentation"
 msgstr "FCKeditor-Dokumentation"
 
-#: fckeditor.module:83; fckeditor.admin.inc:1149
 msgid "administer fckeditor"
 msgstr "FCKeditor verwalten"
 
-#: fckeditor.info:0; fckeditor.install:208; fckeditor.module:286; fckeditor.help.inc:98
 msgid "FCKeditor"
 msgstr "FCKeditor"
 
-#: fckeditor.info:0
 msgid "Enables the usage of FCKeditor (WYSIWYG) instead of plain text fields."
-msgstr ""
-"Ermöglicht die Benutzung des FCKeditor (WYSIWYG) anstelle der "
-"normalen Textfelder."
+msgstr "Ermöglicht die Benutzung des FCKeditor (WYSIWYG) anstelle der normalen Textfelder."
 
-#: fckeditor.admin.inc:1105
 msgid "Advanced settings"
 msgstr "Erweiterte Einstellungen"
 
-#: fckeditor.help.inc:182; fckeditor.admin.inc:751
 msgid "File browser type"
 msgstr "Dateibrowser-Typ"
 
-#: fckeditor.admin.inc:754
-msgid ""
-"Select the file browser that you would like to use to upload files, "
-"images and flash movies."
-msgstr ""
-"Auswahl des Dateibrowsers, der für das Hochladen der Dateien, Bilder "
-"und Flashfilme verwendet werden soll."
+msgid "Select the file browser that you would like to use to upload files, images and flash movies."
+msgstr "Auswahl des Dateibrowsers, der für das Hochladen der Dateien, Bilder und Flashfilme verwendet werden soll."
 
-#: fckeditor.admin.inc:759
 msgid "Allow quick uploads"
 msgstr "Schnelle Uploads erlauben"
 
-#: fckeditor.admin.inc:1050,377
 msgid "Exclude"
 msgstr "Ausschließen"
 
-#: fckeditor.admin.inc:1051,378
 msgid "Include"
 msgstr "Einschließen"
 
-#: fckeditor.help.inc:161; fckeditor.admin.inc:742,726
 msgid "Image Browser"
 msgstr "Image Browser"
 
-#: fckeditor.admin.inc:308
 msgid "Security"
 msgstr "Sicherheit"
 
-#: fckeditor.admin.inc:318
 msgid "Security filters"
 msgstr "Sicherheitsfilter"
 
-#: fckeditor.admin.inc:319
-msgid ""
-"Please choose carefully all filters that protect your content "
-"(probably not all filters listed below are security filters)."
-msgstr ""
-"Es sollten sorgfältig alle Filter ausgewählt werden, die den Inhalt "
-"beschützen (nicht alle unten aufgeführten Filter sind "
-"Sicherheitsfilter)."
+msgid "Please choose carefully all filters that protect your content (probably not all filters listed below are security filters)."
+msgstr "Es sollten sorgfältig alle Filter ausgewählt werden, die den Inhalt beschützen (nicht alle unten aufgeführten Filter sind Sicherheitsfilter)."
 
-#: fckeditor.admin.inc:348
 msgid "Security settings"
 msgstr "Sicherheits-Einstellungen"
 
-#: fckeditor.admin.inc:351
 msgid "Always run security filters for FCKeditor."
 msgstr "Sicherheitsfilter für FCKeditor immer laufen lassen."
 
-#: fckeditor.admin.inc:352
-msgid ""
-"Run security filters only when FCKeditor is set to start "
-"automatically."
-msgstr ""
-"Sicherheitsfilter nur laufen lassen, wenn FCKeditor auf automatischen "
-"Start eingestellt ist."
+msgid "Run security filters only when FCKeditor is set to start automatically."
+msgstr "Sicherheitsfilter nur laufen lassen, wenn FCKeditor auf automatischen Start eingestellt ist."
 
-#: fckeditor.admin.inc:765
-msgid ""
-"The quick upload functionality can be disabled and enabled "
-"independently of the file browser. It will always use the settings "
-"below. To enable quick uploads you must follow the same configuration "
-"procedure as when enabling the built-in file browser."
-msgstr ""
-"Die Funktion ‚Schnelle Uploads‘ kann unabhängig vom Dateibrowser "
-"aktiviert und deaktiviert werden. Es werden immer die Einstellungen "
-"unten verwendet. Um schnelle Uploads zu aktivieren, muss die gleiche "
-"Konfigurationsprozedur befolgt werden wie beim Aktivieren des "
-"eingebauten Dateibrowsers."
+msgid "The quick upload functionality can be disabled and enabled independently of the file browser. It will always use the settings below. To enable quick uploads you must follow the same configuration procedure as when enabling the built-in file browser."
+msgstr "Die Funktion ‚Schnelle Uploads‘ kann unabhängig vom Dateibrowser aktiviert und deaktiviert werden. Es werden immer die Einstellungen unten verwendet. Um schnelle Uploads zu aktivieren, muss die gleiche Konfigurationsprozedur befolgt werden wie beim Aktivieren des eingebauten Dateibrowsers."
 
-#: fckeditor.module:278
 msgid "XSS Filter"
 msgstr "XSS-Filter"
 
-#: fckeditor.module:279
 msgid "XSS Filter."
 msgstr "XSS-Filter."
 
-#: fckeditor.admin.inc:1159
 msgid "Location of files uploaded with FCKeditor in the private folder"
-msgstr ""
-"Lokation der mittels FCKeditor in den privaten Ordner hochgeladenen "
-"Dateien"
+msgstr "Lokation der mittels FCKeditor in den privaten Ordner hochgeladenen Dateien"
 
-#: fckeditor.admin.inc:1164
-msgid ""
-"The path relative to the location of the private directory where "
-"FCKeditor should store uploaded files."
-msgstr ""
-"Der Pfad relativ zur Lokation des privaten Verzeichnisses, in der der "
-"FCKeditor hochgeladenen Dateien speichern soll."
+msgid "The path relative to the location of the private directory where FCKeditor should store uploaded files."
+msgstr "Der Pfad relativ zur Lokation des privaten Verzeichnisses, in der der FCKeditor hochgeladenen Dateien speichern soll."
 
-#: fckeditor.admin.inc:127
 msgid "clone"
 msgstr "Duplizieren"
 
-#: fckeditor.admin.inc:1069,397
-msgid ""
-"Enter the paths to the textarea fields on which you want to enable or "
-"disable FCKeditor."
-msgstr ""
-"Hier können die Pfade zu den Textfeldern angegeben werden bei den der "
-"FCKeditor aktiviert oder deaktiviert werden soll."
+msgid "Enter the paths to the textarea fields on which you want to enable or disable FCKeditor."
+msgstr "Hier können die Pfade zu den Textfeldern angegeben werden bei den der FCKeditor aktiviert oder deaktiviert werden soll."
 
-#: fckeditor.admin.inc:454
 msgid "Show"
 msgstr "Anzeigen"
 
-#: fckeditor.user.inc:119; fckeditor.admin.inc:497
 msgid "Collapsed"
 msgstr "Eingeklappt"
 
-#: fckeditor.admin.inc:646
 msgid "Use theme fckstyles.xml"
 msgstr "fckstyles.xml des Themes verwenden"
 
-#: fckeditor.admin.inc:919,709,671,647
 msgid "Define path to fckstyles.xml"
 msgstr "pfad-zu-den-fckstyles-definieren.xml"
 
-#: fckeditor.admin.inc:1188,866
-msgid ""
-"Include mode selected, but no paths given. Enter at least one path "
-"where FCKeditor should appear."
-msgstr ""
-"Einschließen-Modus ausgewählt, aber keine Pfade angegeben. Es muss "
-"mindestens ein Pfad angegeben werden, in dem der FCKeditor erscheinen "
-"soll."
+msgid "Include mode selected, but no paths given. Enter at least one path where FCKeditor should appear."
+msgstr "Einschließen-Modus ausgewählt, aber keine Pfade angegeben. Es muss mindestens ein Pfad angegeben werden, in dem der FCKeditor erscheinen soll."
 
-#: fckeditor.admin.inc:875
 msgid "Minimum rows must be a valid number."
 msgstr "Die Angabe zur minimale Zeilen muss eine gültige Zahl sein"
 
-#: fckeditor.admin.inc:890
 msgid "This profile name is reserved. Please choose a different name."
 msgstr "Dieser Profilname ist reserviert. Bitte ein anderes auswählen."
 
-#: fckeditor.admin.inc:895
-msgid ""
-"The profile name must be unique. A profile with this name already "
-"exists."
-msgstr ""
-"Der Profilname muss eindeutig sein. Ein Profil mit diesem Name ist "
-"bereits vorhanden."
+msgid "The profile name must be unique. A profile with this name already exists."
+msgstr "Der Profilname muss eindeutig sein. Ein Profil mit diesem Name ist bereits vorhanden."
 
-#: fckeditor.admin.inc:1114
 msgid "Path to FCKeditor"
 msgstr "Pfad zum FCKeditor"
 
-#: fckeditor.admin.inc:1132
 msgid "Local path to FCKeditor"
 msgstr "Lokaler Pfad zum FCKeditor"
 
-#: fckeditor.user.inc:77; fckeditor.admin.inc:1143
 msgid "Show field name hint below each rich text editor"
 msgstr "Hinweise zu den Feldnamen unter den Textfeldern anzeigen"
 
-#: fckeditor.admin.inc:1256
-msgid ""
-"Rule %rule is ambiguous: please append .* if %rule is a path or "
-"prepend *. if %rule is a field"
-msgstr ""
-"Die Regel %rule ist mehrdeutig: bitte .* hinzufügen, wenn %rule ein "
-"Pfad ist oder *. voranstellen, wenn %rule ein Feld ist"
+msgid "Rule %rule is ambiguous: please append .* if %rule is a path or prepend *. if %rule is a field"
+msgstr "Die Regel %rule ist mehrdeutig: bitte .* hinzufügen, wenn %rule ein Pfad ist oder *. voranstellen, wenn %rule ein Feld ist"
 
-#: fckeditor.admin.inc:1275
 msgid "Are you sure that you want to delete the FCKeditor profile %profile?"
 msgstr "Soll das FCKeditor-Profil %profile wirklich gelöscht werden?"
 
-#: fckeditor.admin.inc:1298
 msgid "Deleted FCKeditor profile."
 msgstr "FCKeditor-Profil gelöscht."
 
-#: fckeditor.help.inc:51
-msgid ""
-"The Global Profile allows you to define settings that are common for "
-"all profiles. Values defined in other profiles will be appended to the "
-"global configuration. This way you can avoid repeating some of the "
-"settings that are usually the same in each profile."
-msgstr ""
-"Das globale Profil ermöglicht Einstellungen vorzunehmen, die für "
-"alle Profile gelten. In anderen Profilen definierte Werte werden an "
-"die globale Konfiguration angehängt. Auf diese Weise kann vermieden "
-"werden, einige der Einstellungen wiederholen zu müssen, die "
-"normalerweise in jedem Profil gleich sind."
+msgid "The Global Profile allows you to define settings that are common for all profiles. Values defined in other profiles will be appended to the global configuration. This way you can avoid repeating some of the settings that are usually the same in each profile."
+msgstr "Das globale Profil ermöglicht Einstellungen vorzunehmen, die für alle Profile gelten. In anderen Profilen definierte Werte werden an die globale Konfiguration angehängt. Auf diese Weise kann vermieden werden, einige der Einstellungen wiederholen zu müssen, die normalerweise in jedem Profil gleich sind."
 
-#: fckeditor.help.inc:65
-msgid ""
-"Profiles can be defined based on user roles. A FCKeditor profile can "
-"define which pages receive this FCKeditor capability, what buttons or "
-"themes are enabled for the editor, how the editor is displayed, and a "
-"few other editor functions. It is possible also to define the Global "
-"Profile that will hold values that will be appended to all other "
-"profiles."
-msgstr ""
-"Profile können basierend auf Benutzerrollen definiert werden. Ein "
-"FCKeditor-Profil definiert z.B. welche Webseiten die "
-"FCKeditor-Funktionalität erhalten soll, welche Schaltflächen oder "
-"Oberfläche für den FCKeditor aktiviert sein soll, wie der Editor "
-"angezeigt wird und viele andere Einstellungsmöglichkeiten. Es ist "
-"auch möglich das globale Profil zu definieren, welches Werte "
-"enthält, die an alle anderen Profile angefügt werden."
+msgid "Profiles can be defined based on user roles. A FCKeditor profile can define which pages receive this FCKeditor capability, what buttons or themes are enabled for the editor, how the editor is displayed, and a few other editor functions. It is possible also to define the Global Profile that will hold values that will be appended to all other profiles."
+msgstr "Profile können basierend auf Benutzerrollen definiert werden. Ein FCKeditor-Profil definiert z.B. welche Webseiten die FCKeditor-Funktionalität erhalten soll, welche Schaltflächen oder Oberfläche für den FCKeditor aktiviert sein soll, wie der Editor angezeigt wird und viele andere Einstellungsmöglichkeiten. Es ist auch möglich das globale Profil zu definieren, welches Werte enthält, die an alle anderen Profile angefügt werden."
 
-#: fckeditor.help.inc:83
 msgid "Configuration"
 msgstr "Konfiguration"
 
-#: fckeditor.help.inc:90
 msgid "Enable the module as usual from Drupal's admin pages."
 msgstr "Das Modul wie gewohnt in Drupal in den Verwaltungsseiten aktivieren."
 
-#: fckeditor.help.inc:116
 msgid "Defining field inclusion/exclusions"
 msgstr "Definieren der Felder für das Einschließen/Ausschließen"
 
-#: fckeditor.help.inc:128
 msgid "Some examples:"
 msgstr "Einige Beispiele:"
 
-#: fckeditor.help.inc:139
 msgid "Troubleshooting"
 msgstr "Behandlung von Problemen"
 
-#: fckeditor.help.inc:146
 msgid "Plugins: Teaser break and Pagebreak"
 msgstr "Plug-Ins: Teaserbreak und Pagebreak"
 
-#: fckeditor.help.inc:147
-msgid ""
-"By default, FCKeditor module comes with two plugins that can handle "
-"teaser break (&lt;!--break--&gt;) and pagebreak "
-"(&lt;!--pagebreak--&gt;). You can enable any (or even both) of them."
-msgstr ""
-"Standardmäßig kommt das FCKeditor-Modul mit zwei Plug-Ins, einmal "
-"den Teaserbreak(er) (&lt;!--break--&gt;) und den Pagebreak(er) "
-"(&lt;!--pagebreak--&gt;). Es kann eines oder beide aktiviert werden."
+msgid "By default, FCKeditor module comes with two plugins that can handle teaser break (&lt;!--break--&gt;) and pagebreak (&lt;!--pagebreak--&gt;). You can enable any (or even both) of them."
+msgstr "Standardmäßig kommt das FCKeditor-Modul mit zwei Plug-Ins, einmal den Teaserbreak(er) (&lt;!--break--&gt;) und den Pagebreak(er) (&lt;!--pagebreak--&gt;). Es kann eines oder beide aktiviert werden."
 
-#: fckeditor.help.inc:154
 msgid "Uploading images and files"
 msgstr "Bilder und Dateien hochladen"
 
-#: fckeditor.help.inc:155
 msgid "There are three ways for uploading files:"
 msgstr "Es gibt drei Wege Dateien hochzuladen:"
 
-#: fckeditor.help.inc:157
 msgid "By using the built-in file browser."
 msgstr "Mit dem integrierten Dateibrowser."
 
-#: fckeditor.help.inc:164
 msgid "By using the core upload module."
 msgstr "Mit dem Upload-Modul des Drupal-Kerns."
 
-#: fckeditor.help.inc:168,94
 msgid "How to enable the built-in file browser"
 msgstr "Wie man den integrierten Dateibrowser aktiviert"
 
-#: fckeditor.help.inc:169
-msgid ""
-"The editor gives the end user the flexibility to create a custom file "
-"browser that can be integrated on it. The included file browser allows "
-"users to view the content of a specific directory on the server and "
-"add new content to that directory (create folders and upload files)."
-msgstr ""
-"Der Editor bietet dem Endbenutzer die Möglichkeit einen "
-"benutzerdefinierten Dateibrowser zu erstellen, welcher dann integriert "
-"werden kann. Der eingebundene Dateibrowser erlaubt Benutzern, den "
-"Inhalt eines bestimmten Verzeichnisses auf dem Server zu durchzusuchen "
-"und neuen Inhalt diesem Verzeichnis hinzuzufügen (Ordner erstellen "
-"und Dateien hochladen)."
+msgid "The editor gives the end user the flexibility to create a custom file browser that can be integrated on it. The included file browser allows users to view the content of a specific directory on the server and add new content to that directory (create folders and upload files)."
+msgstr "Der Editor bietet dem Endbenutzer die Möglichkeit einen benutzerdefinierten Dateibrowser zu erstellen, welcher dann integriert werden kann. Der eingebundene Dateibrowser erlaubt Benutzern, den Inhalt eines bestimmten Verzeichnisses auf dem Server zu durchzusuchen und neuen Inhalt diesem Verzeichnis hinzuzufügen (Ordner erstellen und Dateien hochladen)."
 
-#: fckeditor.help.inc:172
-msgid ""
-"To enable file browsing you need to edit the connector configuration "
-"file in your fckeditor module directory, the file should be in "
-"%config."
-msgstr ""
-"Um die Funktion <em>Datei durchsuchen</em> nutzen zu können, ist es "
-"notwendig die connector-Konfigurationsdatei im Verzeichnis des "
-"FCKeditor-Moduls zu bearbeiten. Die Datei sollte zufinden sein unter "
-"%config."
+msgid "To enable file browsing you need to edit the connector configuration file in your fckeditor module directory, the file should be in %config."
+msgstr "Um die Funktion <em>Datei durchsuchen</em> nutzen zu können, ist es notwendig die connector-Konfigurationsdatei im Verzeichnis des FCKeditor-Moduls zu bearbeiten. Die Datei sollte zufinden sein unter %config."
 
-#: fckeditor.help.inc:185
 msgid "Modules: Image Assist"
 msgstr "Module: Image Assist"
 
-#: fckeditor.user.inc:46
 msgid "Rich text editor settings"
 msgstr "Rich-Text-Editor Einstellungen"
 
-#: fckeditor.module:888
 msgid "Open rich text editor"
 msgstr "Rich-Text-Editor öffnen"
 
-#: fckeditor.module:346,336,326,316,306,296,287
 msgid "Configure the rich text editor."
 msgstr "Konfiguration des FCKeditor."
 
-#: fckeditor.module:305
 msgid "Clone FCKeditor profile"
 msgstr "FCKeditor-Profil duplizieren"
 
-#: fckeditor.module:325
 msgid "Delete FCKeditor profile"
 msgstr "Globale Profil des FCKeditor löschen"
 
-#: fckeditor.module:335
 msgid "Add FCKeditor Global profile"
 msgstr "Globales FCKeditor-Profil hinzufügen"
 
-#: fckeditor.module:345
 msgid "Edit FCKeditor Global profile"
 msgstr "Globales FCKeditor-Profil bearbeiten"
 
-#: fckeditor.install:217
 msgid "FCKeditor was not found at %sourcepath"
 msgstr "FCKeditor wurde unter %sourcepath nicht gefunden"
 
-#: fckeditor.install:240
-msgid ""
-"You are using a feature that requires $cookie_domain to be set, but it "
-"is not set in your settings.php (either built-in filebrowser or quick "
-"uploads are enabled in the !profile profile)."
-msgstr ""
-"Es wird eine Funktion verwendet, welche das Setzen der $cookie_domain "
-"erfordert. Jedoch ist diese nicht in der settings.php gesetzt "
-"(Entweder ist der integrierte Dateibrowser oder „Schnelle Uploads“ "
-"im !profile Profil aktiviert)."
+msgid "You are using a feature that requires $cookie_domain to be set, but it is not set in your settings.php (either built-in filebrowser or quick uploads are enabled in the !profile profile)."
+msgstr "Es wird eine Funktion verwendet, welche das Setzen der $cookie_domain erfordert. Jedoch ist diese nicht in der settings.php gesetzt (Entweder ist der integrierte Dateibrowser oder „Schnelle Uploads“ im !profile Profil aktiviert)."
 
-#: fckeditor.install:322
-msgid ""
-"!config not found. Make sure that you have uploaded all files or "
-"didn't remove that file accidentally."
-msgstr ""
-"!config nicht gefunden. Bitte nochmals überprüfen, ob auch alle "
-"Dateien hochgeladen wurden oder diese Datei nicht zufällig entfernt "
-"wurde."
+msgid "!config not found. Make sure that you have uploaded all files or didn't remove that file accidentally."
+msgstr "!config nicht gefunden. Bitte nochmals überprüfen, ob auch alle Dateien hochgeladen wurden oder diese Datei nicht zufällig entfernt wurde."
 
-#: fckeditor.install:326
 msgid "FCKeditor needs read permission to !config."
 msgstr "Der FCKeditor braucht Leseberechtigung für !config."
 
-#: fckeditor.install:353
-msgid ""
-"You are using a feature that requires manual integration into "
-"config.php (either built-in filebrowser or quick uploads are enabled "
-"in the !profile profile). Read instructions about enabling built-in "
-"file browser and add \"require_once ...\" statement in "
-"editor/filemanager/connectors/php/config.php."
-msgstr ""
-"Es wird ein Funktion verwendet, welches das manuelle Einbinden in der "
-"config.php erfordert (Entweder ist der integrierte Dateibrowser oder "
-"„Schnelle Uploads“ im !profile Profil aktiviert). Bitte die "
-"Anleitung zum Aktivieren des integrierten Dateibrowsers lesen und die "
-"\"require_once...\" Anweisungen in der "
-"editor/filemanager/connectors/php/config.php hinzufügen."
+msgid "You are using a feature that requires manual integration into config.php (either built-in filebrowser or quick uploads are enabled in the !profile profile). Read instructions about enabling built-in file browser and add \"require_once ...\" statement in editor/filemanager/connectors/php/config.php."
+msgstr "Es wird ein Funktion verwendet, welches das manuelle Einbinden in der config.php erfordert (Entweder ist der integrierte Dateibrowser oder „Schnelle Uploads“ im !profile Profil aktiviert). Bitte die Anleitung zum Aktivieren des integrierten Dateibrowsers lesen und die \"require_once...\" Anweisungen in der editor/filemanager/connectors/php/config.php hinzufügen."
 
-#: fckeditor.install:358
-msgid ""
-"You are using a feature that requires manual integration into "
-"config.php (either built-in filebrowser or quick uploads are enabled "
-"in the !profile profile). You have added \"require_once ...\" "
-"statement in editor/filemanager/connectors/php/config.php, but in the "
-"wrong line."
-msgstr ""
-"Es wird ein Funktion verwendet, welches das manuelle Einbinden in der "
-"config.php erfordert (Entweder ist der integrierte Dateibrowser oder "
-"„Schnelle Uploads“ im !profile Profil aktiviert). Es wurde die "
-"\"require_once...\" Anweisungen in der "
-"editor/filemanager/connectors/php/config.php hinzugefügt, jedoch in "
-"der falschen Zeile."
+msgid "You are using a feature that requires manual integration into config.php (either built-in filebrowser or quick uploads are enabled in the !profile profile). You have added \"require_once ...\" statement in editor/filemanager/connectors/php/config.php, but in the wrong line."
+msgstr "Es wird ein Funktion verwendet, welches das manuelle Einbinden in der config.php erfordert (Entweder ist der integrierte Dateibrowser oder „Schnelle Uploads“ im !profile Profil aktiviert). Es wurde die \"require_once...\" Anweisungen in der editor/filemanager/connectors/php/config.php hinzugefügt, jedoch in der falschen Zeile."
 
-#: img_assist_fckeditor.js:0
 msgid "Inserting image into FCKeditor is allowed only in WYSIWYG mode"
-msgstr ""
-"Das Einfügen von Bildern in den FCKeditor ist nur im WYSIWYG-Modus "
-"erlaubt"
+msgstr "Das Einfügen von Bildern in den FCKeditor ist nur im WYSIWYG-Modus erlaubt"
 
-#: fckeditor.help.inc:162; fckeditor.admin.inc:746,727
 msgid "Web File Manager"
 msgstr "Web File Manager"
 
-#: fckeditor.admin.inc:819
 msgid "Load fckeditor.config.js from theme path"
 msgstr "fckeditor.config.js aus dem Theme Pfad laden"
 
-#: fckeditor.user.inc:166,128; fckeditor.admin.inc:900,506
 msgid "or"
 msgstr "oder"
 
-#: fckeditor.admin.inc:362
-msgid ""
-"The following settings are combined with the visibility settings of "
-"the global profile."
-msgstr ""
-"Die folgenen Einstellungen werden mit der Sichtbarkeitseinstellung des "
-"globalen Profiles kombiniert."
+msgid "The following settings are combined with the visibility settings of the global profile."
+msgstr "Die folgenen Einstellungen werden mit der Sichtbarkeitseinstellung des globalen Profiles kombiniert."
 
-#: fckeditor.admin.inc:1042
-msgid ""
-"The following settings are combined with the visibility settings of "
-"the specific profile."
-msgstr ""
-"Die folgenden Einstellungen werden mit den Sichtbarkeits-Einstellung "
-"des angegebenen Profil kombiniert."
+msgid "The following settings are combined with the visibility settings of the specific profile."
+msgstr "Die folgenden Einstellungen werden mit den Sichtbarkeits-Einstellung des angegebenen Profil kombiniert."
 
-#: fckeditor.help.inc:186
-msgid ""
-"Image Assist version 1 and 2 can be integrated with FCKeditor. It is "
-"no longer necessary to copy a Javascript file."
-msgstr ""
-"Image-Assist Version 1 und 2 kann in FCKeditor intergriert werden. Es "
-"ist nicht mehr länger notwendig eine Javascipt-Datei zu kopieren."
+msgid "Image Assist version 1 and 2 can be integrated with FCKeditor. It is no longer necessary to copy a Javascript file."
+msgstr "Image-Assist Version 1 und 2 kann in FCKeditor intergriert werden. Es ist nicht mehr länger notwendig eine Javascipt-Datei zu kopieren."
 
-#: fckeditor.user.inc:217
 msgid "Image Assist output was not recognized"
 msgstr "Image-Assist Ausgabe wurde nicht erkannt"
 
-#: fckeditor.module:356
 msgid "Image assist"
 msgstr "Image-Assist"
 
-#: fckeditor.install:221
 msgid "FCKeditor version could not be determined"
 msgstr "Die Version des FCKeditors konnte nicht ermittelt werden"
 
-#: fckeditor.admin.inc:309
-msgid ""
-"The FCKeditor security system protects you from executing malicious "
-"code that is already in your database. In plain text areas database "
-"content is harmless because it is not executed, but the FCKeditor "
-"WYSIWYG editor evaluates HTML like a web browser and content needs to "
-"be filtered before it is loaded."
-msgstr ""
-"Das FCKeditor Sicherheitsystem schützt Sie vor Ausführung von "
-"bösartigen Code, der bereits in der Datenbank ist. Bei einfachen "
-"Textfeldern ist der Datenbankinhalt harmlos, da er nicht ausgeführt "
-"wird, aber der FCKeditor WYSIWYG Editor führt das HTML wie ein "
-"Webbrowser aus und der Inhalt muss vor dem Laden gefiltert werden."
+msgid "The FCKeditor security system protects you from executing malicious code that is already in your database. In plain text areas database content is harmless because it is not executed, but the FCKeditor WYSIWYG editor evaluates HTML like a web browser and content needs to be filtered before it is loaded."
+msgstr "Das FCKeditor Sicherheitsystem schützt Sie vor Ausführung von bösartigen Code, der bereits in der Datenbank ist. Bei einfachen Textfeldern ist der Datenbankinhalt harmlos, da er nicht ausgeführt wird, aber der FCKeditor WYSIWYG Editor führt das HTML wie ein Webbrowser aus und der Inhalt muss vor dem Laden gefiltert werden."
 
-#: fckeditor.admin.inc:354
-msgid ""
-"There are two ways of starting FCKeditor: automatically and manually "
-"(via toggle or in a popup). If you decide to apply security filters "
-"only when FCKeditor starts automatically, you will not be protected "
-"when toggling manually from plain text area to FCKeditor or when using "
-"FCKeditor in a popup mode. So choose this option only, if you can "
-"detect various attacks (mainly XSS) by yourself just by looking at the "
-"HTML code."
-msgstr ""
-"Es gibt 2 Methoden, den FCKeditor zu starten: automatisch und manuell "
-"(mittels Umschalter oder in einem Popup). Wenn Sicherheitsfilter nur "
-"angewendet werden sollen, wenn der FCKeditor automatisch startet, "
-"besteht kein Schutz wenn manuell von einem normalen Textbereich zum "
-"FCKeditor umgestellt wird oder wenn der FCKeditor im Popup-Modus "
-"verwendet wird. Diese Option sollte daher nur gewählt werden, wenn "
-"verschiedene Attacken (hauptsächlich XSS) selbst durch Prüfung des "
-"HTML-Codes festgestellt werden können."
+msgid "There are two ways of starting FCKeditor: automatically and manually (via toggle or in a popup). If you decide to apply security filters only when FCKeditor starts automatically, you will not be protected when toggling manually from plain text area to FCKeditor or when using FCKeditor in a popup mode. So choose this option only, if you can detect various attacks (mainly XSS) by yourself just by looking at the HTML code."
+msgstr "Es gibt 2 Methoden, den FCKeditor zu starten: automatisch und manuell (mittels Umschalter oder in einem Popup). Wenn Sicherheitsfilter nur angewendet werden sollen, wenn der FCKeditor automatisch startet, besteht kein Schutz wenn manuell von einem normalen Textbereich zum FCKeditor umgestellt wird oder wenn der FCKeditor im Popup-Modus verwendet wird. Diese Option sollte daher nur gewählt werden, wenn verschiedene Attacken (hauptsächlich XSS) selbst durch Prüfung des HTML-Codes festgestellt werden können."
 
-#: fckeditor.admin.inc:1169,799,782
 msgid "User ID"
 msgstr "Benutzer-ID"
 
-#: fckeditor.user.inc:222
 msgid "This Image Assist version is not supported"
 msgstr "Die Image-Assist Version wird nicht unterstützt"
 
-#: fckeditor.install:254
-msgid ""
-"The installed version of FCKeditor is known to have a security "
-"problem. You can download an updated version at !fcklink."
-msgstr ""
-"Die installierte Version des FCKeditor weist Sicherheitsprobleme auf. "
-"Unter !fcklink kann eine aktualisierte Version heruntergeladen werden."
+msgid "The installed version of FCKeditor is known to have a security problem. You can download an updated version at !fcklink."
+msgstr "Die installierte Version des FCKeditor weist Sicherheitsprobleme auf. Unter !fcklink kann eine aktualisierte Version heruntergeladen werden."
 
-#: fckeditor.admin.inc:40
-msgid ""
-"The FCKeditor component appears to be not installed correctly, because "
-"%checkfile could not be found."
-msgstr ""
-"Die FCKeditor-Komponente ist nicht ordnungsgemäß installiert, weil "
-"%checkfile nicht gefunden werden kann."
+msgid "The FCKeditor component appears to be not installed correctly, because %checkfile could not be found."
+msgstr "Die FCKeditor-Komponente ist nicht ordnungsgemäß installiert, weil %checkfile nicht gefunden werden kann."
 
-#: fckeditor.admin.inc:40
-msgid ""
-"Please go to the !fckeditorlink to download the latest version. After "
-"that you must extract the files to %fckeditorpath and make sure that "
-"the directory %fckeditorsubdir and the file %fckeditorfile exist. "
-"Refer to the !readme for more information."
-msgstr ""
-"Auf der !fckeditorlink sollte die neueste Version heruntergeladen "
-"werden. Danach müssen die Dateien nach %fckeditorpath entpackt und "
-"sichergestellt werden, dass das Verzeichnis %fckeditorsubdir und die "
-"Datei %fckeditorfile vorhanden sind. Weitere Informationen sind der "
-"!readme zu entnehmen."
+msgid "Please go to the !fckeditorlink to download the latest version. After that you must extract the files to %fckeditorpath and make sure that the directory %fckeditorsubdir and the file %fckeditorfile exist. Refer to the !readme for more information."
+msgstr "Auf der !fckeditorlink sollte die neueste Version heruntergeladen werden. Danach müssen die Dateien nach %fckeditorpath entpackt und sichergestellt werden, dass das Verzeichnis %fckeditorsubdir und die Datei %fckeditorfile vorhanden sind. Weitere Informationen sind der !readme zu entnehmen."
 
-#: fckeditor.admin.inc:728,44
 msgid "readme.txt"
 msgstr "liesmich.txt"
 
-#: fckeditor.admin.inc:49
-msgid ""
-"If you have FCKeditor already installed please edit !editgloballink "
-"and update FCKeditor path."
-msgstr ""
-"Wenn der FCKeditor bereits installiert ist, bearbeiten Sie das "
-"!editgloballink und aktualisieren Sie den FCKeditor Pfad."
+msgid "If you have FCKeditor already installed please edit !editgloballink and update FCKeditor path."
+msgstr "Wenn der FCKeditor bereits installiert ist, bearbeiten Sie das !editgloballink und aktualisieren Sie den FCKeditor Pfad."
 
-#: fckeditor.admin.inc:58
-msgid ""
-"There is currently no role with the %accesspermission permission. "
-"Visit !permissionslink administration section."
-msgstr ""
-"Aktuell besitzt keine Rolle die Berechtigung %accesspermission. Im "
-"Verwaltungsbereich können die !acl gesetzt werden."
+msgid "There is currently no role with the %accesspermission permission. Visit !permissionslink administration section."
+msgstr "Aktuell besitzt keine Rolle die Berechtigung %accesspermission. Im Verwaltungsbereich können die !acl gesetzt werden."
 
-#: fckeditor.admin.inc:90
-msgid ""
-"Not all roles with %accesspermission permission are associated with "
-"FCKeditor profiles. As a result, users having the following roles may "
-"be unable to use FCKeditor: !list Create new or edit FCKeditor "
-"profiles below and in the %basicsetupsection section, check "
-"%rolesetting."
-msgstr ""
-"Es sind nicht alle Rollen mit der Berechtigung %accesspermission einem "
-"FCKeditor-Profil zugeordnet. Dies führt dazu, dass Benutzer mit "
-"folgenden Rollen den FCKeditor nicht benutzen können: !list Es sollte "
-"ein neues FCKeditor-Profil erstellt oder eines unten bearbeitet werden "
-"und im Abschnitt %basicsetupsection %rolesetting überprüft werden."
+msgid "Not all roles with %accesspermission permission are associated with FCKeditor profiles. As a result, users having the following roles may be unable to use FCKeditor: !list Create new or edit FCKeditor profiles below and in the %basicsetupsection section, check %rolesetting."
+msgstr "Es sind nicht alle Rollen mit der Berechtigung %accesspermission einem FCKeditor-Profil zugeordnet. Dies führt dazu, dass Benutzer mit folgenden Rollen den FCKeditor nicht benutzen können: !list Es sollte ein neues FCKeditor-Profil erstellt oder eines unten bearbeitet werden und im Abschnitt %basicsetupsection %rolesetting überprüft werden."
 
-#: fckeditor.admin.inc:138
 msgid "No profiles found. Click here to !createlink."
 msgstr "Keine Profile gefunden. Klicke hier, um !createlink."
 
-#: fckeditor.admin.inc:146
 msgid "Global profile not found. Click here to !createlink."
 msgstr "Globale Profil nicht gefunden. Klicke hier, um !createlink."
 
-#: fckeditor.admin.inc:215
-msgid ""
-"You haven't assigned %accesspermission !permissionslink yet. It is "
-"recommended to assign the %accesspermission !permissionslink before "
-"updating FCKeditor profiles."
-msgstr ""
-"Die %accesspermission !permissionslink wurde noch nicht zugewiesen.Es "
-"wird empfohlen die %accesspermission !permissionslink zuerteilen bevor "
-"die FCKeditor-Profile verändert werden."
+msgid "You haven't assigned %accesspermission !permissionslink yet. It is recommended to assign the %accesspermission !permissionslink before updating FCKeditor profiles."
+msgstr "Die %accesspermission !permissionslink wurde noch nicht zugewiesen.Es wird empfohlen die %accesspermission !permissionslink zuerteilen bevor die FCKeditor-Profile verändert werden."
 
-#: fckeditor.admin.inc:230
-msgid ""
-"Not all user roles are shown since they already have FCKeditor "
-"profiles. You must first unassign profiles in order to add them to a "
-"new one."
-msgstr ""
-"Nicht alle Benutzerrollen werden gezeigt, da sie bereits ein FCKeditor "
-"Profil haben. Es muss erst eine Zuweisung entfernt, um diese einem "
-"neuen hinzuzufügen."
+msgid "Not all user roles are shown since they already have FCKeditor profiles. You must first unassign profiles in order to add them to a new one."
+msgstr "Nicht alle Benutzerrollen werden gezeigt, da sie bereits ein FCKeditor Profil haben. Es muss erst eine Zuweisung entfernt, um diese einem neuen hinzuzufügen."
 
-#: fckeditor.admin.inc:287
-msgid ""
-"Only roles with %accesspermission permission will be shown here. If no "
-"role is available, make sure that you have assigned the "
-"%accesspermission !permissionslink."
-msgstr ""
-"Nur Rollen mit der Berechtigung %accesspermission werden hier "
-"angezeigt. Wenn keine Rolle verfügbar ist muss sichergestellt werden, "
-"das die !permissionslink %accesspermission zugewiesen ist."
+msgid "Only roles with %accesspermission permission will be shown here. If no role is available, make sure that you have assigned the %accesspermission !permissionslink."
+msgstr "Nur Rollen mit der Berechtigung %accesspermission werden hier angezeigt. Wenn keine Rolle verfügbar ist muss sichergestellt werden, das die !permissionslink %accesspermission zugewiesen ist."
 
-#: fckeditor.admin.inc:303
-msgid ""
-"If allowed, users will be able to override the %appearancesection by "
-"visiting their profile page."
-msgstr ""
-"Wenn erlaubt, können Benutzer die %appearancesection überschreiben "
-"in ihrem Benutzerkonto."
+msgid "If allowed, users will be able to override the %appearancesection by visiting their profile page."
+msgstr "Wenn erlaubt, können Benutzer die %appearancesection überschreiben in ihrem Benutzerkonto."
 
-#: fckeditor.admin.inc:1070,398
-msgid ""
-"Please see the !helppagelink for more information about defining field "
-"names. Short instruction is available below."
-msgstr ""
-"Bitte lesen Sie die !helppagelink für weitere Information über die "
-"Definition der Feldnamen. Eine kurze Anleitung ist folgt hier."
+msgid "Please see the !helppagelink for more information about defining field names. Short instruction is available below."
+msgstr "Bitte lesen Sie die !helppagelink für weitere Information über die Definition der Feldnamen. Eine kurze Anleitung ist folgt hier."
 
-#: fckeditor.admin.inc:1098,1072,426,400
 msgid "help page"
 msgstr "Hilfeseite"
 
-#: fckeditor.admin.inc:1075,403
 msgid "Path structure"
 msgstr "Pfadstruktur"
 
-#: fckeditor.admin.inc:1076,404
 msgid "The following wildcards are available: *, ?"
 msgstr "Die folgenden Wildcards sind verfügbar: *, ?"
 
-#: fckeditor.admin.inc:1077,405
 msgid "Content type is optional. You may even specify only path or field id"
-msgstr ""
-"Der Inhaltstyp ist optional. Es kann auch nur ein bestimmter Pfad oder "
-"Feld-ID angegeben werden."
+msgstr "Der Inhaltstyp ist optional. Es kann auch nur ein bestimmter Pfad oder Feld-ID angegeben werden."
 
-#: fckeditor.admin.inc:1078,406
 msgid "Examples"
 msgstr "Beispiele"
 
-#: fckeditor.admin.inc:1079,407
 msgid "matches all fields of type %type called %field, on any page"
 msgstr "betrifft alle %field Felder des Typs %type, auf jeder Seite"
 
-#: fckeditor.admin.inc:1080,408
 msgid "matches fields starting with %field on pages starting with %path"
-msgstr ""
-"betrifft alle Felder, die mit %field beginnen auf den Seiten die mit "
-"%path beginnen"
+msgstr "betrifft alle Felder, die mit %field beginnen auf den Seiten die mit %path beginnen"
 
-#: fckeditor.admin.inc:1092,420
-msgid ""
-"Enter the paths to the textarea fields on which you want to force the "
-"simplified toolbar (%toolbarname)."
-msgstr ""
-"Pfade zu den Textbereichen angeben, indem die vereinfachte "
-"Werkzeugleiste  (%toolbarname) angezeigt werden soll."
+msgid "Enter the paths to the textarea fields on which you want to force the simplified toolbar (%toolbarname)."
+msgstr "Pfade zu den Textbereichen angeben, indem die vereinfachte Werkzeugleiste  (%toolbarname) angezeigt werden soll."
 
-#: fckeditor.admin.inc:1096,424
-msgid ""
-"Please see the !helppagelink for more information about defining field "
-"names. Take a look at the exclusion settings (above) for short "
-"instruction."
-msgstr ""
-"Bitte lesen Sie die !helppagelink für weitere Information über die "
-"Definition der Feldnamen. Lesen Sie oben die Ausschließen-Einstellung "
-"für eine kurze Anleitung."
+msgid "Please see the !helppagelink for more information about defining field names. Take a look at the exclusion settings (above) for short instruction."
+msgstr "Bitte lesen Sie die !helppagelink für weitere Information über die Definition der Feldnamen. Lesen Sie oben die Ausschließen-Einstellung für eine kurze Anleitung."
 
-#: fckeditor.admin.inc:484
-msgid ""
-"Choose a default toolbar set. To define new toolbar, edit %configfile "
-"located in %module_path."
-msgstr ""
-"Wähle die Standard-Werkzeugleiste. Neue Werkzeugleisten werden durch "
-"bearbeiten der %configfile unter %module_path definiert."
+msgid "Choose a default toolbar set. To define new toolbar, edit %configfile located in %module_path."
+msgstr "Wähle die Standard-Werkzeugleiste. Neue Werkzeugleisten werden durch bearbeiten der %configfile unter %module_path definiert."
 
-#: fckeditor.user.inc:128; fckeditor.admin.inc:506
 msgid "Width in pixels or percent."
 msgstr "Breite in Pixel oder Prozent."
 
-#: fckeditor.user.inc:166,128; fckeditor.admin.inc:900,506
 msgid "Example"
 msgstr "Beispiel"
 
-#: fckeditor.admin.inc:567
 msgid "Semicolon separated list of HTML font formats."
 msgstr "Eine mit Semikolon getrennt Liste von HTML Schriftformate."
 
-#: fckeditor.admin.inc:567
 msgid "Allowed values are"
 msgstr "Zulässige Werte sind"
 
-#: fckeditor.admin.inc:579
-msgid ""
-"When set to %true the editor will format the XHTML when switching from "
-"WYSIWYG view to Source view, by inserting line breaks on some tags "
-"endings and indenting paragraphs, tables and lists."
-msgstr ""
-"Wenn auf %true gesetzt, wird der Editor das XHTML beim Umschalten "
-"zwischen der WYSIWYG-Ansicht und der Quelltext-Ansicht formatieren, "
-"indem bei einigen Tags am Ende Zeilenumbrüche und Einzüge bei "
-"Absätzen, Tabellen und Listen eingefügt werden."
+msgid "When set to %true the editor will format the XHTML when switching from WYSIWYG view to Source view, by inserting line breaks on some tags endings and indenting paragraphs, tables and lists."
+msgstr "Wenn auf %true gesetzt, wird der Editor das XHTML beim Umschalten zwischen der WYSIWYG-Ansicht und der Quelltext-Ansicht formatieren, indem bei einigen Tags am Ende Zeilenumbrüche und Einzüge bei Absätzen, Tabellen und Listen eingefügt werden."
 
-#: fckeditor.admin.inc:594
-msgid ""
-"When set to %true the editor will format the XHTML output by inserting "
-"line breaks on some tags endings and indenting paragraphs, tables and "
-"lists."
-msgstr ""
-"Wenn auf %true gesetzt, wird der Editor die XHTML-Ausgabe formatieren, "
-"indem bei einigen Tags am Ende Zeilenumbrüche und Einzüge bei "
-"Absätzen, Tabellen und Listen eingefügt werden."
+msgid "When set to %true the editor will format the XHTML output by inserting line breaks on some tags endings and indenting paragraphs, tables and lists."
+msgstr "Wenn auf %true gesetzt, wird der Editor die XHTML-Ausgabe formatieren, indem bei einigen Tags am Ende Zeilenumbrüche und Einzüge bei Absätzen, Tabellen und Listen eingefügt werden."
 
-#: fckeditor.admin.inc:602
 msgid "Style and template files"
 msgstr "Style und Template Dateien"
 
-#: fckeditor.admin.inc:618,612
 msgid "Use theme CSS"
 msgstr "Theme CSS verwenden"
 
-#: fckeditor.admin.inc:906,619,613
 msgid "Define CSS"
 msgstr "CSS definieren"
 
-#: fckeditor.admin.inc:617
 msgid "Defines the CSS to be used in the editor area."
 msgstr "Definiere das CSS, der im Editorbereich genutzt werden soll."
 
-#: fckeditor.admin.inc:618
 msgid "load style.css from current site theme."
 msgstr "Lade style.css des aktuellen Theme der Webseite"
 
-#: fckeditor.admin.inc:619
 msgid "enter path for CSS file below."
 msgstr "Pfad für die CSS Datei unten angeben"
 
-#: fckeditor.admin.inc:620
 msgid "uses default CSS from editor."
 msgstr "Standard CSS des Editors verwenden."
 
-#: fckeditor.admin.inc:630
-msgid ""
-"Enter path to CSS file (Example: %cssexample1) or a list of CSS files "
-"separated by a comma (Example: %cssexample2). Make sure to select "
-"%defcss above."
-msgstr ""
-"Den Pfad zur CSS Datei angeben (Beispiel: %cssexample1) oder eine "
-"Liste von CSS Dateien getrennt mit ein Komma (Beispiel: %cssexample2). "
-"%defcss muss oben ausgewählt sein."
+msgid "Enter path to CSS file (Example: %cssexample1) or a list of CSS files separated by a comma (Example: %cssexample2). Make sure to select %defcss above."
+msgstr "Den Pfad zur CSS Datei angeben (Beispiel: %cssexample1) oder eine Liste von CSS Dateien getrennt mit ein Komma (Beispiel: %cssexample2). %defcss muss oben ausgewählt sein."
 
-#: fckeditor.admin.inc:1168,1123,795,779,711,673,636
 msgid "Available placeholders"
 msgstr "Verfügbare Platzhalter"
 
-#: fckeditor.admin.inc:712,674,637
 msgid "host name (%host)"
 msgstr "Host-Adresse (%host)"
 
-#: fckeditor.admin.inc:713,675,638
 msgid "path to theme (%theme)"
 msgstr "Pfad zum Theme (%theme)"
 
-#: fckeditor.admin.inc:689,651
-msgid ""
-"Define the location of %file file. It is used by the %setting dropdown "
-"list available in the default toolbar. Copy %sourcefile inside your "
-"theme directory (%themefile) and adjust it to your needs."
-msgstr ""
-"Definiere den Speicherort der Datei %file. Er wird von der "
-"%setting-Auswahlliste in der Standard-Werkzeugleiste verwendet. "
-"%sourcefile muss in das Theme Verzeichnis (%themefile) kopiert und "
-"nach eigenen Bedürfnissen angepasst werden."
+msgid "Define the location of %file file. It is used by the %setting dropdown list available in the default toolbar. Copy %sourcefile inside your theme directory (%themefile) and adjust it to your needs."
+msgstr "Definiere den Speicherort der Datei %file. Er wird von der %setting-Auswahlliste in der Standard-Werkzeugleiste verwendet. %sourcefile muss in das Theme Verzeichnis (%themefile) kopiert und nach eigenen Bedürfnissen angepasst werden."
 
-#: fckeditor.admin.inc:705,667
-msgid ""
-"Enter the path to XML file with predefined @type (Example: %example). "
-"Be sure to select %setting above."
-msgstr ""
-"Pfad eingeben zur XML Datei mit den vordefnierten @type (Beispiel: "
-"%example). %setting muss oben ausgewählt sein."
+msgid "Enter the path to XML file with predefined @type (Example: %example). Be sure to select %setting above."
+msgstr "Pfad eingeben zur XML Datei mit den vordefnierten @type (Beispiel: %example). %setting muss oben ausgewählt sein."
 
-#: fckeditor.admin.inc:669
 msgid "styles"
 msgstr "Styles"
 
-#: fckeditor.admin.inc:714,676
 msgid "path to FCKeditor module (%module)"
 msgstr "Pfad zum FCKeditor-Modul (%module)"
 
-#: fckeditor.admin.inc:932,681
 msgid "Predefined templates"
 msgstr "Vordefinierte Templates"
 
-#: fckeditor.admin.inc:685
 msgid "Use theme fcktemplates.xml"
 msgstr "Theme fcktemplates.xml verwenden"
 
-#: fckeditor.admin.inc:932,686
 msgid "Define path to fcktemplates.xml"
 msgstr "Pfad zur fcktemplates.xml definieren"
 
-#: fckeditor.admin.inc:692
 msgid "Templates"
 msgstr "Templates"
 
-#: fckeditor.admin.inc:700
 msgid "Predefined templates path"
 msgstr "Pfad der vordefinierten Templates"
 
-#: fckeditor.admin.inc:707
 msgid "templates"
 msgstr "Templates"
 
-#: fckeditor.admin.inc:723
-msgid ""
-"Set file browser settings. A file browser will allow you to explore "
-"the files contained on the server and embed them as links, images or "
-"flash movies. Besides the built-in FCKeditor file browser, you can "
-"also use a contributed module like !imcelink, !iblink or !webfmlink. "
-"The quick upload setting controls whether images, flash movies and "
-"files can be uploaded using the upload tab of the respective dialogs. "
-"Please note that these options require manual configuration, check "
-"!readmelink for more information."
-msgstr ""
-"Ein Dateibrowser ermöglicht es, die Dateien auf dem Server zu "
-"durchsuchen und diese als Links, Bilder oder Flashfilme einzufügen. "
-"Neben dem integrierten Dateibrowser des FCKeditors, kann auch ein "
-"Zusatz-Modul wie !imcelink, !iblink oder !webfmlink verwendet werden. "
-"Die Einstellung „Schnelle Uploads“ kontrolliert, ob Bilder, "
-"Flashfilme und Dateien in dem jeweiligen Dialog mit einem Reiter "
-"„Hochladen“ hochgeladen werden kann. Zu beachten ist, dass diese "
-"Optionen manuelle Änderungen erfordert, weitere Informationen sind in "
-"der !readmelink zu finden."
+msgid "Set file browser settings. A file browser will allow you to explore the files contained on the server and embed them as links, images or flash movies. Besides the built-in FCKeditor file browser, you can also use a contributed module like !imcelink, !iblink or !webfmlink. The quick upload setting controls whether images, flash movies and files can be uploaded using the upload tab of the respective dialogs. Please note that these options require manual configuration, check !readmelink for more information."
+msgstr "Ein Dateibrowser ermöglicht es, die Dateien auf dem Server zu durchsuchen und diese als Links, Bilder oder Flashfilme einzufügen. Neben dem integrierten Dateibrowser des FCKeditors, kann auch ein Zusatz-Modul wie !imcelink, !iblink oder !webfmlink verwendet werden. Die Einstellung „Schnelle Uploads“ kontrolliert, ob Bilder, Flashfilme und Dateien in dem jeweiligen Dialog mit einem Reiter „Hochladen“ hochgeladen werden kann. Zu beachten ist, dass diese Optionen manuelle Änderungen erfordert, weitere Informationen sind in der !readmelink zu finden."
 
-#: fckeditor.help.inc:182; fckeditor.admin.inc:734
 msgid "Built-in file browser"
 msgstr "Integrierten Dateibrowser"
 
-#: fckeditor.admin.inc:778
 msgid "Path to uploaded files relative to the document root."
-msgstr ""
-"Pfad zu den hochgeladenen Dateien relativ zum Wurzelverzeichnis des "
-"Dokuments."
+msgstr "Pfad zu den hochgeladenen Dateien relativ zum Wurzelverzeichnis des Dokuments."
 
-#: fckeditor.admin.inc:1124,797,780
 msgid "base URL path of the Drupal installation (%base)"
 msgstr "Base-URL Pfad, der Drupal-Installation (%base)"
 
-#: fckeditor.admin.inc:798,781
 msgid "Drupal file system path where the files are stored (%files)"
-msgstr ""
-"Dateisystem-Pfad von Drupal, indem die Datei gespeichert werden "
-"(%files)"
+msgstr "Dateisystem-Pfad von Drupal, indem die Datei gespeichert werden (%files)"
 
-#: fckeditor.admin.inc:1138,1126,801,784
 msgid "Current path: %path"
 msgstr "Aktueller Pfad: %path"
 
-#: fckeditor.admin.inc:794
-msgid ""
-"The path to the local directory (in the server) which points to the "
-"path defined above. If empty, FCKeditor will try to discover the right "
-"path."
-msgstr ""
-"Der Pfad zum lokalen Verzeichnis (auf dem Webserver), welches auf die "
-"obigen definierten Pfade zeigt. Wenn leer, wird der FCKeditor "
-"versuchen den richtigen Pfad zu finden."
+msgid "The path to the local directory (in the server) which points to the path defined above. If empty, FCKeditor will try to discover the right path."
+msgstr "Der Pfad zum lokalen Verzeichnis (auf dem Webserver), welches auf die obigen definierten Pfade zeigt. Wenn leer, wird der FCKeditor versuchen den richtigen Pfad zu finden."
 
-#: fckeditor.admin.inc:796
 msgid "server path to document root (%root)"
 msgstr "Serverpfad zum Wurzelverzeichnis des Dokuments (%root)"
 
-#: fckeditor.admin.inc:805
-msgid ""
-"Setting relative path to uploaded files has been disabled because "
-"private downloads are enabled and this path is calculated "
-"automatically. To change the location of uploaded files in the private "
-"file system, edit the !globallink."
-msgstr ""
-"Die Einstellung des relativen Pfades zu den hochgeladenen Dateien ist "
-"deaktiviert worden, weil Download-Methode (Privat) aktiviert ist und "
-"dieser Pfad automatisch errechnet wird. Um den Speicherort der "
-"hochgeladenen Dateien für diese Download-Methode zu ändern, "
-"bearbeiten Sie !globallink."
+msgid "Setting relative path to uploaded files has been disabled because private downloads are enabled and this path is calculated automatically. To change the location of uploaded files in the private file system, edit the !globallink."
+msgstr "Die Einstellung des relativen Pfades zu den hochgeladenen Dateien ist deaktiviert worden, weil Download-Methode (Privat) aktiviert ist und dieser Pfad automatisch errechnet wird. Um den Speicherort der hochgeladenen Dateien für diese Download-Methode zu ändern, bearbeiten Sie !globallink."
 
-#: fckeditor.admin.inc:807
-msgid ""
-"Setting path to uploaded files has been disabled because private "
-"downloads are enabled and this path is calculated automatically. To "
-"change the location of uploaded files in the private file system, edit "
-"the !globallink."
-msgstr ""
-"Die Einstellung des Pfades zu den hochgeladenen Dateien ist "
-"deaktiviert worden, weil Private-Downloads aktiviert ist und dieser "
-"Pfad automatisch errechnet wird. Um den Speicherort der hochgeladenen "
-"Dateien für diese Download-Methode zu ändern, bearbeiten Sie "
-"!globallink."
+msgid "Setting path to uploaded files has been disabled because private downloads are enabled and this path is calculated automatically.To change the location of uploaded files in the private file system, edit the !globallink."
+msgstr "Die Einstellung des Pfades zu den hochgeladenen Dateien ist deaktiviert worden, weil Private-Downloads aktiviert ist und dieser Pfad automatisch errechnet wird. Um den Speicherort der hochgeladenen Dateien für diese Download-Methode zu ändern, bearbeiten Sie !globallink."
 
-#: fckeditor.admin.inc:826
-msgid ""
-"When set to %true the editor will try to load the %configfile file "
-"from theme directory."
-msgstr ""
-"Wenn auf %true gesetzt, wird der Editor versuchen die %configfile "
-"Datei aus dem Theme-Verzeichnis zu laden."
+msgid "When set to %true the editor will try to load the %configfile file from theme directory."
+msgstr "Wenn auf %true gesetzt, wird der Editor versuchen die %configfile Datei aus dem Theme-Verzeichnis zu laden."
 
-#: fckeditor.admin.inc:839
-msgid ""
-"To change FCKeditor configuration globally, you should modify the "
-"config file: %fckeditor_config. Sometimes it is required to change the "
-"FCKeditor configuration for a single profile only. Use this box to "
-"define settings that are unique for this profile. Available options "
-"are listed in the !docslink. Add the following code snippet to disable "
-"some advanced tabs in dialog windows of FCKeditor."
-msgstr ""
-"Um die FCKeditor Konfiguration global zu ändern, sollte die "
-"Konfigurationsdatei geändert werden: %fckeditor_config. Manchmal ist "
-"es erforderlich, die FCKeditor-Konfiguration für ausgewählte Profile "
-"zu ändern. Verwenden Sie diese Box, um Einstellungen zu definieren, "
-"die eindeutig für dieses Profil vorgesehen sind. Mögliche Optionen "
-"sind in der !docslink aufgelistet.Füge folgene Codezeilen hinzu, um "
-"bestimmte Fenster-Dialoge/Bereiche des FCKeditors abzuschalten."
+msgid "To change FCKeditor configuration globally, you should modify the config file: %fckeditor_config. Sometimes it is required to change the FCKeditor configuration for a single profile only. Use this box to define settings that are unique for this profile. Available options are listed in the !docslink. Add the following code snippet to disable some advanced tabs in dialog windows of FCKeditor."
+msgstr "Um die FCKeditor Konfiguration global zu ändern, sollte die Konfigurationsdatei geändert werden: %fckeditor_config. Manchmal ist es erforderlich, die FCKeditor-Konfiguration für ausgewählte Profile zu ändern. Verwenden Sie diese Box, um Einstellungen zu definieren, die eindeutig für dieses Profil vorgesehen sind. Mögliche Optionen sind in der !docslink aufgelistet.Füge folgene Codezeilen hinzu, um bestimmte Fenster-Dialoge/Bereiche des FCKeditors abzuschalten."
 
-#: fckeditor.admin.inc:1165,845
 msgid "Warning"
 msgstr "Warnung"
 
-#: fckeditor.admin.inc:846
 msgid "If you do something wrong here, FCKeditor may fail to load."
-msgstr ""
-"Wenn falsche Einstellungen vorgenommen werden, könnte es sein, dass "
-"der FCKeditor nicht geladen werden kann."
+msgstr "Wenn falsche Einstellungen vorgenommen werden, könnte es sein, dass der FCKeditor nicht geladen werden kann."
 
-#: fckeditor.user.inc:166; fckeditor.admin.inc:900
 msgid "Enter valid width."
 msgstr "Eine gültige Breite eingeben:"
 
-#: fckeditor.admin.inc:905
 msgid "CSS path is not empty."
 msgstr "CSS Pfad ist nicht leer."
 
-#: fckeditor.admin.inc:931,918,905
 msgid "Please set the %settingname option to %settingoption mode."
 msgstr "Bitte setzen Sie die Option %settingname auf den Modus %settingoption."
 
-#: fckeditor.admin.inc:918
 msgid "Path to predefined styles is not empty."
 msgstr "Pfad zu den vordefinierten Styles ist nicht leer."
 
-#: fckeditor.admin.inc:931
 msgid "Path to predefined templates is not empty."
 msgstr "Pfad zu den vordefinierten Templates ist nicht leer."
 
-#: fckeditor.admin.inc:1028
-msgid ""
-"A user having multiple roles gets the permissions of the highest one. "
-"Sort role IDs according to their precedence from higher to lower by "
-"putting &gt; in between."
-msgstr ""
-"Ein Benutzer mit mehreren Rollen erhält die Berechtigung von der "
-"höchsten. Die Rollen-IDs können entsprechend nach ihren Vorrang von "
-"höheren zur niedrigeren sortiert werden, indem dazwischen ein &gt; "
-"eingefügt wird."
+msgid "A user having multiple roles gets the permissions of the highest one. Sort role IDs according to their precedence from higher to lower by putting &gt; in between."
+msgstr "Ein Benutzer mit mehreren Rollen erhält die Berechtigung von der höchsten. Die Rollen-IDs können entsprechend nach ihren Vorrang von höheren zur niedrigeren sortiert werden, indem dazwischen ein &gt; eingefügt wird."
 
-#: fckeditor.admin.inc:1031
 msgid "Here are the id-name pairs of roles having access to FCKeditor:"
-msgstr ""
-"Hier sind die ID-Name Paare der Rollen, die Zugriff auf den FCKeditor "
-"haben:"
+msgstr "Hier sind die ID-Name Paare der Rollen, die Zugriff auf den FCKeditor haben:"
 
-#: fckeditor.admin.inc:1034
 msgid "You haven't assigned the %accesspermission !permissionslink yet."
 msgstr "Es wurde noch nicht die %accesspermission !permissionslink vergeben."
 
-#: fckeditor.admin.inc:1119
-msgid ""
-"Path to FCKeditor (the HTML editor, downloaded from !fckeditorlink) "
-"relative to the document root."
-msgstr ""
-"Pfad zum FCKeditor (der HTML Editor, heruntergeladen von "
-"!fckeditorlink) relativ zum Dokumentenverzeichnis."
+msgid "Path to FCKeditor (the HTML editor, downloaded from !fckeditorlink) relative to the document root."
+msgstr "Pfad zum FCKeditor (der HTML Editor, heruntergeladen von !fckeditorlink) relativ zum Dokumentenverzeichnis."
 
-#: fckeditor.admin.inc:1125
 msgid "base URL path where FCKeditor module is stored (%files)"
 msgstr "Base-URL Pfad, indem das FCKeditor-Modul gespeichert ist (%files)"
 
-#: fckeditor.admin.inc:1137
-msgid ""
-"The path to the local directory (on the server) which points to the "
-"path defined above. Enter either an absolute server path or path "
-"relative to %index. If empty, FCKeditor module will try to find the "
-"right path."
-msgstr ""
-"Der Pfad zum lokalen Verzeichnis (auf dem Server), welcher auf den "
-"oben definierten Pfad zeigt. Geben Sie den absoluten Serverpfad ein "
-"oder den relativen Pfad zur %index. Falls nichts eintragen wird, "
-"versucht das FCKeditor-Modul den richtigen Pfad zu ermitteln."
+msgid "The path to the local directory (on the server) which points to the path defined above. Enter either an absolute server path or path relative to %index. If empty, FCKeditor module will try to find the right path."
+msgstr "Der Pfad zum lokalen Verzeichnis (auf dem Server), welcher auf den oben definierten Pfad zeigt. Geben Sie den absoluten Serverpfad ein oder den relativen Pfad zur %index. Falls nichts eintragen wird, versucht das FCKeditor-Modul den richtigen Pfad zu ermitteln."
 
-#: fckeditor.admin.inc:1149
 msgid "This only applies for users with %adminpermission permissions."
 msgstr "Dies gilt nur für Benutzer mit den Berechtigungen %adminpermission."
 
-#: fckeditor.admin.inc:1166
-msgid ""
-"FCKeditor does not implement any kind of access protection on files "
-"available in this location. All files stored in the directory defined "
-"above might be accessible by unauthenticated users if there is no "
-"information about the file in the Drupal's database."
-msgstr ""
-"Der FCKeditor verfügt keinerlei Schutzmaßnahmen für den Zugriff auf "
-"diese Dateien. Auf alle Dateien in den oben definierten Verzeichnis "
-"können nicht berechtigte Personen zugreifen, wenn keine Informationen "
-"zu der Datei in der Datenbank gespeichert ist."
+msgid "FCKeditor does not implement any kind of access protection on files available in this location. All files stored in the directory defined above might be accessible by unauthenticated users if there is no information about the file in the Drupal's database."
+msgstr "Der FCKeditor verfügt keinerlei Schutzmaßnahmen für den Zugriff auf diese Dateien. Auf alle Dateien in den oben definierten Verzeichnis können nicht berechtigte Personen zugreifen, wenn keine Informationen zu der Datei in der Datenbank gespeichert ist."
 
-#: fckeditor.admin.inc:1167
 msgid "System path to the private folder is: @system_path."
 msgstr "Der Systempaf zum privaten Ordner ist: @system_path."
 
-#: fckeditor.admin.inc:1171
 msgid "Current path: @path"
 msgstr "Aktueller Pfad: @path"
 
-#: fckeditor.help.inc:41
-msgid ""
-"FCKeditor is highly configurable. The most commonly used features are "
-"listed below. If you want to take a look at all available settings, "
-"open %fckconfig and then customize %fckeditor_config to your needs. "
-"This is also the only way to define new toolbar sets. It is advised to "
-"not edit %fckconfigjs because you may overwrite it accidentally when "
-"you update the editor."
-msgstr ""
-"Hinweis: Der FCKeditor ist in hohem Maße konfigurierbar. Die am "
-"häufigsten verwendeten Funktionen sind hier aufgeführt. Um einen "
-"Blick auf alle möglichen Einstellungen zu werfen, kann die Datei "
-"%fckconfig geöffnet werden und dann %fckeditor_config nach eigenen "
-"Anforderungen angepasst werden. Dies ist auch die einzige "
-"Möglichkeit, neue Werkzeugleisten-Sets zu definieren. Es wird "
-"empfohlen, die Datei %fckconfigjs nicht direkt zu bearbeiten, weil sie "
-"versehentlich überschrieben werden könnte, wenn der Editor "
-"aktualisiert wird."
+msgid "FCKeditor is highly configurable. The most commonly used features are listed below. If you want to take a look at all available settings, open %fckconfig and then customize %fckeditor_config to your needs. This is also the only way to define new toolbar sets. It is advised to not edit %fckconfigjs because you may overwrite it accidentally when you update the editor."
+msgstr "Hinweis: Der FCKeditor ist in hohem Maße konfigurierbar. Die am häufigsten verwendeten Funktionen sind hier aufgeführt. Um einen Blick auf alle möglichen Einstellungen zu werfen, kann die Datei %fckconfig geöffnet werden und dann %fckeditor_config nach eigenen Anforderungen angepasst werden. Dies ist auch die einzige Möglichkeit, neue Werkzeugleisten-Sets zu definieren. Es wird empfohlen, die Datei %fckconfigjs nicht direkt zu bearbeiten, weil sie versehentlich überschrieben werden könnte, wenn der Editor aktualisiert wird."
 
-#: fckeditor.help.inc:74,56
-msgid ""
-"The FCKeditor module allows Drupal to replace textarea fields with a "
-"rich text or !wysiwyg editor. This editor brings many of the powerful "
-"functionalities of known desktop editors like Word to the web. It's "
-"relatively lightweight and doesn't require any kind of installation on "
-"the client computer."
-msgstr ""
-"Das FCKeditor-Modul erlaubt Drupal, Textfelder durch einen Rich-Text- "
-"oder !wysiwyg-Editor zu ersetzen. Dieser Editor bringt viele der "
-"leistungsstarken Funktionalitäten der bekannten Desktop-Editoren wie "
-"Word ins WWW. Er ist verhältnismäßig klein und benötigt keinerlei "
-"Installation auf dem Client Computer."
+msgid "The FCKeditor module allows Drupal to replace textarea fields with a rich text or !wysiwyg editor. This editor brings many of the powerful functionalities of known desktop editors like Word to the web. It's relatively lightweight and doesn't require any kind of installation on the client computer."
+msgstr "Das FCKeditor-Modul erlaubt Drupal, Textfelder durch einen Rich-Text- oder !wysiwyg-Editor zu ersetzen. Dieser Editor bringt viele der leistungsstarken Funktionalitäten der bekannten Desktop-Editoren wie Word ins WWW. Er ist verhältnismäßig klein und benötigt keinerlei Installation auf dem Client Computer."
 
-#: fckeditor.help.inc:76,58
 msgid "What You See Is What You Get"
-msgstr ""
-"What You See Is What You Get („Was du siehst, ist [das,] was du "
-"bekommst.“)"
+msgstr "What You See Is What You Get („Was du siehst, ist [das,] was du bekommst.“)"
 
-#: fckeditor.help.inc:76,58
 msgid "WYSIWYG"
 msgstr "WYSIWYG"
 
-#: fckeditor.help.inc:78,60
-msgid ""
-"More information about the editor is located at the !fckeditorlink. A "
-"small user guide is located at !userguidelink."
-msgstr ""
-"Weitere Informationen über den Editor sind auf der !fckeditorlink "
-"oder im !userguidelink zu finden."
+msgid "More information about the editor is located at the !fckeditorlink. A small user guide is located at !userguidelink."
+msgstr "Weitere Informationen über den Editor sind auf der !fckeditorlink oder im !userguidelink zu finden."
 
-#: fckeditor.help.inc:66
-msgid ""
-"Lastly, only users with the %accesspermission !permissionlink will be "
-"able to use FCKeditor."
-msgstr ""
-"Letztendlich können nur Benutzer mit der %accesspermission "
-"!permissionlink den FCKeditor verwenden."
+msgid "Lastly, only users with the %accesspermission !permissionlink will be able to use FCKeditor."
+msgstr "Letztendlich können nur Benutzer mit der %accesspermission !permissionlink den FCKeditor verwenden."
 
-#: fckeditor.help.inc:85
-msgid ""
-"Go to the !fckeditorlink and download the latest version of FCKeditor. "
-"Then uncompress the contents of the fckeditor directory of the "
-"downloaded file to %fckeditordir."
-msgstr ""
-"Rufen Sie !fckeditorlink auf und laden Sie die letzte Version des "
-"FCKeditors herunter. Dann entpacken Sie den Inhalt des Pakets nach "
-"%fckeditordir."
+msgid "Go to the !fckeditorlink and download the latest version of FCKeditor. Then uncompress the contents of the fckeditor directory of the downloaded file to %fckeditordir."
+msgstr "Rufen Sie !fckeditorlink auf und laden Sie die letzte Version des FCKeditors herunter. Dann entpacken Sie den Inhalt des Pakets nach %fckeditordir."
 
-#: fckeditor.help.inc:91
-msgid ""
-"Grant permissions for use of FCKeditor in !adminpath. See the "
-"@sectionname section how to enable the file browser feature."
-msgstr ""
-"Gewähre unter !adminpath die Berechtigung für die Nutzung des "
-"FCKeditors. Im @sectionname Bereich erfahren Sie wie sie den "
-"Dateibrowser aktivieren."
+msgid "Grant permissions for use of FCKeditor in !adminpath. See the @sectionname section how to enable the file browser feature."
+msgstr "Gewähre unter !adminpath die Berechtigung für die Nutzung des FCKeditors. Im @sectionname Bereich erfahren Sie wie sie den Dateibrowser aktivieren."
 
-#: fckeditor.help.inc:96
-msgid ""
-"Under !adminpath, adjust the fckeditor profiles. In each profile you "
-"can choose which textareas will be replaced by FCKeditor, select "
-"default toolbar and configure some more advanced settings."
-msgstr ""
-"Unter !adminpath passen Sie die FCKedior-Profile an. In jedem Profil "
-"kann ausgewählt werden, welcher Textbereich mit dem FCKeditor "
-"versehen werden soll, welche Werkzeugleiste angezeigt wird sowie "
-"weitere nützliche Einstellung sind einstellbar."
+msgid "Under !adminpath, adjust the fckeditor profiles. In each profile you can choose which textareas will be replaced by FCKeditor, select default toolbar and configure some more advanced settings."
+msgstr "Unter !adminpath passen Sie die FCKedior-Profile an. In jedem Profil kann ausgewählt werden, welcher Textbereich mit dem FCKeditor versehen werden soll, welche Werkzeugleiste angezeigt wird sowie weitere nützliche Einstellung sind einstellbar."
 
-#: fckeditor.help.inc:100
-msgid ""
-"For the Rich Text Editing to work you also need to configure your "
-"!filterlink for the users that may access Rich Text Editing. Either "
-"grant those users Full HTML access or use the following:"
-msgstr ""
-"Um mit der Rich-Text Bearbeitung zu arbeiten, sollte !filterlink für "
-"die Benutzer angepasst werden, die Zugriff auf die Rich-Text "
-"Bearbeitung haben. Entweder vergeben Sie solche Benutzer FULL HTML "
-"oder verwenden Sie folgendes:"
+msgid "For the Rich Text Editing to work you also need to configure your !filterlink for the users that may access Rich Text Editing. Either grant those users Full HTML access or use the following:"
+msgstr "Um mit der Rich-Text Bearbeitung zu arbeiten, sollte !filterlink für die Benutzer angepasst werden, die Zugriff auf die Rich-Text Bearbeitung haben. Entweder vergeben Sie solche Benutzer FULL HTML oder verwenden Sie folgendes:"
 
-#: fckeditor.help.inc:105
-msgid ""
-"To have a better control over line breaks, you should disable "
-"%settingname in the chosen filter (recommended)."
-msgstr ""
-"Für eine bessere Kontrolle der Zeilenumbrüche, sollte der "
-"%settingname deaktiviert werden im gewählten Eingabeformat "
-"(Empfohlen)."
+msgid "To have a better control over line breaks, you should disable %settingname in the chosen filter (recommended)."
+msgstr "Für eine bessere Kontrolle der Zeilenumbrüche, sollte der %settingname deaktiviert werden im gewählten Eingabeformat (Empfohlen)."
 
-#: fckeditor.help.inc:109
-msgid ""
-"Modify the fckeditor.config.js file to custom your needs (optional). "
-"You may copy the needed configuration lines from the default FCKeditor "
-"configuration settings (%fckconfig), the lines in fckeditor.config.js "
-"will override most settings."
-msgstr ""
-"Die Datei fckeditor.config.js kann nach eigenen Bedürfnissen "
-"angepasst werden (optional). Aus der standardmäßigen "
-"FCKeditor-Konfigurationseinstellungen (%fckconfig) können benötige "
-"Konfigurationeinstellungen kopiert und in die fckeditor.config.js "
-"eingefügt werden, die dann die meisten Einstellungen überschreiben "
-"wird."
+msgid "Modify the fckeditor.config.js file to custom your needs (optional). You may copy the needed configuration lines from the default FCKeditor configuration settings (%fckconfig), the lines in fckeditor.config.js will override most settings."
+msgstr "Die Datei fckeditor.config.js kann nach eigenen Bedürfnissen angepasst werden (optional). Aus der standardmäßigen FCKeditor-Konfigurationseinstellungen (%fckconfig) können benötige Konfigurationeinstellungen kopiert und in die fckeditor.config.js eingefügt werden, die dann die meisten Einstellungen überschreiben wird."
 
-#: fckeditor.help.inc:117
-msgid ""
-"In order to specifically display FCKeditor on those text areas on "
-"which you need it, the FCKeditor module provides a powerfull method to "
-"define fields that should be enhanced with FCKeditor. The first choice "
-"you have to make is whether you want to display FCKeditor on all "
-"textareas and define a list of exceptions, or if you don't want to "
-"display FCKeditor unless it is specifically enabled. This choice is "
-"made in the %settingname setting."
-msgstr ""
-"Um gezielt den FCKeditor auf den Textfeldern, bei den er gewollt ist, "
-"anzuzeigen. Bietet das FCKeditor-Modul eine sehr mächtige Methode an, "
-"um Textfeldern mit den FCKeditor zuerweitern. Die erste Entscheidung, "
-"die getroffen werden muss, ist, ob der FCKeditor bei allen Textfelder "
-"angezeigt werden soll und ein Liste der Ausnahmen. Oder ob der "
-"FCKeditor erst dann angezeigt werden soll, wenn er explizit aktiviert "
-"wird. Dazu muss die Einstellung %settingname  entsprechend gewählt "
-"werden."
+msgid "In order to specifically display FCKeditor on those text areas on which you need it, the FCKeditor module provides a powerfull method to define fields that should be enhanced with FCKeditor. The first choice you have to make is whether you want to display FCKeditor on all textareas and define a list of exceptions, or if you don't want to display FCKeditor unless it is specifically enabled. This choice is made in the %settingname setting."
+msgstr "Um gezielt den FCKeditor auf den Textfeldern, bei den er gewollt ist, anzuzeigen. Bietet das FCKeditor-Modul eine sehr mächtige Methode an, um Textfeldern mit den FCKeditor zuerweitern. Die erste Entscheidung, die getroffen werden muss, ist, ob der FCKeditor bei allen Textfelder angezeigt werden soll und ein Liste der Ausnahmen. Oder ob der FCKeditor erst dann angezeigt werden soll, wenn er explizit aktiviert wird. Dazu muss die Einstellung %settingname  entsprechend gewählt werden."
 
-#: fckeditor.help.inc:121
-msgid ""
-"Next, the list of exceptions has to be defined. This list follows a "
-"specific syntax: the path to a field is defined by specifying the "
-"content type followed by @ character, specifying the path followed by "
-"dot and appending the field name at the end. You may decide to not use "
-"the content type. The field %fieldname on page %pathname would thus be "
-"addressed as %result. You can use wildcards * and ? anywhere in this "
-"line. If you have a dot in your field name and it causes problems, you "
-"can escape it with a slash (\\)."
-msgstr ""
-"Als nächstes muss die Liste der Ausnahmen definiert werden. Diese "
-"Liste folgt einer speziellen Syntax: der Pfad zu einem Feld wird "
-"definiert durch ein bestimmten Inhaltstyp gefolgt von einem „@“ "
-"Zeichen, dann bei bestimmten Pfaden ein Punkt und am Ende wird der "
-"Feldname drangehangen. Man kann natürlich auch den Inhaltstyp "
-"weglasssen. Das Feld %fieldname auf der Seite %pathname würde man "
-"dann mit %result ansprechen können. Es können auch die "
-"Wildcard-Zeichen * und ? an beliebliger Stelle verwendet werden. "
-"Sollte in einem Feldname ein Punkt vorkommen und es zu Problemen "
-"kommen, kann dieser mit ein Backslash (\\) maskiert werden."
+msgid "Next, the list of exceptions has to be defined. This list follows a specific syntax: the path to a field is defined by specifying the content type followed by @ character, specifying the path followed by dot and appending the field name at the end. You may decide to not use the content type. The field %fieldname on page %pathname would thus be addressed as %result. You can use wildcards * and ? anywhere in this line. If you have a dot in your field name and it causes problems, you can escape it with a slash (\\)."
+msgstr "Als nächstes muss die Liste der Ausnahmen definiert werden. Diese Liste folgt einer speziellen Syntax: der Pfad zu einem Feld wird definiert durch ein bestimmten Inhaltstyp gefolgt von einem „@“ Zeichen, dann bei bestimmten Pfaden ein Punkt und am Ende wird der Feldname drangehangen. Man kann natürlich auch den Inhaltstyp weglasssen. Das Feld %fieldname auf der Seite %pathname würde man dann mit %result ansprechen können. Es können auch die Wildcard-Zeichen * und ? an beliebliger Stelle verwendet werden. Sollte in einem Feldname ein Punkt vorkommen und es zu Problemen kommen, kann dieser mit ein Backslash (\\) maskiert werden."
 
-#: fckeditor.help.inc:130
 msgid "matches all fields on %pathname"
 msgstr "betrifft alle Felder auf %pathname"
 
-#: fckeditor.help.inc:131
 msgid "matches all fields called %fieldname on any page"
 msgstr "betrifft alle Felder, die %fieldname heißen auf allen Seiten"
 
-#: fckeditor.help.inc:132
-msgid ""
-"matches all fields called %fieldname on pages related to node type "
-"%typename"
-msgstr ""
-"betrifft alle Felder, die %fieldname heißen auf allen Seiten des "
-"Inhaltstyp %typename"
+msgid "matches all fields called %fieldname on pages related to node type %typename"
+msgstr "betrifft alle Felder, die %fieldname heißen auf allen Seiten des Inhaltstyp %typename"
 
-#: fckeditor.help.inc:133
 msgid "matches all fields on pages related to node type %nodetype"
 msgstr "betrifft alle Felder auf allen Seiten des Inhaltstyp %nodetype"
 
-#: fckeditor.help.inc:134
 msgid "matches all fields on pages such as %pathname1, %pathname2, etc."
 msgstr "betrifft alle Felder auf den Seiten wie %pathname1, %pathname2, etc."
 
-#: fckeditor.help.inc:135
-msgid ""
-"matches all %fieldname fields on pages such as %pathname1, %pathname2, "
-"etc."
-msgstr ""
-"betrifft alle %fieldname Felder auf den Seiten wie %pathname1, "
-"%pathname2, etc."
+msgid "matches all %fieldname fields on pages such as %pathname1, %pathname2, etc."
+msgstr "betrifft alle %fieldname Felder auf den Seiten wie %pathname1, %pathname2, etc."
 
-#: fckeditor.help.inc:136
-msgid ""
-"matches fields starting with %fieldname on pages starting with "
-"%pathname"
-msgstr ""
-"betrifft alle Felder, die mit %fieldname beginnen auf den Seiten die "
-"mit %pathname beginnen"
+msgid "matches fields starting with %fieldname on pages starting with %pathname"
+msgstr "betrifft alle Felder, die mit %fieldname beginnen auf den Seiten die mit %pathname beginnen"
 
-#: fckeditor.help.inc:141
 msgid "Take a look at !listlink when installing FCKeditor."
-msgstr ""
-"Schauen Sie sich die !listlink an, wenn Sie den FCKeditor "
-"installieren."
+msgstr "Schauen Sie sich die !listlink an, wenn Sie den FCKeditor installieren."
 
-#: fckeditor.help.inc:141
 msgid "list of common problems"
 msgstr "Liste der allgemeinen Probleme"
 
-#: fckeditor.help.inc:142
-msgid ""
-"If you are looking for more information, have any trouble in "
-"configuration or if you found an issue, please visit the "
-"!officiallink."
-msgstr ""
-"Wenn weiterer Informationsbedarf besteht, Probleme in der "
-"Konfiguration auftreten oder irgendwelche Fehler gefunden wurden, "
-"besuchen Sie die !officiallink."
+msgid "If you are looking for more information, have any trouble in configuration or if you found an issue, please visit the !officiallink."
+msgstr "Wenn weiterer Informationsbedarf besteht, Probleme in der Konfiguration auftreten oder irgendwelche Fehler gefunden wurden, besuchen Sie die !officiallink."
 
-#: fckeditor.help.inc:142
 msgid "official project page"
 msgstr "offizielle Projektseite"
 
-#: fckeditor.help.inc:143
-msgid ""
-"More information about how to tune up FCKeditor for your theme can be "
-"found !herelink."
-msgstr ""
-"Mehr Information dazu wie man den FCKeditor für das Theme aufrüsten "
-"kann, sind !herelink zu finden."
+msgid "More information about how to tune up FCKeditor for your theme can be found !herelink."
+msgstr "Mehr Information dazu wie man den FCKeditor für das Theme aufrüsten kann, sind !herelink zu finden."
 
-#: fckeditor.help.inc:143
 msgid "here"
 msgstr "hier"
 
-#: fckeditor.help.inc:149
 msgid "Open %fckeditor.config.js and uncomment these three lines:"
 msgstr "Öffne %fckeditor.config.js und entkommentiere diese drei Codezeilen:"
 
-#: fckeditor.help.inc:150
-msgid ""
-"The second step is to add buttons to the toolbar (in the same file). "
-"The button names are: <code>DrupalBreak</code>, "
-"<code>DrupalPageBreak</code>. For example if you have a toolbar with "
-"an array of buttons defined as follows: <pre>!buttons1</pre> simply "
-"add those two buttons at the end of array (remember about single "
-"quotes): <pre>!buttons2</pre>"
-msgstr ""
-"Der zweite Schritt ist, (in der gleichen Datei) der Werkzeugleiste "
-"Schaltflächen hinzuzufügen. Die Bezeichnungen der Schaltflächen "
-"sind: <code>DrupalBreak</code>, <code>DrupalPageBreak</code>. Zum "
-"Beispiel, wenn eine Werkzeugleiste mit ein Array von Schaltflächen "
-"wie folgt vor liegt: <pre>!buttons1</pre> dann können diese zwei "
-"Schaltflächen am Ende des Arrays hinzugefügt werden: (man beachte "
-"die einfachen Anführungszeichen): <pre>!buttons2</pre>"
+msgid "The second step is to add buttons to the toolbar (in the same file). The button names are: <code>DrupalBreak</code>, <code>DrupalPageBreak</code>. For example if you have a toolbar with an array of buttons defined as follows: <pre>!buttons1</pre> simply add those two buttons at the end of array (remember about single quotes): <pre>!buttons2</pre>"
+msgstr "Der zweite Schritt ist, (in der gleichen Datei) der Werkzeugleiste Schaltflächen hinzuzufügen. Die Bezeichnungen der Schaltflächen sind: <code>DrupalBreak</code>, <code>DrupalPageBreak</code>. Zum Beispiel, wenn eine Werkzeugleiste mit ein Array von Schaltflächen wie folgt vor liegt: <pre>!buttons1</pre> dann können diese zwei Schaltflächen am Ende des Arrays hinzugefügt werden: (man beachte die einfachen Anführungszeichen): <pre>!buttons2</pre>"
 
-#: fckeditor.help.inc:151
-msgid ""
-"Note that the &lt;--pagebreak--&gt; tag is not supported by default in "
-"Drupal. You should install the !paginglink module to enable the "
-"&lt;!--pagebreak--&gt; tag support. Please refer to the Paging module "
-"documentation for detailed installation instructions."
-msgstr ""
-"Zu beachten ist, dass der Tag &lt;!--pagebreak--&gt; standardmäßig "
-"nicht von Drupal unterstützt wird. Dazu muss das Modul !paginglink "
-"installiert werden, um die Funktion von &lt;!--pagebreak--&gt; nutzen "
-"zu können. Detaillierte Installationsanweisungen enthält die "
-"Dokumentation des Paging-Moduls."
+msgid "Note that the &lt;--pagebreak--&gt; tag is not supported by default in Drupal. You should install the !paginglink module to enable the &lt;!--pagebreak--&gt; tag support. Please refer to the Paging module documentation for detailed installation instructions."
+msgstr "Zu beachten ist, dass der Tag &lt;!--pagebreak--&gt; standardmäßig nicht von Drupal unterstützt wird. Dazu muss das Modul !paginglink installiert werden, um die Funktion von &lt;!--pagebreak--&gt; nutzen zu können. Detaillierte Installationsanweisungen enthält die Dokumentation des Paging-Moduls."
 
-#: fckeditor.help.inc:151
 msgid "Paging"
 msgstr "Paging"
 
-#: fckeditor.help.inc:158
 msgid "By using a module like !imcelink, !iblink or !webfmlink."
 msgstr "Durch benutzen eines Moduls wie !imcelink, !iblink oder !webfmlink."
 
-#: fckeditor.help.inc:173
-msgid ""
-"In this file you will need to enable the file browser by adding one "
-"line that includes a file with the special authentication function for "
-"Drupal (filemanager.config.php)."
-msgstr ""
-"In dieser Datei muss der Dateibrowser aktiviert werden durch "
-"hinzufügen einer weiteren Codezeile, die eine Datei mit der "
-"benötigten Authentifizierungs-Funktion für Drupal einbindet "
-"(filemanager.config.php)."
+msgid "In this file you will need to enable the file browser by adding one line that includes a file with the special authentication function for Drupal (filemanager.config.php)."
+msgstr "In dieser Datei muss der Dateibrowser aktiviert werden durch hinzufügen einer weiteren Codezeile, die eine Datei mit der benötigten Authentifizierungs-Funktion für Drupal einbindet (filemanager.config.php)."
 
-#: fckeditor.help.inc:174
 msgid "Add this code:"
 msgstr "Diesen Code hinzufügen:"
 
-#: fckeditor.help.inc:176
 msgid "straight below this line:"
 msgstr "direkt unterhalb dieser Zeile:"
 
-#: fckeditor.help.inc:178
-msgid ""
-"The config.php file also holds some other important settings, please "
-"take a look at it and adjust it to your needs (optional)."
-msgstr ""
-"Die config.php Datei enthält auch einige andere wichtige Einstellung. "
-"Bei Bedarf kann diese nach eignen Anforderungen angepasst werden "
-"(optional)."
+msgid "The config.php file also holds some other important settings, please take a look at it and adjust it to your needs (optional)."
+msgstr "Die config.php Datei enthält auch einige andere wichtige Einstellung. Bei Bedarf kann diese nach eignen Anforderungen angepasst werden (optional)."
 
-#: fckeditor.help.inc:180
-msgid ""
-"Locate file named %settingsphp inside your drupal directory and set "
-"%cookiedomain variable to the appropriate domain (remember to "
-"uncomment that line). If you not do this, FCKeditor will claim that "
-"file browser is disabled."
-msgstr ""
-"Finde die Datei %settingsphp im Drupalverzeichnis (meisten unter "
-"<code>sites/default/settings.php</code>) und setze die %cookiedomain "
-"Variabel entsprechend zur Domain (nicht vergessen diese Zeile zu "
-"entkommentieren). Ansonsten wird der FCKeditor melden das der "
-"Dateibrowser nicht aktiviert ist."
+msgid "Locate file named %settingsphp inside your drupal directory and set %cookiedomain variable to the appropriate domain (remember to uncomment that line). If you not do this, FCKeditor will claim that file browser is disabled."
+msgstr "Finde die Datei %settingsphp im Drupalverzeichnis (meisten unter <code>sites/default/settings.php</code>) und setze die %cookiedomain Variabel entsprechend zur Domain (nicht vergessen diese Zeile zu entkommentieren). Ansonsten wird der FCKeditor melden das der Dateibrowser nicht aktiviert ist."
 
-#: fckeditor.help.inc:181
-msgid ""
-"Enabling file uploads is <strong>a security risk</strong>. That's why "
-"you have to grant a separate !permissionlink to enable the file "
-"browser to certain groups (assign the %uploadpermission permission)."
-msgstr ""
-"Das Aktivieren des Datei-Uploads stellt ein "
-"<strong>Sicherheitsrisiko</strong> dar. Daher muss zuerst ein separate "
-"!permissionlink bestätigt werden, um den Dateibrowser für bestimmte "
-"Benutzerrollen zu aktivieren (Berechtigungen %uploadpermission "
-"zuweisen)."
+msgid "Enabling file uploads is <strong>a security risk</strong>. That's why you have to grant a separate !permissionlink to enable the file browser to certain groups (assign the %uploadpermission permission)."
+msgstr "Das Aktivieren des Datei-Uploads stellt ein <strong>Sicherheitsrisiko</strong> dar. Daher muss zuerst ein separate !permissionlink bestätigt werden, um den Dateibrowser für bestimmte Benutzerrollen zu aktivieren (Berechtigungen %uploadpermission zuweisen)."
 
-#: fckeditor.help.inc:182
-msgid ""
-"Lastly, adjust the %filebrowsersection for each !profilelink: set "
-"%filebrowsertypesetting to %builtinoption"
-msgstr ""
-"Zum Schluß passe die %filebrowsersection für jeden !profilelink an: "
-"setze %filebrowsertypesetting auf %builtinoption"
+msgid "Lastly, adjust the %filebrowsersection for each !profilelink: set %filebrowsertypesetting to %builtinoption"
+msgstr "Zum Schluß passe die %filebrowsersection für jeden !profilelink an: setze %filebrowsertypesetting auf %builtinoption"
 
-#: fckeditor.module:74
-msgid ""
-"The FCKeditor module is not installed correctly. You should run the "
-"!updatephplink immediately."
-msgstr ""
-"Der FCKeditor ist nicht ordnungsgemäß installiert worden. Es sollte "
-"sofort das !updatephplink durchgeführt werden."
+msgid "The FCKeditor module is not installed correctly. You should run the !updatephplink immediately."
+msgstr "Der FCKeditor ist nicht ordnungsgemäß installiert worden. Es sollte sofort das !updatephplink durchgeführt werden."
 
-#: fckeditor.module:74
 msgid "database update script"
 msgstr "Datenbank Update-Script"
 
-#: fckeditor.module:896
 msgid "The ID for !excludingorincludinglink this element is %fieldname."
 msgstr "Die ID zum !excludingorincludinglink dieses Element ist %fieldname."
+
+msgid "Automatically detect and convert plain text"
+msgstr "Plaintext automatisch erkennen und konvertieren"
+
+msgid "When set to %true the editor will try to detect if a field was created using the plain text editor and convert line breaks to &lt;br /&gt; and &lt;p&gt; tags. This will alter the field contents and is not reversible."
+msgstr "Wenn auf %true gesetzt, wird der Editor versuchen herauszufinden, ob ein Feld durch den Plaintext-Editor erstellt wurde und konvertiert Zeilenumbrüche nach &lt;br /&gt; and &lt;p&gt;. Diese Konvertierung ändert den Inhalt des Feldes und kann nicht rückgängig gemacht werden."
+
+msgid "Setting path to uploaded files has been disabled because private downloads are enabled and this path is calculated automatically. To change the location of uploaded files in the private file system, edit the !globallink."
+msgstr "Die Einstellung für den Pfad zu den hochgeladenen Dateien wurde deaktiviert, weil die Download-Methode „Privat“ aktiviert ist und dieser Pfad sich generisch zusammensetzt. Um den Speicherort der hochgeladenen Dateien für diese Methode zu ändern, bearbeiten Sie diesen unter !globallink."
+
 

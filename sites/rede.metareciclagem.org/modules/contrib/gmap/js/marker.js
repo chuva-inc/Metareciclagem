@@ -1,4 +1,4 @@
-/* $Id: marker.js,v 1.4 2009/02/11 19:12:12 bdragon Exp $ */
+/* $Id: marker.js,v 1.4.2.1 2010/04/08 13:40:19 rooby Exp $ */
 
 /**
  * @file
@@ -22,6 +22,15 @@ Drupal.gmap.addHandler('gmap', function (elem) {
     GEvent.addListener(m, 'click', function () {
       obj.change('clickmarker', -1, marker);
     });
+    if (obj.vars.behavior.highlight) {
+      GEvent.addListener(m, 'mouseover', function () {
+        var highlightColor = '#' + obj.vars.styles.highlight_color;
+        highlightMarker(obj.map, marker, 'hoverHighlight', highlightColor);
+      });
+      GEvent.addListener(m, 'mouseout', function () {
+        unHighlightMarker(obj.map, marker, 'hoverHighlight');
+      });
+    }
     if (obj.vars.behavior.extramarkerevents) {
       GEvent.addListener(m, 'mouseover', function () {
         obj.change('mouseovermarker', -1, marker);
@@ -41,6 +50,10 @@ Drupal.gmap.addHandler('gmap', function (elem) {
     }
     if (obj.vars.behavior.autozoom) {
       obj.bounds.extend(marker.marker.getPoint());
+    }
+    // If the highlight arg option is used in views highlight the marker.
+    if (marker.opts.highlight == 1) {
+      highlightMarker(obj.map, marker, 'viewHighlight', marker.opts.highlightcolor);
     }
   });
 
