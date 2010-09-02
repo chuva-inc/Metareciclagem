@@ -1,11 +1,24 @@
 <?php
-// $Id: admin.install,v 1.1.2.7 2009/07/22 06:11:13 yhahn Exp $
+// $Id: admin.install,v 1.1.2.7.2.4 2010/07/30 22:48:22 yhahn Exp $
 
 /**
  * Implementation of hook_install().
  */
 function admin_install() {
-  db_query("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('%s', '%s', '%s')", 'admin', 'Admin', 'Admin links.');
+  if (db_table_exists('menu_custom') && !db_result(db_query("SELECT menu_name FROM {menu_custom} WHERE menu_name = 'admin'"))) {
+    $t = get_t();
+    db_query("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('%s', '%s', '%s')", 'admin', $t('Admin'), $t('Administrative links.'));
+  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function admin_uninstall() {
+  if (db_table_exists('menu_custom')) {
+    db_query("DELETE FROM {menu_custom} WHERE menu_name = 'admin'");
+  }
+  variable_del('admin_toolbar');
 }
 
 /**
@@ -59,4 +72,66 @@ function admin_update_6003() {
   $return = array();
   $return[] = update_sql("UPDATE {system} SET weight = 1 WHERE name = 'admin' AND type = 'module'");
   return $return;
+}
+
+/**
+ * Update 6201: Migrate previous permissions for "admin menu" to "use admin toolbar".
+ */
+function admin_update_6201() {
+  $return = array();
+
+  $result = db_query("SELECT * FROM {permission}");
+  while ($row = db_fetch_object($result)) {
+    $perms = explode(', ', $row->perm);
+    if (in_array('admin menu', $perms, TRUE)) {
+      $key = array_search('admin menu', $perms);
+      $perms[$key] = 'use admin toolbar';
+      $perms = implode(', ', $perms);
+      $return[] = update_sql("UPDATE {permission} SET perm = '{$perms}' WHERE pid = {$row->pid}");
+    }
+  }
+
+  // Remove old theme instantiation stack & reset admin theme if
+  // referring to deprecated admin themes.
+  variable_del('admin_theme_invalidated');
+  $theme = variable_get('admin_theme', '0');
+  if ($theme === 'admin' || $theme === 'slate') {
+    variable_del('admin_theme');
+  }
+
+  return $return;
+}
+
+/**
+ * Update 6202: Update the format of the admin_toolbar variable.
+ */
+function admin_update_6202() {
+  $ret = array();
+  $settings = variable_get('admin_toolbar', array());
+  if (isset($settings['blocks'])) {
+    $needs_update = FALSE;
+    // First pass, determine if we need to update these.
+    foreach ($settings['blocks'] as $bid => $status) {
+      if (!is_numeric($status)) {
+        $needs_update = TRUE;
+        break;
+      }
+    }
+    if ($needs_update) {
+      module_load_include('module', 'admin', 'admin');
+      $defaults = admin_get_default_blocks(TRUE);
+      // Second pass, do the update!
+      foreach ($settings['blocks'] as $bid => $status) {
+        if ($status) {
+          $settings['blocks'][$bid] = isset($defaults[$bid]) ? $defaults[$bid] : BLOCK_NO_CACHE;
+        }
+        else {
+          unset($settings['blocks'][$bid]);
+        }
+      }
+      variable_set('admin_toolbar', $settings);
+      $ret[] = array('success' => TRUE, 'query' => 'Updated admin settings.');
+    }
+  }
+  return $ret;
 }

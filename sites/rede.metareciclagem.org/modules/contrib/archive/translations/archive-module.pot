@@ -1,17 +1,18 @@
-# $Id: archive-module.pot,v 1.1.2.2 2008/04/28 02:18:24 susurrus Exp $
+# $Id: archive-module.pot,v 1.1.2.3 2008/10/26 09:32:10 goofyx Exp $
 #
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  archive.inc,v 1.1.2.9 2007/08/30 18:14:22 susurrus
-#  archive.module,v 1.8.2.5 2007/08/31 17:16:34 susurrus
-#  archive.info,v 1.1.2.3 2007/09/05 00:17:36 susurrus
+#  archive.admin.inc,v 1.6 2008/01/04 12:25:33 susurrus
+#  archive.pages.inc,v 1.18.2.4 2008/08/19 22:18:25 susurrus
+#  archive.info,v 1.9 2008/01/04 12:21:36 susurrus
+#  archive.module,v 1.36.2.4 2008/08/19 23:00:53 susurrus
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2007-09-04 20:18-0400\n"
+"POT-Creation-Date: 2008-10-26 10:53+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -20,20 +21,114 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: archive.inc:44
-msgid "There's currently nothing in the archives to browse."
+#: archive.admin.inc:16
+msgid "Content types available in archive"
 msgstr ""
 
-#: archive.inc:391
+#: archive.admin.inc:19
+msgid "Posts of these types will be displayed in the archive."
+msgstr ""
+
+#: archive.pages.inc:35
+msgid "No content found."
+msgstr ""
+
+#: archive.pages.inc:205 archive.info:0
+msgid "Archive"
+msgstr ""
+
+#: archive.pages.inc:232
 msgid "Date"
 msgstr ""
 
-#: archive.inc:402
+#: archive.pages.inc:244
 msgid "Type"
 msgstr ""
 
-#: archive.inc:425;454;491;527
+#: archive.pages.inc:265;291;323;359
 msgid "All"
+msgstr ""
+
+#: archive.pages.inc:265;271;291;304;323;338;359;367 archive.module:113;139;150;173
+msgid "1 post"
+msgid_plural "@count posts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: archive.module:10
+msgid "The archive module allows your users to browse your content by its type and date of publication. The archive module interface, available at the path <a href=\"@archive\">archive</a>, presents simple controls for selecting a year, month or day. All available posts published within this range are displayed beneath the control. Administrators may select the content types to be displayed. The archive module adds an <em>Archives</em> menu item to the default <em>Navigation</em> menu (the item is disabled by default), and displays the current month and year within an optional block."
+msgstr ""
+
+#: archive.module:11
+msgid "You can"
+msgstr ""
+
+#: archive.module:12
+msgid "view your <a href=\"@archive\">archive page</a>."
+msgstr ""
+
+#: archive.module:13
+msgid "enable, position and configure the <em>Current calendar month with archive links</em> block at the <a href=\"@blocks\">blocks administration page</a>."
+msgstr ""
+
+#: archive.module:14
+msgid "enable or disable the <em>Archives</em> menu item on the <a href=\"@menu-administration\">navigation menu administration page</a>."
+msgstr ""
+
+#: archive.module:15
+msgid "For more information, see the online handbook entry for <a href=\"@handbook-page\">Archive module</a>."
+msgstr ""
+
+#: archive.module:121
+msgid "Sun"
+msgstr ""
+
+#: archive.module:121
+msgid "Mon"
+msgstr ""
+
+#: archive.module:121
+msgid "Tue"
+msgstr ""
+
+#: archive.module:121
+msgid "Wed"
+msgstr ""
+
+#: archive.module:121
+msgid "Thu"
+msgstr ""
+
+#: archive.module:121
+msgid "Fri"
+msgstr ""
+
+#: archive.module:121
+msgid "Sat"
+msgstr ""
+
+#: archive.module:193
+msgid "Current calendar month with archive links"
+msgstr ""
+
+#: archive.module:199;26;33
+msgid "Archives"
+msgstr ""
+
+#: archive.module:34
+msgid "Select the content types listed in the archives."
+msgstr ""
+
+#: archive.module:0
+msgid "archive"
+msgstr ""
+
+#: archive.info:0
+msgid "Allows visitors to view content filtered by date or node type."
+msgstr ""
+
+#: archive.info:0
+msgid "Content display"
 msgstr ""
 
 #: archive.inc:457
@@ -84,88 +179,3 @@ msgstr ""
 msgid "Dec"
 msgstr ""
 
-#: archive.inc:425;431;454;467;491;504;527;535 archive.module:95;113
-msgid "1 post"
-msgid_plural "@count posts"
-msgstr[0] ""
-msgstr[1] ""
-
-#: archive.module:10
-msgid "The archive module provides a suggested menu item, which shows a page allowing content to be filtered by date and node type. The date selectors allow visitors to view content published in any given year, month or day. The node type selectors allow visitors to view content of all node types or only specific ones."
-msgstr ""
-
-#: archive.module:11
-msgid "<p>You can</p>\r\n<ul>\r\n<li>view your <a href=\"!archive\">archive page</a>.</li>\r\n<li><a href=\"!admin-menu\">enable or disable the archive menu item</a>.</li>\r\n</ul>\r\n"
-msgstr ""
-
-#: archive.module:17
-msgid "For more information please read the configuration and customization handbook <a href=\"http://drupal.org/handbook/modules/archive/\">Archive page</a>."
-msgstr ""
-
-#: archive.module:20
-msgid "Provides a node listing for specified node-types browsable by date."
-msgstr ""
-
-#: archive.module:32;39;146
-msgid "Archives"
-msgstr ""
-
-#: archive.module:35
-msgid "Browse the archives"
-msgstr ""
-
-#: archive.module:42
-msgid "Configure node types available for archive browsing."
-msgstr ""
-
-#: archive.module:65
-msgid "What nodes are available as filters"
-msgstr ""
-
-#: archive.module:68
-msgid "Whichever node type you choose here will be available as a filter to the user."
-msgstr ""
-
-#: archive.module:100
-msgid "Sun"
-msgstr ""
-
-#: archive.module:100
-msgid "Mon"
-msgstr ""
-
-#: archive.module:100
-msgid "Tue"
-msgstr ""
-
-#: archive.module:100
-msgid "Wed"
-msgstr ""
-
-#: archive.module:100
-msgid "Thu"
-msgstr ""
-
-#: archive.module:100
-msgid "Fri"
-msgstr ""
-
-#: archive.module:100
-msgid "Sat"
-msgstr ""
-
-#: archive.module:141
-msgid "Archive calendar"
-msgstr ""
-
-#: archive.module:0
-msgid "archive"
-msgstr ""
-
-#: archive.info:0
-msgid "Archive"
-msgstr ""
-
-#: archive.info:0
-msgid "Allows visitors to view content filtered by date."
-msgstr ""

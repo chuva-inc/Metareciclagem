@@ -1,5 +1,5 @@
 <?php
-// $Id: image_gallery.views_default.inc,v 1.3 2009/09/05 15:13:42 joachim Exp $
+// $Id: image_gallery.views_default.inc,v 1.4 2010/02/28 10:27:20 joachim Exp $
 
 /**
  * Implementation of hook_views_default_views().
@@ -176,6 +176,20 @@ function image_gallery_views_default_views() {
     ),
   ));
   $handler->override_option('filters', array(
+    'status' => array(
+      'operator' => '=',
+      'value' => '1',
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'status',
+      'table' => 'node',
+      'field' => 'status',
+      'relationship' => 'none',
+    ),
     'type' => array(
       'operator' => 'in',
       'value' => array(
@@ -194,6 +208,9 @@ function image_gallery_views_default_views() {
     ),
   ));
   $handler->override_option('access', array(
+    'type' => 'none',
+  ));
+  $handler->override_option('cache', array(
     'type' => 'none',
   ));
   $handler->override_option('title', 'Image galleries');
