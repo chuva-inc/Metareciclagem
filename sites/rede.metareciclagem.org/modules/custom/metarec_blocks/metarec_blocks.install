@@ -1,0 +1,17 @@
+﻿<?php
+
+/**
+ * @file enables/disables Metareciclagem default blocks.
+ */
+
+function metarec_blocks_install() {
+
+  // Remove Powered by Drupal block
+  db_query("UPDATE {blocks} SET status = 0 WHERE bid = 3");
+
+  //Insert custom blocks
+  
+  db_query("INSERT INTO `blocks` (`bid`, `module`, `delta`, `theme`, `status`, `weight`, `region`, `custom`, `throttle`, `visibility`, `pages`, `title`, `cache`) VALUES
+(0, 'block', 'footer-apoio', 'metarec', 1, -20, 'footer', 0, 0, 0, '', '', -1)");
+
+}

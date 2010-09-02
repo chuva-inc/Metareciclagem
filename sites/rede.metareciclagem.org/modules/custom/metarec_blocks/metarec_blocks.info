@@ -1,0 +1,5 @@
+﻿
+name = Metarec Blocks
+description = "Cria blocos customizados para o site Metareciclagem."
+core = 6.x 
+package = Custom

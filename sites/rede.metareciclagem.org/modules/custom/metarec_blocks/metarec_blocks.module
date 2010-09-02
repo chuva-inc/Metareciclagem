@@ -1,0 +1,94 @@
+﻿<?php
+
+function metarec_blocks_block($op = 'list', $delta = 0, $edit = array()) {
+
+  if ($op == 'list') {
+    $blocks['apoio']['info'] = t('Links Apoio');
+    $blocks['apoio']['status'] = 1;
+    $blocks['apoio']['region'] = 'footer';   
+    
+    $blocks['user']['info'] = t('Painel usuário');
+    return $blocks;
+  }
+  else if ($op == 'view') {
+    switch($delta) {
+      case 'apoio':
+        $blocks['content'] = metarec_blocks_apoio();
+        break;
+      case 'user':
+        $blocks['content'] = metarec_blocks_user();
+        break;
+    }
+    return $blocks;
+  }
+}
+
+function metarec_blocks_user() {
+
+  global $user;
+
+  if ($user->uid){
+    $user_img = theme('imagecache', 'user_img', $user->picture, $alt, $title, $attributes);
+    $user_msg = t('Oi, %username', array('%username' => $user->name));
+
+    $link_painel = l(
+      t('seu painel'),
+      'user',
+      array(
+        'attributes' => array(
+          'class' => 'widelink',
+        )
+      )
+    );
+    
+    $link_perfil = l(
+      t('Perfil'),
+      'user',
+      array(
+        'attributes' => array(
+          'class' => 'widelink',
+        )
+      )
+    );
+    
+    $link_config = l(
+      t('Configurações'),
+      'user/edit',
+      array(
+        'attributes' => array(
+          'class' => 'widelink',
+        )
+      )
+    );
+
+    $link_sair = l(
+      t('Sair'),
+      'logout',
+      array(
+        'attributes' => array(
+          'class' => 'sair',
+        )
+      )
+    );    
+    
+    return  '<div class="user-panel">
+              <div class="message">'.$user_msg.' | '.$link_sair.'</div>
+              <ul>
+                <li>'.$link_painel.'</li>
+                <li>'.$link_perfil.'</li>
+                <li>'.$link_config.'</li>
+              </ul>  
+            </div>'
+            .$user_img;
+  }
+}
+
+function metarec_blocks_apoio(){
+  return '
+  <ul>
+    <li class="cultura"><a href="#">Cultura</a></li>
+    <li class="cultura-viva"><a href="#">Cultura viva</a></li>
+    <li class="mini-cultura"><a href="#">Ministério da Cultura</a></li>
+    <li class="brasil-todos"><a href="#">Brasil - Governo Federal</a></li>
+  </ul>';
+}
