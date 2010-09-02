@@ -1,0 +1,98 @@
+.view-blog-popular ul{
+  list-style:none;
+  padding:0 1.5em;
+}
+
+.view-blog-popular ul li{
+  line-height:20px;
+  border-bottom:1px solid #efebe8;
+  padding:6px 0;
+}
+
+.view-blog-arquivo ul{
+  list-style:none;
+  padding:0 1.5em;
+}
+
+.blog #content-area{
+  font-size:0.8em;
+}
+
+.blog #content-area .submitted{}
+
+.blog #content-area a{
+  color: #df6524;
+}
+
+.blog #content-area h2{
+  clear: left;
+  margin-bottom: 10px;
+}
+
+.blog #content-area h2 a{
+  text-decoration: none;
+  font-size:0.9em;
+}
+
+.blog #content-area .blog-data {
+  background: url(../images/bg-green.jpg) repeat-x;
+  border-radius: 0 10px 10px 0;
+  color: #fff;
+  padding: 2px 30px;
+  float: left;
+  margin-bottom: 20px;
+  margin-left: -20px;
+  -moz-border-radius: 0  10px 10px 0;
+  -webkit-border-radius: 0  10px 10px 0;
+  
+  -moz-box-shadow: 0 4px 7px #999999;
+  -webkit-box-shadow: 0 4px 7px #999999;
+}
+
+.blog #content-area .node-teaser{
+  margin-bottom: 40px;
+}
+
+.blog #content-area .terms{
+  background: url("../images/blog-tags.png") no-repeat scroll 0 0 transparent;
+  margin-left: 30px;
+  padding: 5px 0 5px 22px;
+}
+
+.blog #content-area .node-teaser .blog-comment-counter{
+  background:url("../images/blog-comments.png") no-repeat scroll 0 0 transparent;
+  display:inline;
+  padding:0 0 5px 25px;
+  position:absolute;
+  right:0;
+}
+
+.blog #content-area .node-teaser .content{
+  border-bottom: 1px solid #EFEBE8;
+  color: #333;
+  line-height: 2em;
+  padding-bottom: 1em;
+  padding-top: 1em;
+}
+
+.blog #content-area .node-teaser .content p{
+  display: inline;
+}
+
+.blog #content-area .node-teaser .content .leia-mais a{
+  background: url("../images/blog-leia-mais.png") no-repeat scroll 0 0 transparent;
+  display: inline-block;
+  height: 16px;
+  overflow: hidden;
+  text-indent: -9999px;
+  width: 17px;
+}
+
+.blog #content-area .node-teaser .blog-user{
+  margin-left: 20px;
+}
+
+
+
+
+

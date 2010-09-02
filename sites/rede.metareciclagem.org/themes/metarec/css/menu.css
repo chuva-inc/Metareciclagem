@@ -1,0 +1,31 @@
+#main-menu{
+  font-size:0.85em;
+  position:absolute;
+  right:40px;
+  top:12px;
+}
+
+#main-menu li a{
+  color:#fff;
+  font-weight:bold;
+  padding:5px 8px;
+  text-decoration: none;
+}
+
+/*
+#main-menu li.active a{
+  border-radius:10px 10px 10px 10px;
+  -webkit-border-radius:10px 10px 10px 10px;
+  -moz-border-radius:10px 10px 10px 10px;
+  background:none repeat scroll 0 0 #FFFFFF;
+  color:#2B3618;
+}
+*/
+
+#main-menu li a:hover{
+  border-radius:10px 10px 10px 10px;
+  -webkit-border-radius:10px 10px 10px 10px;
+  -moz-border-radius:10px 10px 10px 10px;
+  background:none repeat scroll 0 0 #FFFFFF;
+  color:#2B3618;
+}

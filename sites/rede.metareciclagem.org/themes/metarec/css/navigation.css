@@ -1,0 +1,36 @@
+
+/**
+* Search box
+**/
+
+#search-box {
+  left:9px;
+  position:absolute;
+  top:28px;
+}
+
+#search-box .form-item{
+  margin: 0px;
+
+}
+
+#search-box input{
+  background:url("../images/search-bg.png") no-repeat scroll 183px center #D6CECB;
+  border:medium none;
+  padding:6px 22px 6px 2px;
+  width:185px;
+  
+  border-radius:5px 5px 5px 5px;
+  -moz-border-radius:5px 5px 5px 5px;
+  -webkit-border-radius:5px 5px 5px 5px;
+}
+
+#search-box label{
+  color:#737373;
+  font-size:0.9em;
+  font-weight:normal;
+}
+
+#search-box .form-submit{
+  display: none;
+}

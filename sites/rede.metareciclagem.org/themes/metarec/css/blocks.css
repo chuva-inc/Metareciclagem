@@ -1,0 +1,64 @@
+/* $Id: blocks.css,v 1.4 2009/11/05 11:05:39 johnalbin Exp $ */
+
+/**
+ * @file
+ * Block Styling
+ */
+
+
+.block /* Block wrapper */ {
+  margin-bottom: 1em;
+}
+
+#block-metarec_blocks-user {
+  float: right;
+  font-size: 0.8em;
+  margin-right: 30px;
+}
+
+#block-metarec_blocks-user img {
+  -webkit-border-radius: 8px 8px 8px 8px;
+  -moz-border-radius: 8px 8px 8px 8px;
+  border: 5px solid #EEEEEE;
+  float: left;
+}
+
+#block-metarec_blocks-user .user-panel {
+  float: left;
+  margin-right: 5px;
+}
+
+#block-metarec_blocks-user .user-panel .message {
+  font-weight:bold;
+  margin-bottom:7px;
+  margin-right:10px;
+  text-align:right;
+}
+
+#block-metarec_blocks-user .user-panel .message a.sair{
+  color: #ec6b1b;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+#block-metarec_blocks-user .user-panel ul {
+
+}
+
+#block-metarec_blocks-user .user-panel ul li {
+  list-style: none;
+  margin:0 10px 0 0;
+  padding:0px;
+}
+
+#block-metarec_blocks-user .user-panel ul li.label {
+  background: #fff7d6;
+  color: #3f3b18;
+  padding:0 2px;
+}
+
+#block-metarec_blocks-user .user-panel ul li a{
+  color: #bbb;
+}
+
+

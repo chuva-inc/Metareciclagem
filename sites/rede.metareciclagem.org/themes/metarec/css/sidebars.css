@@ -1,0 +1,30 @@
+.region-sidebar-second  {
+  margin-left: 740px;
+  margin-right: -940px;
+  width: 220px;
+}
+
+.region-sidebar-second .section {
+  background: none repeat scroll 0 0 #FFFFFF;
+  margin: 28px 0 0 0;
+  padding: 15px;
+  font-size: 0.8em;
+  color: #999;
+
+}
+
+.region-sidebar-second .block{}
+
+.region-sidebar-second .block h2.title{
+  background: #efebe8;
+  border-radius: 10px;
+  color: #333;
+  font-size: 1em;
+  padding: 7px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+
+.region-sidebar-second .block .content a{
+  color: #df6524;
+}

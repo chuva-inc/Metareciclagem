@@ -1,0 +1,36 @@
+.view-lista-esporos table{
+  color: #333;
+  margin: 20px auto 0;
+  width: 100%;
+}
+
+.view-lista-esporos table th{
+  line-height:3em;
+}
+
+.view-lista-esporos table th a{
+  color: #000;
+  text-decoration: none;
+}
+
+.view-lista-esporos table tbody tr{
+  background: #fff;
+  border: none;
+  line-height:2em;
+}
+
+.view-lista-esporos table tbody tr.odd{
+  background: #fffaec;
+}
+
+.view-lista-esporos table tbody td.active{
+  background: none;
+}
+
+.view-lista-esporos table tbody td a{
+  color: #d84d2c;
+}
+
+
+
+

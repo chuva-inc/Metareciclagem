@@ -1,0 +1,73 @@
+#footer-wrapper{
+  background:url(../images/bg-green.jpg) repeat-x;
+}
+
+#footer .section {
+  background: url("../images/footer-logo.png") no-repeat scroll 0 25px transparent;
+  font-size: 0.8em;
+  height: 170px;
+  margin: 0 auto;
+  position: relative;
+  width: 960px;
+}
+
+#footer-message {
+  display: none;
+}
+
+#secondary-menu{
+  background: url("../images/secondary-menu-bg.png") no-repeat scroll right 6px transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  bottom: 20px;
+  margin: 0;
+  padding: 8px;
+  position: absolute;
+  width: 100%;
+}
+
+#secondary-menu li a{
+  color: #fff;
+  text-decoration: none;
+}
+
+#block-metarec_blocks-apoio{}
+
+#block-metarec_blocks-apoio ul{
+  background: url("../images/footer-support-bg.png") no-repeat scroll left center transparent;
+  list-style: none outside none;
+  margin: 0;
+  padding: 0 0 0 45px;
+  position: absolute;
+  right: 10px;
+  top: 30px;
+}
+
+#block-metarec_blocks-apoio ul li{
+  float: left;
+  margin-left: 20px;
+}
+
+#block-metarec_blocks-apoio ul li a{
+  background: url(../images/footer-support.png) no-repeat;
+  display: block;
+  height: 49px;
+  overflow: hidden;
+  text-indent:-9999px;
+  width:87px;
+}
+
+#block-metarec_blocks-apoio ul li.cultura a{
+  background-position: 0px 50%;
+}
+#block-metarec_blocks-apoio ul li.cultura-viva a{ 
+  background-position: -108px 50%; 
+  width: 82px;
+}
+#block-metarec_blocks-apoio ul li.mini-cultura a{
+  background-position: -211px 50%;
+  width: 58px;
+}
+#block-metarec_blocks-apoio ul li.brasil-todos a{
+  background-position:-292px 50%;
+  width:106px;
+}

@@ -1,0 +1,33 @@
+.conectazes .view-lista-conectazes table{
+  color: #333;
+  margin: 20px auto 0;
+  width: 100%;
+}
+
+.conectazes .view-lista-conectazes table th{
+  line-height:3em;
+}
+
+.conectazes .view-lista-conectazes table th a{
+  color: #000;
+  text-decoration: none;
+}
+
+.conectazes .view-lista-conectazes table tbody tr{
+  background: #fff;
+  border: none;
+  line-height:2em;
+}
+
+.conectazes .view-lista-conectazes table tbody tr.odd{
+  background: #fffaec;
+}
+.conectazes .view-lista-conectazes table tbody td{}
+
+.conectazes .view-lista-conectazes table tbody td.active{
+  background: none;
+}
+
+.conectazes .view-lista-conectazes table tbody td a{
+  color: #d84d2c;
+}

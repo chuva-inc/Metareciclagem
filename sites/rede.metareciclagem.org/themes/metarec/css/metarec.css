@@ -1,0 +1,73 @@
+/**
+*  TODO: Organize in separated css files
+**/
+
+body {
+  background: #E2DFDD;
+}
+
+#header-wrapper {
+  height: 65px;
+  background: url(../images/bg-green.jpg) top center repeat-x;
+}
+
+#header{
+  width: 960px;
+  margin: 0 auto;
+}
+
+#logo{
+  margin-top: 10px;
+}
+
+#navigation-wrapper{
+  background: none repeat scroll 0 0 #FFFFFF;
+}
+
+#navigation{
+  float: none;
+  margin: 0 auto;
+  padding: 20px 0;
+  position: relative;
+  width: 960px;
+}
+
+#main{
+  background: #e2dfdd;
+}
+
+#content-area a{
+  color: #df6524;
+}
+
+#content .section {
+  background: none repeat scroll 0 0 #FFFFFF;
+  font-size: 0.9em;
+  margin-right: 20px;
+  padding: 20px;
+}
+
+.front #content .section {
+  margin-top: 28px;
+}
+
+.breadcrumb{
+  color: #666;
+  background: #e2dfdd;
+  font-size: 0.8em;
+  margin-bottom: 10px;
+}
+
+.breadcrumb a{
+  color: #666;
+  text-decoration: none;
+}
+
+div.tabs {
+  position: absolute;
+  right: 0;
+  top: 36px;
+}
+
+
+
