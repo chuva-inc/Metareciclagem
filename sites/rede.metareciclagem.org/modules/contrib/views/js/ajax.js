@@ -1,4 +1,4 @@
-// $Id: ajax.js,v 1.26.2.8 2010/04/08 21:29:59 merlinofchaos Exp $
+// $Id: ajax.js,v 1.26.2.2 2009/11/30 22:47:05 merlinofchaos Exp $
 /**
  * @file ajax_admin.js
  *
@@ -70,7 +70,7 @@ Drupal.Views.Ajax.ajaxResponse = function(data) {
           data: { 'js': 1 },
           type: 'POST',
           success: Drupal.Views.Ajax.ajaxResponse,
-          error: function(xhr) { $('span.views-throbbing').remove(); Drupal.Views.Ajax.handleErrors(xhr, data.url); },
+          error: function() { $('span.views-throbbing').remove(); alert(Drupal.t("An error occurred at @path.", {'@path': data.url})); },
           dataType: 'json'
         });
         return false;
@@ -79,15 +79,13 @@ Drupal.Views.Ajax.ajaxResponse = function(data) {
 
     Drupal.attachBehaviors(ajax_area);
   }
-  else if (!data.tab) {
+  else {
     // If no display, reset the form.
     Drupal.Views.Ajax.setForm('', Drupal.settings.views.ajax.defaultForm);
     //Enable the save button.
     $('#edit-save').removeAttr('disabled');
     // Trigger an update for the live preview when we reach this state:
-    if ($('#views-ui-preview-form input#edit-live-preview').is(':checked')) {
-      $('#views-ui-preview-form').trigger('submit');
-    }
+    $('#views-ui-preview-form').trigger('submit');
   }
 
   // Go through the 'add' array and add any new content we're instructed to add.
@@ -109,19 +107,15 @@ Drupal.Views.Ajax.ajaxResponse = function(data) {
   // Go through and add any requested tabs
   if (data.tab) {
     for (id in data.tab) {
-      // Retrieve the tabset instance by stored ID.
-      var instance = Drupal.Views.Tabs.instances[$('#views-tabset').data('UI_TABS_UUID')];
-      instance.add(id, data.tab[id]['title'], 0);
-      instance.click(instance.$tabs.length);
-
+      $('#views-tabset').addTab(id, data.tab[id]['title'], 0);
       $(id).html(data.tab[id]['body']);
       $(id).addClass('views-tab');
-
-      // Update the preview widget to preview the new tab.
-      var display_id = id.replace('#views-tab-', '');
-      $("#preview-display-id").append('<option selected="selected" value="' + display_id + '">' + data.tab[id]['title'] + '</option>');
-
       Drupal.attachBehaviors(id);
+
+      // This is kind of annoying, but we have to actually to find where the new
+      // tab is.
+      var instance = $.ui.tabs.instances[$('#views-tabset').get(0).UI_TABS_UUID];
+      $('#views-tabset').clickTab(instance.$tabs.length);
     }
   }
 
@@ -184,7 +178,7 @@ Drupal.Views.Ajax.previewResponse = function(data) {
           data: { 'js': 1 },
           type: 'POST',
           success: Drupal.Views.Ajax.previewResponse,
-          error: function(xhr) { $('span.views-throbbing').remove(); Drupal.Views.Ajax.handleErrors(xhr, url); },
+          error: function() { $('span.views-throbbing').remove(); alert(Drupal.t("An error occurred at @path.", {'@path': url})); },
           dataType: 'json'
         });
         return false;
@@ -205,7 +199,7 @@ Drupal.Views.updatePreviewForm = function() {
     data: { 'js': 1 },
     type: 'POST',
     success: Drupal.Views.Ajax.previewResponse,
-    error: function(xhr) { $('span.views-throbbing').remove(); Drupal.Views.Ajax.handleErrors(xhr, url); },
+    error: function() { $('span.views-throbbing').remove(); alert(Drupal.t("An error occurred at @path.", {'@path': url})); },
     dataType: 'json'
   });
 
@@ -223,7 +217,7 @@ Drupal.Views.updatePreviewFilterForm = function() {
     data: { 'js': 1 },
     type: 'GET',
     success: Drupal.Views.Ajax.previewResponse,
-    error: function(xhr) { $('span.views-throbbing').remove(); Drupal.Views.Ajax.handleErrors(xhr, url); },
+    error: function() { $('span.views-throbbing').remove(); alert(Drupal.t("An error occurred at @path.", {'@path': url})); },
     dataType: 'json'
   });
 
@@ -243,7 +237,7 @@ Drupal.Views.updatePreviewLink = function() {
     data: 'js=1',
     type: 'POST',
     success: Drupal.Views.Ajax.previewResponse,
-    error: function(xhr) { $(this).removeClass('views-throbbing'); Drupal.Views.Ajax.handleErrors(xhr, url); },
+    error: function() { $(this).removeClass('views-throbbing'); alert(Drupal.t("An error occurred at @path.", {'@path': url})); },
     dataType: 'json'
   });
 
@@ -270,7 +264,7 @@ Drupal.behaviors.ViewsAjaxLinks = function() {
       url: url,
       data: 'js=1',
       success: Drupal.Views.Ajax.ajaxResponse,
-      error: function(xhr) { $(this).removeClass('views-throbbing'); Drupal.Views.Ajax.handleErrors(xhr, url); },
+      error: function() { $(this).removeClass('views-throbbing'); alert(Drupal.t("An error occurred at @path.", {'@path': url})); },
       dataType: 'json'
     });
 
@@ -289,7 +283,7 @@ Drupal.behaviors.ViewsAjaxLinks = function() {
       data: { 'js': 1 },
       type: 'POST',
       success: Drupal.Views.Ajax.ajaxResponse,
-      error: function(xhr) { $('span.views-throbbing').remove(); Drupal.Views.Ajax.handleErrors(xhr, url); },
+      error: function() { $('span.views-throbbing').remove(); alert(Drupal.t("An error occurred at @path.", {'@path': url})); },
       dataType: 'json'
     });
 
@@ -312,51 +306,8 @@ Drupal.behaviors.ViewsAjaxLinks = function() {
 }
 
 /**
- * Sync preview display.
- */
-Drupal.behaviors.syncPreviewDisplay = function() {
-  $("#views-tabset a").click(function() {
-    var href = $(this).attr('href');
-    // Cut of #views-tabset.
-    var display_id = href.substr(11);
-    // Set the form element.
-    $("#views-live-preview #preview-display-id").val(display_id);
-  });
-}
-
-/**
  * Get rid of irritating tabledrag messages
  */
 Drupal.theme.tableDragChangedWarning = function () {
   return '<div></div>';
-}
-
-/**
- * Display error in a more fashion way
- */
-Drupal.Views.Ajax.handleErrors = function (xhr, path) {
-  var error_text = '';
-
-  if ((xhr.status == 500 && xhr.responseText) || xhr.status == 200) {
-    error_text = xhr.responseText;
-
-    // Replace all &lt; and &gt; by < and >
-    error_text = error_text.replace("/&(lt|gt);/g", function (m, p) {
-      return (p == "lt")? "<" : ">";
-    });
-
-    // Now, replace all html tags by empty spaces
-    error_text = error_text.replace(/<("[^"]*"|'[^']*'|[^'">])*>/gi,"");
-
-    // Fix end lines
-    error_text = error_text.replace(/[\n]+\s+/g,"\n");
-  }
-  else if (xhr.status == 500) {
-    error_text = xhr.status + ': ' + Drupal.t("Internal server error. Please see server or PHP logs for error information.");
-  }
-  else {
-    error_text = xhr.status + ': ' + xhr.statusText;
-  }
-
-  alert(Drupal.t("An error occurred at @path.\n\nError Description: @error", {'@path': path, '@error': error_text}));
 }

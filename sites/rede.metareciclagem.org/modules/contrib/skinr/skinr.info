@@ -1,0 +1,11 @@
+;$Id$
+
+name = Skinr
+description = Provides a way to define and/or skin bits of Drupal output from the UI.
+core = 6.x
+; Information added by drupal.org packaging script on 2009-06-11
+version = "6.x-1.0-beta1"
+core = "6.x"
+project = "skinr"
+datestamp = "1244726191"
+

@@ -1,0 +1,11 @@
+; $Id: dumper.info,v 1.2 2009/09/19 18:57:30 franz Exp $
+name = Dumper 
+description = Module designed to quickly download a database dump.
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-03-08
+version = "6.x-1.5"
+core = "6.x"
+project = "dumper"
+datestamp = "1268074210"
+

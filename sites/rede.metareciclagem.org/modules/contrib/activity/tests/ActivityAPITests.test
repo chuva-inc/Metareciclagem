@@ -1,0 +1,171 @@
+<?php
+// $Id: ActivityAPITests.test,v 1.1.2.1.2.2 2008/01/20 10:10:52 robertDouglass Exp $
+
+class ActivityAPITest extends DrupalTestCase {
+
+  private $beginning_aid;
+  private $sequences_id;
+
+  function get_info() {
+    return array(
+      'name' => t('Activity API tests'),
+      'desc' => t('Test activity_insert_activity and activity_get_activity'),
+      'group' => 'Activity Tests',
+    );
+  }
+
+  function setUp() {
+    parent::setUp();
+    //count current activities.
+    $this->beginning_aid = db_result(db_query("SELECT MAX(aid) FROM {activity}"));
+    //get the last id from sequences.
+    $this->sequences_id = db_result(db_query("SELECT id FROM {sequences} WHERE name = 'activity'"));
+  }
+
+  function tearDown() {
+    parent::tearDown();
+    db_query('DELETE FROM {activity} WHERE aid > %d', $this->beginning_aid);
+    db_query('DELETE FROM {activity_targets} WHERE aid > %d', $this->beginning_aid);
+    db_query("UPDATE {sequences} SET id = %d WHERE name = 'activity'", $this->sequences_id);
+  }
+
+  function testActivityGetInfo() {
+    $this->drupalModuleEnable('nodeactivity');
+
+    // Assert that the api function activity_get_info exists
+    if ($this->assertTrue(function_exists('activity_get_info'), '%s '. t('Asserting that activity_get_info exists'))) {
+      // It exists. Let's call it.
+      $info = activity_get_info();
+
+      // The API's contract is to return an array.
+      $this->assertTrue(is_array($info), '%s '. t('Asserting that return value is an array.'));
+
+      // Assert that all of the modules we're looking for are in the array.
+      $this->assertTrue(in_array('nodeactivity', array_keys($info)), '%s '. t('Asserting that nodeactivity is one of the returned values.'));
+
+      // Assert that all three parts of the array are present and the right type.
+      // Expecting ops, types, roles all to be arrays
+      $this->assertTrue(is_array($info['nodeactivity']['ops']), '%s '. t('Expecting ops, types, roles all to be arrays'));
+      $this->assertTrue(is_array($info['nodeactivity']['types']), '%s '. t('Expecting ops, types, roles all to be arrays'));
+      $this->assertTrue(is_array($info['nodeactivity']['roles']), '%s '. t('Expecting ops, types, roles all to be arrays'));
+    }
+  }
+
+  /**
+   * function activity_insert($module, $type, $operation, $data, $target_users_roles)
+   * - the return value should be 1 greater than the previous greatest activity.
+   */
+  function testInsertActivity() {
+
+    //insert some permutations of activites.
+    $module = 'simpletest';
+    $type = 'testing';
+    $operation = 'insert';
+    $data = array('dummydata' => 'foobar');
+    $target_users_roles = array(ACTIVITY_ALL => 'All', '4711' => 'Court Jester', '4712' => 'King of Spades');
+    $aid = activity_insert($module, $type, $operation, $data, $target_users_roles);
+
+    // $aid is supposed to be the id of the resultant insert. Assert that it is.
+    $this->assertTrue(is_numeric($aid), '%s '. t('activity_insert is supposed to return a numeric id'));
+    // $aid is supposed to have incremented by 1 over the begninng.
+    $this->assertEqual($aid, $this->sequences_id + 1, '%s '. t('the insert created an aid that is one greater than the previous.'));
+
+    // Manually get the information from the activity table which we just put in.
+    $activity = db_fetch_object(db_query("SELECT * FROM {activity} WHERE aid = %d", $aid));
+    $this->assertEqual($activity->module, $module, '%s '. t('module is supposed to be @module', array('@module' => $module)));
+    $this->assertEqual($activity->type, $type, '%s '. t('type is supposed to be @type', array('@type' => $type)));
+    $this->assertEqual($activity->operation, $operation, '%s '. t('operation is supposed to be @action', array('@action' => $operation)));
+    $new_data = unserialize($activity->data);
+    $this->assertTrue(is_array($new_data), '%s '. t('Supposed to be an array'));
+    $this->assertTrue((count(array_diff($new_data, $data)) === 0), '%s '. t('There are supposed to be no differences between the data arrays'));
+  }
+
+  /**
+   * Test activity_get_activity
+   * activity_get_activity($uids = ACTIVITY_ALL, $filters = NULL, $limit = NULL, $tablesort_headers = NULL)
+   *
+   * Assert that function can take a uid or an array of uids
+   * Can take an optional array of filters to filter the results
+   * Takes a limit parameter
+   * Support HTML tables with tablesort query additions
+   * Should always return an array, even if empty.
+   * array items shall be ordered by database so that tablesort queries are possible.
+   */
+  function testGetActivity1() {
+    // Does this function exist?
+    $this->assertTrue(function_exists('activity_get_activity'));
+
+    // Make a new user to test with
+    $tester = $this->drupalCreateUserRolePerm();
+    // Create some activity
+    $module = 'simpletest';
+    $type = 'testing';
+    $operation = 'insert';
+    $data = array('dummydata' => 'foobar');
+    $target_users_roles = array(ACTIVITY_ALL => 'All', $tester->uid => 'Author', '4711' => 'Court Jester', '4712' => 'King of Spades');
+    $aid = activity_insert($module, $type, $operation, $data, $target_users_roles);
+
+    // Assert that each of the following only returns the one activity we inserted.
+    $activities[1] = activity_get_activity($tester->uid);
+    $activities[2] = activity_get_activity(array($tester->uid));
+    $activities[3] = activity_get_activity(array($tester->uid, 999999));
+    $activities[4] = activity_get_activity(array($tester->uid), array('module' => $module));
+    $activities[5] = activity_get_activity($tester->uid, NULL, 40);
+
+    foreach ($activities as $key => $activity) {
+      $this->assertEqual($aid, $activity[0]['aid'], $key. ': %s '. t('Expecting aid to be @aid. Found @activity_id.', array('@aid' => $aid, '@activity_id' => $activity[0]['aid'])));
+    }
+  }
+
+  function testGetActivity2() {
+    // Test the filter process
+    // Invent some more modules
+    $modules = array('huba', 'foobar', 'barbaz');
+    $types = array('test1', 'test2', 'test3');
+    $operations = array('insert', 'delete', 'update', 'view');
+    $roles = array('Author', 'Editor', 'Viewer');
+    $data = array('dummydata' => 'foobar');
+
+    // Make another new user to test with
+    $users[] = $this->drupalCreateUserRolePerm();
+    $users[] = $this->drupalCreateUserRolePerm();
+    $users[] = $this->drupalCreateUserRolePerm();
+    $users[] = $this->drupalCreateUserRolePerm();
+    $users[] = $this->drupalCreateUserRolePerm();
+
+    // Create a LOT of new activity
+    // activity_insert($module, $type, $operation, $data, $target_users_roles);
+    $count = 0;
+    for ($a=0; $a<3; $a++) {
+      $module = $modules[$a];
+      for ($b=0; $b<3; $b++) {
+        $type = $types[$b];
+        for ($c=0; $c<4; $c++) {
+          $operation = $operations[$c];
+          for ($d=0; $d<5; $d++) {
+            $user=$users[$d];
+            for ($e=0; $e<3; $e++) {
+              $role = $roles[$e];
+              $target_users_roles = array(ACTIVITY_ALL => 'All', $user->uid => $role);
+              $count++;
+              activity_insert($module, $type, $operation, $data, $target_users_roles);
+            }
+          }
+        }
+      }
+    }
+
+    $activity = activity_get_activity(ACTIVITY_ALL);
+    $this->assertEqual($count, count($activity), '%s '. t("Expecting $count activities."));
+    $activity = activity_get_activity(array(ACTIVITY_ALL));
+    $this->assertEqual($count, count($activity), '%s '. t("Expecting $count activities."));
+//    $activity = activity_get_activity('*', array('huba', 'foobar'));
+//    $this->assertEqual(100, count($activity), '%s '. t('Expecting 100 huba and foobar activities.'));
+//    $activity = activity_get_activity('*', array('huba', 'foobar'), 17);
+//    $this->assertEqual(17, count($activity), '%s '. t('Expecting 17 huba and foobar activities on one page.'));
+//    $activity = activity_get_activity(1, array('huba', 'foobar'));
+//    $this->assertEqual(0, count($activity), '%s '. t('Expecting 0 huba and foobar activities created by user #1.'));
+
+  }
+
+}

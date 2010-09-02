@@ -1,0 +1,3 @@
+<?php
+
+include_once('metarec_blog.features.inc');

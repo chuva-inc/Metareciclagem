@@ -1,0 +1,290 @@
+<?php
+// $Id: dumper.module,v 1.7.2.9 2010/03/05 22:39:41 lourenzo Exp $
+  /**  @author Franz Glauber Vanderlinde  */
+
+/**
+ * Implementation of hook_perm()
+ * Be careful for this permission!
+ */
+function dumper_perm() {
+  return array('dump sql data', 'dump files');
+}
+
+/**
+ * Settings page form
+ */
+function dumper_admin() {
+  $db_spec = _dumper_sql_get_db_spec();
+
+  // Check wich driver is being used (mysql or pgsql)
+  $form    = array();
+  $form[]  = array('#value' => '<div></div><div>');
+  $form[]  = array('#value' => t('Currently using %driver', array('%driver' =>  $db_spec['driver'])));
+  $form[]  = array('#value' => '</div>');
+
+  // Display default command-line options
+  switch ($db_spec['driver']) {
+    case 'mysql':
+      $extra = '<br>' . t('Default command-line is: "mysqldump --single-transaction --opt -Q"');
+      break;
+    case 'pgsql':
+      $extra = '<br>' . t('Default command-line is: "pg_dump --clean"');
+      break;
+    default:
+      $extra = '';
+  }
+
+  $form['dumper_extra_options'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Extra options'),
+    '#default_value' => variable_get('dumper_extra_options', ''),
+    '#description'   => t("Extra options to append to the command.") . $extra,
+  );
+
+  $form['dumper_exclude_user'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Exclude table "users"'),
+    '#default_value' => variable_get('dumper_exclude_user',FALSE),
+    '#description'   => t("Select this option if you don't want to dump the 'users' table."),
+  );
+
+  $form['dumper_exclude_cache'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Exclude cache'),
+    '#default_value' => variable_get('dumper_exclude_cache',FALSE),
+    '#description'   => t("Select this option if you don't want to dump cache-related tables."),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * The button to get the dump
+ */
+function dumper_form(){
+  
+  $form = array();
+
+  $form['buttons']['submit'] = array (
+    '#type'  => 'submit',
+    '#value' => t('Get Dump'),
+  );
+
+  $form['buttons']['files'] = array (
+    '#type'  => 'submit',
+    '#value' => t('Get Files'),
+  );
+  $form[]['#value'] = '<div>' . t('(Click "Get Files" to download a tarball of Drupal\'s files directory)') . '</div>';
+
+  $form['#submit'][] = 'dumper_form_submit';
+
+  return $form;
+}
+
+/**
+ * Submit callback for form, just call the appropriate action.
+ */
+function dumper_form_submit($form, &$form_state) {
+  // Get Files button pressed, let's just download the files.
+  if ($form_state['clicked_button']['#array_parents'][1] == 'files') {
+    dumper_get_files();
+  }
+  else {
+    dumper_get_dump();
+  }
+}
+
+/**
+ * The core function, that gets the dump itself and return the file dump.sql.gz
+ */
+function dumper_get_dump() {
+  global $db_prefix;
+  $db_spec = _dumper_sql_get_db_spec();
+
+  switch ($db_spec['driver']) {
+    case 'mysql':
+      $exec  = 'mysqldump ';
+      $extra = '--single-transaction --opt -Q ';
+      
+      // Credentials
+      $cred = ' -h' . $db_spec['host'] .
+         (empty($db_spec['port']) ? '' : ' -P' . $db_spec['port']) .
+         ' -u' . $db_spec['username'] .
+         (empty($db_spec['password']) ? '' : ' -p' . $db_spec['password']) . ' ' . $db_spec['database'];
+
+      // Exclude users table?
+      if (variable_get('dumper_exclude_user',FALSE)) {
+        $extra .= '--ignore-table=' . $db_spec['database'] . '.' . $db_prefix . 'users ';
+      }
+
+      // Exclude cache-related tables?
+      if (variable_get('dumper_exclude_cache',FALSE)) {
+        $extra .= '--ignore-table=' . $db_spec['database'] . '.' . $db_prefix . 'cache_content ';
+        $extra .= '--ignore-table=' . $db_spec['database'] . '.' . $db_prefix . 'cache_filter ';
+        $extra .= '--ignore-table=' . $db_spec['database'] . '.' . $db_prefix . 'cache_menu ';
+        $extra .= '--ignore-table=' . $db_spec['database'] . '.' . $db_prefix . 'cache_form ';
+      }
+
+      break;
+
+    case 'pgsql':
+      $exec = 'pg_dump --clean ';
+      
+      // Credentials
+      $cred = $db_spec['database'] . ' ' .
+         (empty($db_spec['host']) || ($db_spec['host'] == "localhost") ? '' : '-h ' . $db_spec['host']) . ' ' .
+         (empty($db_spec['port']) ? '' : '-p' . $db_spec['port']) . ' ';
+
+      // Exclude users table?
+      if (variable_get('dumper_exclude_user',FALSE)) {
+        $extra .= '--exclude-table=' . $db_spec['database'] . '.' . $db_prefix . 'users ';
+      }
+
+      // Exclude cache-related tables?
+      if (variable_get('dumper_exclude_cache',FALSE)) {
+        $extra .= '--exclude-table=' . $db_spec['database'] . '.' . $db_prefix . 'cache_content ';
+        $extra .= '--exclude-table=' . $db_spec['database'] . '.' . $db_prefix . 'cache_filter ';
+        $extra .= '--exclude-table=' . $db_spec['database'] . '.' . $db_prefix . 'cache_menu ';
+      }
+
+      break;
+
+    default:
+    exit;
+  }
+  
+  // Extra options
+  $extra   .= variable_get('dumper_extra_options','');
+
+  // Temporary file location
+  $filename = file_directory_temp() . '/' . session_name() . '.sql.gz';
+
+  // The command to be executed
+  $exec    .= $extra . ' ' . $cred . '|gzip >' . $filename;
+
+  // Executing the command on the system
+  $result   = system($exec);
+  
+  $download_filename = sprintf(
+    'dump_%s-%s.sql.gz',
+    $db_spec['database'],
+    date('Y-m-d_Hs')
+  );
+
+  // Return the file
+  if (file_exists($filename)) {
+    file_transfer($filename, array('Content-type: application/x-gzip', 
+      sprintf(
+        'Content-Disposition: attachment; filename="%s"',
+        $download_filename
+      ), 
+      'Content-Type: application/force-download', 
+    ));
+  }
+  else {
+    drupal_set_message(t('Unable do dump Database (check your extra options)'),'error');
+    drupal_goto('/admin/settings/dumper');
+  }
+}
+
+/**
+ * Function to get DB metadata.
+ * Reference: http://www.drupal.org/project/drush
+ */
+function _dumper_sql_get_db_spec() {
+  
+   $url = $GLOBALS['db_url'];
+   $url = is_array($url) ? $url['default'] : $url;
+   $url = parse_url($url);
+
+   // Fill in defaults to prevent notices.
+   $url += array(
+     'driver' => NULL,
+     'user' => NULL,
+     'pass' => NULL,
+     'port' => NULL,
+     'database' => NULL,
+   );
+   $url = (object)$url;
+   return array(
+     'driver' => $url->scheme == 'mysqli' ? 'mysql' : $url->scheme,
+     'username' => urldecode($url->user),
+     'password' => urldecode($url->pass),
+     'port' => urldecode($url->port),
+     'host' => urldecode($url->host),
+     'database' => substr(urldecode($url->path), 1), // skip leading '/' character≈
+   );
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function dumper_menu() {
+
+  $items = array();
+
+  $items['admin/settings/dumper'] = array(
+    'title'            => t('Dumper settings'),
+    'description'      => t('Configure database dumper.'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('dumper_admin'),
+    'access arguments' => array('dump sql data'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/build/dumper'] = array(
+    'title'            => t('Dump DB'),
+    'description'      => t('Download database dump.'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('dumper_form'),
+    'access arguments' => array('dump sql data'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+
+  $items['dumper/get_files'] = array(
+    'title'            => t('Dump DB'),
+    'description'      => t('Download site files packed in a tgz.'),
+    'page callback'    => 'dumper_get_files',
+    'access arguments' => array('dump files'),
+    'type'             => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Dump the files directory into a files.tgz for downloading
+ */
+function dumper_get_files() {
+  // Temporary file location
+  $filename = file_directory_temp() . '/' . session_name() . '-files.tgz';
+
+  // Files directory
+  $directory = explode('/',file_directory_path());
+  $files = array_pop($directory);
+  $dir_path = implode('/', $directory);
+
+  // The command to be executed
+  $exec = 'tar -czf ' . $filename;
+
+  if(!empty($dir_path)) {
+    $exec .= ' -C '. $dir_path;
+  }
+
+  $exec .= ' ' . $files;
+
+  // Executing the command on the system
+  $result   = system($exec);
+
+  // Return the file
+  if (file_exists($filename)) {
+    file_transfer($filename, array('Content-type: application/x-gzip', 
+      'Content-Disposition: attachment; filename="files.tgz"', 
+      'Content-Type: application/force-download', 
+    ));
+  }
+  else {
+    drupal_set_message(t('Unable do dump files'),'error');
+    drupal_goto('/admin/settings/dumper');
+  }
+}

@@ -1,0 +1,156 @@
+<?php
+// $Id: useractivity.module,v 1.1.4.9 2009/04/27 01:42:12 jaydub Exp $
+
+/**
+ * Activity definition file
+ *
+ * This defines what hooks activity module should use
+ */
+function useractivity_activity_info() {
+  return array(
+    'ops' => array(
+      'insert' => t('Register'),
+      'update' => t('Update'),
+      'login' => t('Login'),
+      'logout' => t('Logout'),
+      'view' => t('View'),
+    ),
+    'types' => array('user' => t('User')),
+    'roles' => array(
+      'author' => array(
+        '#name' => t('Author'),
+        '#description' => t('The person creating user activity.'),
+        '#default' => array(
+          'login' => '[author] logged in to [site-name]',
+          'logout' => '[author] logged off of [site-name]',
+          'insert' => '[author] created a new account on [site-name]',
+          'update' => '[author] updated [possessive] profile',
+          'view' => '[author] viewed [target-profile] profile',
+        ),
+      ),
+      'all' => array(
+        '#name' => t('All'),
+        '#description' => t('The general public.'),
+        '#default' => array(
+          'login' => '[author-all] logged in to [site-name]',
+          'logout' => '[author-all] logged off of [site-name]',
+          'insert' => '[author-all] created a new account on [site-name]',
+          'update' => '[author-all] updated their profile',
+          'view' => '[author-all] viewed [target-profile] profile',
+        ),
+      ),
+    ),
+  );
+}
+
+/** 
+ * Implementation of hook_activityapi().
+ */
+function useractivity_activityapi(&$activity, $op) {
+  if ($op == 'load' && $activity['data']['module'] == 'useractivity') {
+    if ($activity['data']['operation'] == 'insert' || $activity['data']['operation'] == 'update' || $activity['data']['operation'] == 'view') {
+      $uid = ($activity['data']['operation'] == 'view') ? $activity['data']['target-uid'] : $activity['data']['uid'];
+      if (!user_view_access(activity_user_load($activity['data']['target-uid']))) {
+        $activity = array();
+      }
+    }
+  }
+}
+
+/**
+ * Token module integration. Defines available default tokens.
+ */
+function useractivity_token_list($type = 'all') {
+  if ($type == 'useractivity') {
+    $tokens['useractivity'] = array(
+      'possessive'  => t('Possessive pronoun indicating whose user profile page ("your" or "their")'),
+      'target-uid'  => t('User Id of the user profile viewed if viewing a profile'),
+      'target-profile' => t('Person whose user profile was viewed'),
+      'target-profile-name' => t('The username of the person whose profile was viewed'),
+    );
+    return $tokens;
+  }
+}
+
+/**
+ * Token module integration. Defines available default token values.
+ */
+function useractivity_token_values($type, $data = NULL, $options = array()) {
+  global $user;
+  static $authors;
+  if ($type == 'useractivity' && !empty($data)) {
+    if (!isset($authors[$data['target-uid']])) {
+      $authors[$data['target-uid']] = activity_user_load($data['target-uid']);
+    }
+    $target = $authors[$data['target-uid']];
+
+    $data['possessive'] = ($user->uid == $data['uid']) ? t('your') : t('their');
+    $target_profile = theme('activity_username', $target, TRUE);
+    $data['target-profile'] = $target_profile == t('you') ? t('your') : $target_profile ."'s";
+    $data['target-profile-name'] = $target->name;
+    return $data;
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function useractivity_user($op, &$edit, &$account, $category = NULL) {
+  global $user;
+  
+  switch ($op) {
+    case 'insert':
+    case 'update':
+    case 'login':
+    case 'logout':
+    case 'view':
+      
+      // don't record if new user requires admin approval
+      if ($op == 'insert' && variable_get('user_register', 1) != 1) {
+        return FALSE;
+      }
+
+      // check if action is not by done by the account user such 
+      // as if user is edited by admin
+      if ($op == 'update' && $user->uid != $account->uid) {
+        return FALSE;
+      }
+
+      // Check if both type and operation are
+      // enabled for activity. If not then stop here
+      if (!in_array('user', variable_get('useractivity_token_types', array('user')), TRUE) ||
+        !in_array($op, variable_get('useractivity_op_types', array($op)), TRUE)) {
+        return FALSE;
+      }
+
+      // Privacy setting check
+      if (activity_user_privacy_optout(($op == 'view' ? $user : $account))) {
+        return FALSE;
+      }
+
+      // User hide activity permission check
+      if (user_access('hide activity', ($op == 'view' ? $user : $account))) {
+        return FALSE;
+      }
+
+      // If $op is view, don't record
+      if ($op == 'view' && $user->uid == $account->uid) {
+        return FALSE;
+      }
+
+      $data = array(
+        'operation' => $op,
+        'target-uid' => $account->uid,
+      );
+
+      $target_users_roles = array(
+        ACTIVITY_ALL => 'all',
+        ($op == 'view' ? $user->uid : $account->uid) => 'author'
+      );
+
+      activity_insert(($op == 'view' ? $user->uid : $account->uid), 'useractivity', 'user', $op, $data, $target_users_roles);
+      break;
+  }
+}
+
+

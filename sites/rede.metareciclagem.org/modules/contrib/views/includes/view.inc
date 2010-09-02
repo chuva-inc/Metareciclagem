@@ -1,5 +1,5 @@
 <?php
-// $Id: view.inc,v 1.167.2.7 2010/03/22 20:55:11 merlinofchaos Exp $
+// $Id: view.inc,v 1.167.2.2 2009/11/18 02:26:16 merlinofchaos Exp $
 /**
  * @file view.inc
  * Provides the view object type and associated methods.
@@ -413,12 +413,6 @@ class view extends views_db_object {
     $output = drupal_build_form('views_exposed_form', $form_state);
     if (!empty($form_state['js settings'])) {
       $this->js_settings = $form_state['js settings'];
-    }
- 
-    // Don't render exposed filter form when there's form errors.
-    // Applies when filters are in a block ("exposed_block" option).
-    if (form_get_errors() && empty($form_state['rerender'])) {
-      return NULL;
     }
 
     return $output;
@@ -1012,14 +1006,10 @@ class view extends views_db_object {
   }
 
   /**
-   * Called to get hook_menu() information from the view and the named display handler.
-   *
-   * @param $display_id
-   *   A display id.
-   * @param $callbacks
-   *   A menu callback array passed from views_menu_alter().
+   * Called to get hook_menu information from the view and the
+   * named display handler.
    */
-  function execute_hook_menu($display_id = NULL, $callbacks = array()) {
+  function execute_hook_menu($display_id = NULL) {
     // Prepare the view with the information we have.
 
     // This was probably already called, but it's good to be safe.
@@ -1029,7 +1019,7 @@ class view extends views_db_object {
 
     // Execute the view
     if (isset($this->display_handler)) {
-      return $this->display_handler->execute_hook_menu($callbacks);
+      return $this->display_handler->execute_hook_menu();
     }
   }
 
@@ -1433,7 +1423,7 @@ class view extends views_db_object {
   /**
    * Delete the view from the database.
    */
-  function delete($clear = TRUE) {
+  function delete() {
     if (empty($this->vid)) {
       return;
     }
@@ -1445,11 +1435,8 @@ class view extends views_db_object {
     }
 
     cache_clear_all('views_query:' . $this->name, 'cache_views');
-
-    if ($clear) {
-      cache_clear_all(); // this clears the block and page caches only.
-      menu_rebuild(); // force a menu rebuild when a view is deleted.
-    }
+    cache_clear_all(); // In Drupal 5.0 and later this clears the page cache only.
+    menu_rebuild(); // force a menu rebuild when a view is deleted.
   }
 
   /**
@@ -1460,7 +1447,7 @@ class view extends views_db_object {
     $output = '';
     $output .= $this->export_row('view', $indent);
     // Set the API version
-    $output .= $indent . '$view->api_version = ' . views_api_version() . ";\n";
+    $output .= $indent . '$view->api_version = 2' . ";\n";
     $output .= $indent . '$view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */' . "\n";
 
     foreach ($this->display as $id => $display) {
@@ -1525,7 +1512,7 @@ class view extends views_db_object {
   function clone_view() {
     $clone = version_compare(phpversion(), '5.0') < 0 ? $this : clone($this);
 
-    $keys = array('current_display', 'display_handler', 'build_info', 'built', 'executed', 'attachment_before', 'attachment_after', 'field', 'argument', 'filter', 'sort', 'relationship', 'query', 'inited', 'style_plugin', 'plugin_name', 'exposed_data', 'exposed_input', 'exposed_widgets', 'many_to_one_tables', 'feed_icon');
+    $keys = array('current_display', 'display_handler', 'build_info', 'built', 'executed', 'attachment_before', 'attachment_after', 'field', 'argument', 'filter', 'sort', 'relationship', 'query', 'inited', 'style_plugin', 'plugin_name', 'exposed_data', 'exposed_input', 'exposed_widgets', 'many_to_one_tables');
     foreach ($keys as $key) {
       if (isset($clone->$key)) {
         unset($clone->$key);

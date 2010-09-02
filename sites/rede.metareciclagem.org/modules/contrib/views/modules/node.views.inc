@@ -1,5 +1,5 @@
 <?php
-// $Id: node.views.inc,v 1.97.2.7 2010/03/25 01:14:22 merlinofchaos Exp $
+// $Id: node.views.inc,v 1.97.2.1 2009/11/02 23:25:14 merlinofchaos Exp $
 /**
  * @file
  * Provide views data and handlers for node.module
@@ -228,9 +228,6 @@ function node_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_boolean',
       'click sortable' => TRUE,
-      'output formats' => array(
-        'sticky' => array('', t('Sticky')),
-      ),
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_boolean_operator',
@@ -239,7 +236,6 @@ function node_views_data() {
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
-      'help' => t('Whether or not the node is sticky. To list sticky nodes first, set this to descending.'),
     ),
   );
 
@@ -268,15 +264,6 @@ function node_views_data() {
       'handler' => 'views_handler_field_node_link_delete',
     ),
   );
-
-  $data['node']['path'] = array(
-    'field' => array(
-      'title' => t('Path'),
-      'help' => t('The aliased path to this node.'),
-      'handler' => 'views_handler_field_node_path',
-    ),
-  );
-
 
   // Bogus fields for aliasing purposes.
 
@@ -486,7 +473,7 @@ function node_views_data() {
      // Information for displaying a title as a field
     'field' => array(
       'field' => 'title', // the real field
-      'handler' => 'views_handler_field_node_revision',
+      'handler' => 'views_handler_field_node',
       'click sortable' => TRUE,
      ),
     'sort' => array(
@@ -659,9 +646,6 @@ function node_views_handlers() {
       'views_handler_field_node_link' => array(
         'parent' => 'views_handler_field',
       ),
-      'views_handler_field_node_path' => array(
-        'parent' => 'views_handler_field',
-      ),
       'views_handler_field_node_type' => array(
         'parent' => 'views_handler_field_node',
       ),
@@ -680,9 +664,7 @@ function node_views_handlers() {
       'views_handler_field_history_user_timestamp' => array(
         'parent' => 'views_handler_field_node',
       ),
-      'views_handler_field_node_revision' => array(
-        'parent' => 'views_handler_field_node',
-      ),
+
       // argument handlers
       'views_handler_argument_node_type' => array(
         'parent' => 'views_handler_argument',
@@ -848,13 +830,6 @@ function node_views_analyze($view) {
           }
           $ret[] = views_ui_analysis(t('Display %display has no access control but does not contain a filter for published nodes.', array('%display' => $display->display_title)), 'warning');
         }
-      }
-    }
-  }
-  foreach ($view->display as $id => $display) {
-    if ($display->display_plugin == 'page') {
-      if ($display->handler->get_option('path') == 'node/%') {
-        $ret[] = views_ui_analysis(t('Display %display has set node/% as path. This will not produce what you want. If you want to have multiple versions of the node view, use panels.', array('%display' => $display->display_title)), 'warning');
       }
     }
   }
