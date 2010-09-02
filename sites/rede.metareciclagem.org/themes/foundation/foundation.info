@@ -1,0 +1,19 @@
+;$Id: foundation.info,v 1.2 2008/07/13 13:47:57 add1sun Exp $
+name = Foundation
+description = Tableless, multi-column, fluid width starter theme.
+core = 6.x
+engine = phptemplate
+
+; Regions
+regions[left] = Left sidebar
+regions[right] = Right sidebar
+regions[contenttop] = Content Top
+regions[content] = Content
+regions[header] = Header
+regions[footer] = Footer
+; Information added by drupal.org packaging script on 2008-07-16
+version = "6.x-1.0"
+core = "6.x"
+project = "foundation"
+datestamp = "1216242309"
+
