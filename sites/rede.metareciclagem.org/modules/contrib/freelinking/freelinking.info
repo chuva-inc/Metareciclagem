@@ -1,6 +1,7 @@
-; $Id: freelinking.info,v 1.1.4.1 2008/07/01 22:27:10 eafarris Exp $
+; $Id: freelinking.info,v 1.1.4.2 2009/11/24 05:57:21 grayside Exp $
 name = Freelinking
 description = Wiki-style freelinking for node content using CamelCase and delimiters.
+package = Input filters
 
 ; Information added by drupal.org packaging script on 2008-03-18
 version = "6.x-1.2"
@@ -9,9 +10,9 @@ project = "freelinking"
 datestamp = "1205848814"
 
 
-; Information added by drupal.org packaging script on 2009-05-20
-version = "6.x-1.8"
+; Information added by drupal.org packaging script on 2010-04-06
+version = "6.x-1.10"
 core = "6.x"
 project = "freelinking"
-datestamp = "1242833471"
+datestamp = "1270537215"
 

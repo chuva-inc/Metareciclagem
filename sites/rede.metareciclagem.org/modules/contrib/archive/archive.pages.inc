@@ -1,5 +1,5 @@
 <?php
-// $Id: archive.pages.inc,v 1.18.2.4 2008/08/19 22:18:25 susurrus Exp $
+// $Id: archive.pages.inc,v 1.18.2.8 2010/06/16 18:30:48 rmuilwijk Exp $
 
 /**
  * Fetch nodes for the selected date, or current date if none selected.
@@ -7,14 +7,20 @@
  * @param $year
  *   Number of year.
  * @param $month
- *   Number of month.   
+ *   Number of month.
  * @param $day
  *   Number of day.
  * @return
  *   A string with the themed page.
  */
 function archive_page($type = 'all', $year = 0, $month = 0, $day = 0) {
-  
+  // Argument validation, should be a valid node type and numeric.
+  $node_types = node_get_types();
+  if (($type != 'all' && !isset($node_types[$type])) || !is_numeric($year)
+      || !is_numeric($month) || $month > 12 || !is_numeric($day) || $day > 31) {
+    return MENU_NOT_FOUND;
+  }
+
   // Make sure all values are secure.
   $day = (int) $day;
   $year = (int) $year;
@@ -26,15 +32,15 @@ function archive_page($type = 'all', $year = 0, $month = 0, $day = 0) {
   if (!_archive_validate_type($type)) {
     $type = 'all';
   }
-  
+
   drupal_set_title(theme('archive_page_title', $type, $year, $month, $day));
-  
+
   // Check that there're nodes we can display.
   $nodes = db_result(db_query(db_rewrite_sql("SELECT COUNT(1) FROM {node} n WHERE n.status = 1 AND n.type IN ('". implode("', '", variable_get('archive_type_filters', array())) ."')")));
   if (!$nodes && $type == 'all' && $year == 0 && $month == 0 && $day == 0) {
     return t('No content found.');
   }
-  
+
   drupal_add_css(drupal_get_path('module', 'archive') .'/archive.css');
   $date = _archive_date($type, $year, $month, $day);
   $output = theme('archive_navigation', $type, $date);
@@ -129,16 +135,16 @@ function _archive_query($type, $date) {
     $start = 0;
     $end = 0;
   }
-  
+
   // Grab limits on node types if exist
   $final_types = _archive_types_sql_string($type);
-  
+
   // Allow viewing all nodes, not just nodes by year
   if ($start && $end) {
-    return array('SELECT n.nid, n.type FROM {node} n WHERE n.status = 1 '. $final_types .'AND n.created >= %d AND n.created < %d ORDER BY n.created DESC', $start - $date->tz, $end - $date->tz);
+    return array('SELECT DISTINCT(n.nid), n.type FROM {node} n WHERE n.status = 1 '. $final_types .'AND n.created >= %d AND n.created < %d ORDER BY n.created DESC', $start - $date->tz, $end - $date->tz);
   }
   else {
-    return array('SELECT n.nid, n.type FROM {node} n WHERE n.status = 1 '. $final_types .'ORDER BY n.created DESC');
+    return array('SELECT DISTINCT(n.nid), n.type FROM {node} n WHERE n.status = 1 '. $final_types .'ORDER BY n.created DESC');
   }
 }
 
@@ -151,9 +157,9 @@ function _archive_query($type, $date) {
  *   An array of node-types to number of posts of that type.
  */
 function _archive_node_types($date) {
-  
+
   $types = variable_get('archive_type_filters', array());
-  
+
   // Confine the display interval to only one day
   if ($date->day) {
     $start = gmmktime(0, 0, 0, $date->month, $date->day, $date->year);
@@ -174,18 +180,18 @@ function _archive_node_types($date) {
     $end = 0;
   }
   if ($start && $end) {
-    $result = db_query(db_rewrite_sql("SELECT t.type, t.name, COUNT(n.nid) AS node_count FROM {node} n INNER JOIN {node_type} t ON t.type = n.type WHERE n.status = 1 AND t.type IN ('". join($types, "', '") ."') AND n.created BETWEEN %d AND %d GROUP BY n.type ORDER BY n.created"), $start - $date->tz, $end - $date->tz);
+    $result = db_query(db_rewrite_sql("SELECT t.type, t.name, COUNT(n.nid) AS node_count FROM {node} n INNER JOIN {node_type} t ON t.type = n.type WHERE n.status = 1 AND t.type IN ('". join($types, "', '") ."') AND n.created BETWEEN %d AND %d GROUP BY t.type, t.name, n.created ORDER BY n.created"), $start - $date->tz, $end - $date->tz);
   }
   else {
-    $result = db_query(db_rewrite_sql("SELECT t.type, t.name, COUNT(n.nid) AS node_count FROM {node} n INNER JOIN {node_type} t ON t.type = n.type WHERE n.status = 1 AND t.type IN ('". join($types, "', '") ."') GROUP BY n.type ORDER BY n.created"));
+    $result = db_query(db_rewrite_sql("SELECT t.type, t.name, COUNT(n.nid) AS node_count FROM {node} n INNER JOIN {node_type} t ON t.type = n.type WHERE n.status = 1 AND t.type IN ('". join($types, "', '") ."') GROUP BY t.type, t.name, n.created ORDER BY n.created"));
   }
-  
+
   $n_types = array();
   while ($row = db_fetch_array($result)) {
     $n_types[$row['type']] = array('count' => $row['node_count'],
                                    'name'  => $row['name']);
   }
-  
+
   ksort($n_types);
   return $n_types;
 }
@@ -201,7 +207,7 @@ function _archive_node_types($date) {
  * @return string
  */
 function theme_archive_page_title($type, $year, $month, $day) {
-  
+
   $title = t('Archive');
   $month_names = array('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
   if ($day) {
@@ -213,19 +219,19 @@ function theme_archive_page_title($type, $year, $month, $day) {
   else if ($year) {
     $title .= ' - '. $year;
   }
-  
+
   if ($type != 'all') {
     $type_name = db_result(db_query("SELECT name FROM {node_type} WHERE type = '%s'", $type));
-  	
+
     $title .= ' - '. ($type_name ? t($type_name) : $type);
   }
-  
+
   return $title;
 }
 
 /**
  * Theme the archive navigation with years, months and dates by default.
- * 
+ *
  * @ingroup themeable
  */
 function theme_archive_navigation($type, $date) {
@@ -238,7 +244,7 @@ function theme_archive_navigation($type, $date) {
     $output .= theme('archive_navigation_days', $type, $date);
   }
   $output .= "</dd>";
-  
+
   // Only display node type filter if more than one node type represented
   if (sizeof(_archive_node_types($date)) > 1) {
     $output .= "<dt>". t('Type') ."</dt><dd>\n";
@@ -251,17 +257,17 @@ function theme_archive_navigation($type, $date) {
 
 /**
  * Theme the list of years for the archive navigation.
- * 
+ *
  * @ingroup themeable
  */
-function theme_archive_navigation_years($type, $date) {  
+function theme_archive_navigation_years($type, $date) {
   $output = "<ul id=\"archive-years\">\n";
-  
+
   $all_count = 0;
   foreach ($date->years as $year_count) {
     $all_count += $year_count;
   }
-  
+
   $output .= '<li'. ($date->year?'':' class="selected"') .'>'. l(t('All'), _archive_url($type), array('attributes' => array('title' => format_plural($all_count, '1 post', '@count posts')))) ."</li>\n";
   foreach ($date->years as $year => $year_count) {
     $class = '';
@@ -277,17 +283,17 @@ function theme_archive_navigation_years($type, $date) {
 
 /**
  * Theme the list of months for the archive navigation.
- * 
+ *
  * @ingroup themeable
  */
 function theme_archive_navigation_months($type, $date) {
   $output = "<ul id=\"archive-months\">\n";
-  
+
   $all_count = 0;
   foreach ($date->months as $month) {
     $all_count += $month;
   }
-  
+
   $output .= '<li'. ($date->month?'':' class="selected"') .'>'. l(t('All'), _archive_url($type, $date->year), array('attributes' => array('title' => format_plural($all_count, '1 post', '@count posts')))) ."</li>\n";
   $curr_month = date('n', time());
   $curr_year = date('Y', time());
@@ -309,22 +315,22 @@ function theme_archive_navigation_months($type, $date) {
 
 /**
  * Theme the list of days for the archive navigation.
- * 
+ *
  * @ingroup themeable
  */
 function theme_archive_navigation_days($type, $date) {
   $output = "<ul id=\"archive-days\">\n";
-  
+
   $all_count = 0;
   foreach ($date->days as $day) {
     $all_count += $day;
   }
-  
+
   $output .= '<li'. ($date->day?'':' class="selected"') .'>'. l(t('All'), _archive_url($type, $date->year, $date->month), array('attributes' => array('title' => format_plural($all_count, '1 post', '@count posts')))) ."</li>\n";
   $curr_month = date('n', time());
   $curr_year = date('Y', time());
   $curr_day = date('j', time());
-  
+
   $day_stop = gmdate('t', gmmktime(0, 0, 0, $date->month, 1, $date->year));
   for ($day = 1; $day <= $day_stop; $day++) {
     $posts = array_key_exists($day, $date->days) ? $date->days[$day] : 0;
@@ -343,19 +349,19 @@ function theme_archive_navigation_days($type, $date) {
 
 /**
  * Theme the list of node types for the archives.
- * 
+ *
  * @ingroup themeable
  */
 function theme_archive_navigation_node_types($type, $date) {
-  
+
   $output = "<ul id=\"archive-node_types\">\n";
   $types_count = _archive_node_types($date);
-  
+
   $all_count = 0;
   foreach ($types_count as $t) {
     $all_count += $t['count'];
   }
-  
+
   $output .= '<li'. ($type && $type != 'all'?'':' class="selected"') .'>'. l(t('All'), _archive_url('all', $date->year, $date->month, $date->day), array('attributes' => array('title' => format_plural($all_count, '1 post', '@count posts')))) ."</li>\n";
   foreach ($types_count as $ft_key => $ft_value) {
     if (!$ft_value['count']) {
@@ -376,7 +382,7 @@ function theme_archive_navigation_node_types($type, $date) {
 
 /**
  * Theme the date separators between nodes of different year/month/day.
- * 
+ *
  * @param $date_created
  *   A UNIX timestamp.
  * @param $separators
@@ -398,6 +404,6 @@ function theme_archive_separator($date_created, $separators) {
   else if ($separators['day']) {
     $date_sep = format_date($date_created, 'custom', 'F jS');
   }
-  
+
   return '<h3>'. $date_sep .'</h3>';
 }

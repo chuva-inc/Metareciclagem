@@ -6,9 +6,9 @@ dependencies[] = og
 dependencies[] = views
 core = 6.x
 
-; Information added by drupal.org packaging script on 2009-08-18
-version = "6.x-2.0"
+; Information added by drupal.org packaging script on 2010-03-16
+version = "6.x-2.1"
 core = "6.x"
 project = "og"
-datestamp = "1250604120"
+datestamp = "1268751911"
 

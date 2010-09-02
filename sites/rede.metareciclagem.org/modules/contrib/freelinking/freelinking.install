@@ -24,6 +24,18 @@ function freelinking_install() {
     }
 } // endfunction freelinking_install
 
+/**
+ * Implementation of hook_uninstall().
+ */
+function freelinking_uninstall() {
+  db_query('DROP TABLE {freelinking}');
+  variable_del('freelinking_camelcase');
+  variable_del('freelinking_nodetype');
+  variable_del('freelinking_notfound');
+  variable_del('freelinking_onceonly');
+  variable_del('freelinking_restriction');
+} // end freelinking_uninstall
+
 function freelinking_update_1() {
   $ret = array();
   switch ($GLOBALS['db_type']) {

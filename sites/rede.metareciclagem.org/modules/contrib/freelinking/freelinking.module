@@ -5,7 +5,7 @@
 
    Drupal freelinking project: http://www.drupal.org/project/freelinking
 
-   $Id: freelinking.module,v 1.32.2.15 2009/05/20 15:23:39 eafarris Exp $
+   $Id: freelinking.module,v 1.32.2.19 2010/04/06 06:54:26 grayside Exp $
 */
 
 function freelinking_menu() {
@@ -110,7 +110,7 @@ function freelinking_page_form() {
       $link = l(t('see this content'), drupal_get_path_alias('node/' . $fltargetnid));
     }
     else { // no content found, show create link
-      $link = '<a href="' . url($freelink['path'], array()) . '">' . t('create this content') . '</a>';
+      $link = l(t('create this content'), $freelink['path'], array('attributes' => array('class' => 'freelinking fl-create')));
     }
     $form['target'][$hash] = array(
       '#value' => $link,
@@ -304,33 +304,48 @@ function freelinking_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
     case 'insert':
       _freelinking_do_filtering($node->body, TRUE);
       break;
+    case 'update index':
+      $filters = filter_list_format($node->format);
+      if (isset($filters['freelinking/0'])) {
+        global $base_path;
+        $text = freelinking_filter('process', 0, -1, $node->body);
+        if (preg_match_all(',<a href="'. $base_path .'freelinking/([^"]*)" class="freelinking">,i', $text, $matches)) {
+          foreach ($matches[1] as $thetitle) {
+            if ($nid = _freelinking_exists($thetitle)) {
+              $output .= '<a href="'. $base_path .'node/'. $nid .'">'. urldecode($thetitle) .'</a>';
+            }
+          }
+          return $output;
+        }
+      }
+      break;
   } // endswitch $op
 } // endfunction freelinking_nodeapi
 
 function freelinking_filter_tips($delta, $format, $long = FALSE) {
   if ($long) {
-    $output  = 'Content in [[double square brackets]] will be linked to existing content with that title, or a page to create that content. ';
-    $output .= 'Links can contain an optional bar, "|". Content on the left of the bar is the target; to the right, the link shown. ';
-    $output .= 'Links to pages outside this site are allowed. They must start with one of the following: "http", "https", "ftp", or "mailto", and can exist either by themselves, or on the left of the bar. ';
-    $output .= 'Examples: ';
+    $output  = t('Content in [[double square brackets]] will be linked to existing content with that title, or a page to create that content. ');
+    $output .= t('Links can contain an optional bar, "|". Content on the left of the bar is the target; to the right, the link shown. ');
+    $output .= t('Links to pages outside this site are allowed. They must start with one of the following: "http", "https", "ftp", or "mailto", and can exist either by themselves, or on the left of the bar. ');
+    $output .= t('Examples: ');
     $ouptut .= '<ul>';
-    $output .= '<li>[[simple link]] - will go to the content titled "simple link" or a page to create that content.</li>';
-    $output .= '<li>[[this is the target|this is the source]] - will present "this is the source" as a link to "this is the target", or a page to create that content.</li>';
-    $output .= '<li>[[http://www.example.com|this is the source]] - will present "this is the source" as a link to http://www.example.com.</li>';
-    $output .= '<li>[[http://www.example.com]] - will present "http://www.example.com" as a link to http://www.example.com.</li>';
+    $output .= '<li>' . t('[[simple link]] - will go to the content titled "simple link" or a page to create that content.') . '</li>';
+    $output .= '<li>' . t('[[this is the target|this is the source]] - will present "this is the source" as a link to "this is the target", or a page to create that content.') . '</li>';
+    $output .= '<li>' . t('[[http://www.example.com|this is the source]] - will present "this is the source" as a link to http://www.example.com.') . '</li>';
+    $output .= '<li>' . t('[[http://www.example.com]] - will present "http://www.example.com" as a link to http://www.example.com.') . '</li>';
     $output .= '</ul>';
     if (variable_get('freelinking_camelcase', TRUE)) {
-      $output .= 'Content consisting of two or more capitalized words run together (aka "CamelCase") will be linked to existing content with that title, or a page to create that content.';
+      $output .= t('Content consisting of two or more capitalized words run together (aka "CamelCase") will be linked to existing content with that title, or a page to create that content.');
     }
   }
   else { // short tips displayed in-line
-    $output  = 'Link to content with [[some text]], where "some text" is the title of existing content or the title of a new piece of content to create. You can also link text to a different title by using [[link to this title|show this text]]. ';
-    $output .= 'Link to outside URLs with [[http://www.example.com|some text]], or even [[http://www.example.com]]. ';
+    $output  = t('Link to content with [[some text]], where "some text" is the title of existing content or the title of a new piece of content to create. You can also link text to a different title by using [[link to this title|show this text]]. ');
+    $output .= t('Link to outside URLs with [[http://www.example.com|some text]], or even [[http://www.example.com]]. ');
     if (variable_get('freelinking_camelcase', TRUE)) {
-      $output .= 'Link to existing or new content with CamelCaseWords.';
+      $output .= t('Link to existing or new content with CamelCaseWords.');
     }
   }
-  return t($output);
+  return $output;
 }
 
 function freelinking_form_alter(&$form, $form_state, $form_id) {
@@ -343,6 +358,10 @@ function freelinking_form_alter(&$form, $form_state, $form_id) {
 } // endfunction freelinking_form_alter
     
 function freelinking_page_form_validate($form_id, &$form_state) {
+  // check that no values submitted results in clean error
+  if(!$form_values['links']) {
+    $form_values['links'] = array(NULL);
+  }
   $links = array_filter($form_values['links']);
   if (count($links) == 0) {
     form_set_error('form', t('No items selected'));
@@ -438,10 +457,10 @@ function freelinking_delete_all_confirm_submit($form_id, &$form_state) {
 
 function _freelinking_do_filtering($text, $store = FALSE) {
   $allowcamelcase = variable_get("freelinking_camelcase", TRUE);
-  $freelinkingregexp = '/[^!](\[\[.+]])/Uu'; // this finds [[links like this]], un-greedily and utf-8
+  $freelinkingregexp = '/(?<![!\\\\])(\[\[.+]])/Uu'; // this finds [[links like this]], un-greedily and utf-8
   preg_match_all($freelinkingregexp, $text, $flmatches, PREG_PATTERN_ORDER);
   if ($allowcamelcase) {
-     $camelcaseregexp = '/\b([[:upper:]][[:lower:]]+){2,}\b/'; // this gets us close, but is not perfect. Example: ThisIsACamelCaseWord won't match (two caps in a row)
+     $camelcaseregexp = '/\b(?<!\[\[)([[:upper:]][[:lower:]]+){2,}(?!\]\])\b/'; // this gets us close, but is not perfect. Example: ThisIsACamelCaseWord won't match (two caps in a row)
      preg_match_all($camelcaseregexp, $text, $ccmatches);
      $wikiwords = array_merge($ccmatches[0], $flmatches[1]);
   }
@@ -463,7 +482,7 @@ function _freelinking_do_filtering($text, $store = FALSE) {
          $store = FALSE;
       }
       else {
-        $replacement = l(html_entity_decode($phrase), 'freelinking/' . rawurlencode($freelink), array('attributes' => array('class' => 'freelinking')));
+        $replacement = l(html_entity_decode($phrase), 'freelinking/' . $freelink, array('attributes' => array('class' => 'freelinking')));
       }
     }
 
@@ -479,6 +498,9 @@ function _freelinking_do_filtering($text, $store = FALSE) {
       _freelinking_store($freelink, $replacement);
     }
   } // foreach wikiword
+
+  // strip out comment syntax (!)
+  $text = preg_replace('/[!\\\\](\[\[.+]])/Uu', '$1', $text);
   return $text;
 } // endfunction _freelinking_do_filtering
 
@@ -524,7 +546,7 @@ function _freelinking_exists($thetitle) { // helper function for freelinking_pag
   $noderestrict = variable_get('freelinking_restriction', array('none'));
   if (is_array($noderestrict) && !in_array('none', $noderestrict)) { // need to add the where clause
     foreach ($noderestrict as $restrictedtype)  {
-      $clauseparts[] = 'type = "' . $restrictedtype . '"';
+      $clauseparts[] = 'type = \'' . $restrictedtype . '\'';
     }
     $restrictions = implode(' OR ', $clauseparts);
     $query .= " AND (" . $restrictions . ')';
@@ -550,13 +572,15 @@ function _freelinking_make_link($thetitle) { // helper function for freelinking_
     switch (variable_get('freelinking_notfound', 'no access search')) {
       case 'create only':
         $freelink['path'] = 'node/add/' . variable_get('freelinking_nodetype', 'story');
+        $freelink['path'] = str_replace('_', '-', $freelink['path']);
         $freelink['options'] = array(
-          'query' => 'edit[title]=' . $thetitle,
+          'query' => 'edit[title]=' . str_replace('&', '%26', $thetitle),
         );
         break;
       case 'no access search':
         if (node_access('create', variable_get('freelinking_nodetype', 'story'))) {
           $freelink['path'] = 'node/add/' . variable_get('freelinking_nodetype', 'story');
+          $freelink['path'] = str_replace('_', '-', $freelink['path']);
           $freelink['options'] = array(
             'query' => 'edit[title]=' . $thetitle,
           );
@@ -569,7 +593,9 @@ function _freelinking_make_link($thetitle) { // helper function for freelinking_
         $freelink['path'] = 'search/node/' . $thetitle;
         break;
     } // endswitch notfound options
+    return $freelink;
   }
+
   _freelinking_store($thetitle, $freelink['path'], isset($freelink['args']) ? $freelink['args'] : '');
   return $freelink;
 } // endfunction _freelinking_make_link
