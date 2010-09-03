@@ -1,0 +1,208 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Draft\n"
+"POT-Creation-Date: 2008-11-11 13:12+0100\n"
+"PO-Revision-Date: 2008-11-11 13:51+0100\n"
+"Last-Translator: Claudio Cicali <claudio.cicali@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+
+#: draft.views.inc:35;40
+#: draft.module:22
+#: draft.info:0
+msgid "Draft"
+msgstr "Draft"
+
+#: draft.views.inc:41
+msgid "Drafts table holding all draft content not yet published"
+msgstr "La tabella che contiene le bozze dei documenti non ancora pubblicati"
+
+#: draft.views.inc:61
+msgid "Draft ID"
+msgstr "Id. Bozza"
+
+#: draft.views.inc:62
+msgid "The Draft ID"
+msgstr "Identificativo bozza"
+
+#: draft.views.inc:71
+msgid "User ID"
+msgstr "Id. utente"
+
+#: draft.views.inc:72
+msgid "The user's ID"
+msgstr "L'identificativo utente"
+
+#: draft.views.inc:81
+msgid "Node Type"
+msgstr "Tipo di nodo"
+
+#: draft.views.inc:82
+#: draft.install:43
+msgid "Node Type for the draft"
+msgstr "Tipo di nodo per la bozza"
+
+#: draft.views.inc:91
+msgid "Title"
+msgstr "Titolo"
+
+#: draft.views.inc:92
+msgid "Data title"
+msgstr "Titolo"
+
+#: draft.views.inc:101
+msgid "Updated"
+msgstr "Aggiornato"
+
+#: draft.views.inc:102
+msgid "Last update for draft"
+msgstr "Ultimo aggiornamento della bozza"
+
+#: draft.views.inc:112
+msgid "View Draft"
+msgstr "Vedi bozza"
+
+#: draft.views.inc:113
+msgid "Provide a simple link to view the draft."
+msgstr "Link per visualizzare la bozza"
+
+#: draft.module:47
+msgid "Draft Settings"
+msgstr "Impostazioni modulo Draft"
+
+#: draft.module:50
+msgid "Draft Autosave Interval"
+msgstr "Intervallo di salvataggio automatico"
+
+#: draft.module:53
+msgid "Time interval between automatic savings of the form"
+msgstr "Millisecondi tra un salvataggio automatico e l'altro"
+
+#: draft.module:57
+msgid "Ignore form elements"
+msgstr "Elementi di form da ignorare"
+
+#: draft.module:59
+msgid "List of form elements spilt by \"|\" that we do not wish to save i.e. form token, op buttons etc"
+msgstr "Lista degli elementi della forma, divisi dal carattere \"|\" che non vogliamo siano salvati nella bozza (per esempio: token, pulsanti, eccetera)"
+
+#: draft.module:63
+msgid "Allow drafts when editing"
+msgstr "Permetti la bozza in modifica"
+
+#: draft.module:65
+msgid "If checked then the module will allow you to save as draft when editing an already existing node"
+msgstr "Permette di salvare la bozza di un documento quando questo si trova in modifica. Se non impostato, la bozze verranno salvate solo in fase di creazione del nodo"
+
+#: draft.module:146;177
+msgid "Save As Draft"
+msgstr "Salva come bozza"
+
+#: draft.module:179
+msgid "Disabled"
+msgstr "Disabilitato"
+
+#: draft.module:179
+msgid "Enabled"
+msgstr "Abilitato"
+
+#: draft.module:205;237
+msgid "No draft id was received by the system"
+msgstr "Manca l'Id del draft"
+
+#: draft.module:221
+msgid "Are you sure you wish to remove the draft?"
+msgstr "Sei sicuro di voler cancellare questa bozza?"
+
+#: draft.module:224
+#: includes/draft_views_handler_field_draft_view.inc:20
+msgid "Delete"
+msgstr "Elimina"
+
+#: draft.module:225
+msgid "Cancel"
+msgstr "Annulla"
+
+#: draft.module:234
+msgid "Draft successfully removed from the system"
+msgstr "La bozza è stata cancellata"
+
+#: draft.module:284
+msgid "Draft Autosave Settings"
+msgstr "Impostazioni per l'autosalvataggio delle bozze"
+
+#: draft.module:290
+msgid "Enable Autosave"
+msgstr "Abilita il salvataggio automatico"
+
+#: draft.module:292
+msgid "If checked autosave functionality will be enabled on administer specified node types"
+msgstr "Se selezionato la funzionalità di salvataggio automatico sarà abilitata sui tipi di nodo specificati in amministrazione"
+
+#: draft.module:296
+msgid "Autosave Interval"
+msgstr "Intervallo di tempo del salvataggio automatico"
+
+#: draft.module:298
+msgid "Time interval between autosaves, must be greater than 10000"
+msgstr "Millisecondi tra un salvataggio e l'altro. Deve essere maggiore di 1000 (un secondo)"
+
+#: draft.module:310
+msgid "Autosave Interval must be greate than or equal to 10000"
+msgstr "L'intervallo del salvataggio automatico deve essere maggiore di 1000 (un secondo)"
+
+#: draft.module:14
+msgid "access save as draft"
+msgstr "accedi a salva come bozza"
+
+#: draft.module:23
+msgid "Configure draft settings."
+msgstr "Impostazioni delle bozze"
+
+#: draft.module:29
+msgid "Remove Draft"
+msgstr "Cancella bozza"
+
+#: draft.module:35
+msgid "Save Draft"
+msgstr "Salva bozza"
+
+#: draft.module:0
+msgid "draft"
+msgstr "bozza"
+
+#: draft.install:8
+msgid "Draft module successfully installed."
+msgstr "Modulo Draft installato con successo"
+
+#: draft.install:35
+msgid "Stores drafts in the system"
+msgstr "Sistema di salvataggio come bozza"
+
+#: draft.install:38
+msgid "Primary key: Draft ID"
+msgstr "Chiave primaria: Identificativo bozza"
+
+#: draft.install:49
+msgid "User who created the draft"
+msgstr "Utente che ha creato la bozza"
+
+#: draft.install:55
+msgid "Time of last update / creation"
+msgstr "Data di ultimo aggiornamento/creazione"
+
+#: draft.install:61
+msgid "Serialized data about the draft we have saved"
+msgstr "Dato serializzato relativo alla bozza salvata"
+
+#: draft.info:0
+msgid "Provides the ability to save as draft for Drupal"
+msgstr "Permette il salvataggio in bozza dei nodi di Drupal"
+
+#: includes/draft_views_handler_field_draft_view.inc:18
+msgid "View"
+msgstr "Vista"
+

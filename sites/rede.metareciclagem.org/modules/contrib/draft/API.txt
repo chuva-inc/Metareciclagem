@@ -1,0 +1,22 @@
+// $Id: API.txt,v 1.1.2.7 2010/01/29 16:23:50 darrenferguson Exp $
+
+Developer documentation for the draft module
+
+The draft hook
+==============
+This hook must be implemented by modules that are utilizing ajax in order to populate 
+the form with extra elements once the form is on the page in order to add more elements 
+i.e. FlexiField 
+
+Prototype for the hook is below
+===============================
+function hook_draft($op, $draft_id, $draft_data = array(), &$form)
+
+ * $op - currently supported operation is form elements which you should add the pertinent form elements to the form
+ * $draft_id - id of the draft currently being displayed too the user
+ * $draft_data - array holding the stored information regarding the draft including form field names which are the array keys
+ * &$form - this is the form being built and you must pass in by reference in order for the alterations to take effect
+
+Function Calls
+==============
+Hook is invoked in the draft function draft_form_alter

@@ -1,0 +1,11 @@
+; $Id: draft.info,v 1.1.2.15 2010/01/29 16:23:50 darrenferguson Exp $
+name = Draft
+description = Provides the ability to save as draft for Drupal
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-01-29
+version = "6.x-1.8"
+core = "6.x"
+project = "draft"
+datestamp = "1264793704"
+

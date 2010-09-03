@@ -1,0 +1,345 @@
+<?php
+// $Id: draft.module,v 1.2.2.40 2010/01/29 16:23:50 darrenferguson Exp $
+
+/**
+ * @file
+ * Module providing draft saving capability for Drupal
+ */
+define('DRAFT_PATH', drupal_get_path('module', 'draft'));
+
+/**
+ * Implementation of hook_perm().
+ */
+function draft_perm() {
+  return array('access save as draft');
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function draft_menu() {
+  $items['admin/settings/draft'] = array(
+    'title' => 'Draft',
+    'description' => 'Configure draft settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('draft_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'draft.admin.inc',
+  );
+  $items['draft/list'] = array(
+    'title' => 'Draft List',
+    'page callback' => 'draft_list',
+    'access arguments' => array('access save as draft'),
+    'type' => MENU_CALLBACK,
+    'file' => 'draft.page.inc',
+  );
+  $items['draft/remove'] = array(
+    'title' => 'Remove Draft',
+    'page callback' => 'draft_remove',
+    'access arguments' => array('access save as draft'),
+    'type' => MENU_CALLBACK,
+    'file' => 'draft.page.inc',
+  );
+  $items['draft/save'] = array(
+    'title' => 'Save Draft',
+    'page callback' => 'draft_save',
+    'access arguments' => array('access save as draft'),
+    'type' => MENU_CALLBACK,
+    'file' => 'draft.page.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_user()
+ */
+function draft_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'form':
+      return draft_user_form($edit, $account, $category);
+      break;
+
+    case 'update':
+      draft_user_update($edit, $account, $category);
+      break;
+
+    case 'validate':
+      draft_user_validate($edit, $account);
+      break;
+  }
+}
+
+
+/**
+ * Implementation of hook_cron()
+ */
+function draft_cron() {
+  // Administrator does not want the module to remove the drafts from the system
+  if (variable_get('draft_cron_remove_disabled', 0) == 0) {
+    // Retrieve the administration configured timeout in days for the system
+    $cron_remove_timeout = variable_get('draft_cron_remove_timeout', 1);
+    // If someone has entered non numeric data reset to one day
+    if (!is_numeric($cron_remove_timeout)) {
+      variable_set('draft_cron_remove_timeout', 1);
+      $cron_remove_timeout = 1;
+    }
+    // Multiply by 86400 seconds per day and then set the time to the timestamp - that amount
+    $cron_remove_timeout = $cron_remove_timeout * 86400;
+    $updated = time() - $cron_remove_timeout;
+    // Remove any records that have never been updated and resided in the system longer than the updated
+    db_query("DELETE FROM {drafts} WHERE cron_remove = 0 AND updated <= %d", $updated);
+  }
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function draft_theme() {
+  return array(
+    'draft_save_as_button' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'draft.theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function draft_form_alter(&$form, &$form_state, $form_id) {
+  global $user;
+
+  if (isset($form['type']) && isset($form['#node'])) {
+    $node = $form['#node'];
+    if (user_access('access save as draft') && isset($form['type']['#value']) && $form['type']['#value'] .'_node_form' == $form_id && variable_get("save_as_draft_$node->type", FALSE)) {
+      // Allow drafts on Edit depending on whether the module administrator has said that is the case
+      if (empty($node->nid) || (variable_get('draft_on_edit', 0) && !empty($node->nid))) {
+        if (isset($_GET['draft_id']) && is_numeric($_GET['draft_id'])) {
+          $result = db_fetch_object(db_query("SELECT * FROM {drafts} WHERE draft_id = %d", $_GET['draft_id']));
+
+          if (is_null($result->uid)) {
+            // Set not found if the draft does not exist
+            drupal_not_found();
+            die();
+          } elseif ($result->uid != $user->uid) {
+            // Deny the user access if the draft is not theirs
+            drupal_access_denied();
+            die();
+          }
+          // Checking if the form is in a submitted state if it is we do not want to re-populate anything in the form at this point
+          // Since if the user has clicked Preview we would over write the information in the users preview with the old draft information
+          if ($form_state['submitted'] == 1) {
+            $node->draft_populate_trigger = 0;
+          }
+          drupal_add_js('$(document).ready(function() { $(".draft_save .title").html(Drupal.t("Populating Draft form")).parent().slideDown(); setTimeout(Drupal.draft.populateForm, 2000); });', 'inline');
+          $node->draft_form_data = $result->data;
+          // At this point adding calling hook_draft() to determine if any other modules wish to add elements to the form
+          // This functionality is here specifically for modules that utilize AJAX to create widgets in the form once it
+          // Is already loaded in the system so that those fields can be pre-created and then will be populated by the module
+          foreach (module_implements('draft') as $module) {
+            module_invoke($module, 'draft', 'form elements', $_GET['draft_id'], unserialize($result->data), $form);
+          }
+        }
+        // button to save the node as a draft for later use
+        $form['buttons']['save_as_draft'] = array(
+          '#type' => 'button',
+          '#value' => t('Save As Draft'),
+          '#weight' => 15,
+          '#attributes' => array('onclick' => 'if (typeof Drupal.draft == "undefined") { return false; }; return Drupal.draft.saveForm();', 'node' => $node),
+          '#theme' => 'draft_save_as_button',
+        );
+        // adding the draft id field will either be populated if $_GET['draft_id'] is
+        // set or will be set by the ajax handler when the save draft button is pushed
+        if (isset($_GET['draft_id']) && is_numeric($_GET['draft_id'])) {
+          $draft_id = $_GET['draft_id'];
+        }
+        else {
+          if ($form_state['submitted'] == 1 && is_numeric($form_state['values']['draft_id'])) {
+            $draft_id = $form_state['values']['draft_id'];
+          }
+          else {
+            $array = array('node_type' => $form['type']['#value'], 'uid' => $user->uid, 'updated' => time(), 'data' => NULL);
+            drupal_write_record('drafts', $array);
+            $draft_id = $array['draft_id'];
+          }
+        }
+        $form['draft_id'] = array(
+          '#type' => 'hidden',
+          '#value' => $draft_id,
+        );
+        $form['#submit'][] = 'draft_node_form_submit';
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_alter() for node_type_form
+ */
+function draft_form_node_type_form_alter(&$form, $form_state) {
+  // Also add option to node settings form in the admin settings.
+  if (isset($form['identity']['type'])) {
+    $form['workflow']['save_as_draft'] = array(
+      '#type' => 'radios',
+      '#title' => t('Save As Draft'),
+      '#default_value' => variable_get('save_as_draft_'. $form['#node_type']->type, 0),
+      '#options' => array(t('Disabled'), t('Enabled')),
+    );
+    // trying to retrieve all of the fields for this particular node type
+    // Only do this if the content module is enabled otherwise we don't do this
+    if (module_exists('content')) {
+      $fields = _draft_content_type_fields($form['#node_type']->type);
+      // Only display if we actually have fields in the content type
+      if (count($fields) > 1) {
+        $form['workflow']['save_as_draft_title'] = array(
+          '#type' => 'select',
+          '#title' => t('Field to utilize for draft title'),
+          '#default_value' => variable_get('save_as_draft_title_'. $form['#node_type']->type, ''),
+          '#options' => $fields,
+        );
+        $form['workflow']['save_as_draft_body'] = array(
+          '#type' => 'select',
+          '#title' => t('Field to utilize for draft body'),
+          '#default_value' => variable_get('save_as_draft_body_'. $form['#node_type']->type, ''),
+          '#options' => $fields,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Submission handler for when the node is submitted
+ */
+function draft_node_form_submit($form, &$form_state) {
+  // check if we have a draft id associated with this submission if so we can remove it
+  if ($form_state['values']['op'] == "Save") {
+    if (isset($form_state['values']['draft_id']) && is_numeric($form_state['values']['draft_id'])) {
+      db_query("DELETE FROM {drafts} WHERE draft_id = %d", $form_state['values']['draft_id']);
+    }
+  }
+}
+
+/**
+ * Add form elements to the user account form
+ */
+function draft_user_form($edit, $user, $category = NULL) {
+  $form = array();
+  if ($category == 'account' && user_access('access save as draft') && !variable_get('draft_disable_autosave', 0)) {
+    $form['draft'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Draft Autosave Settings'),
+      '#tree' => TRUE,
+      '#weight' => 2,
+    );
+    $form['draft']['draft_autosave'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Autosave'),
+      '#default_value' => variable_get('draft_autosave_'. $user->uid, 0),
+      '#description' => t('If checked autosave functionality will be enabled on administer specified node types'),
+    );
+    $form['draft']['draft_autosave_interval'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Autosave Interval'),
+      '#default_value' => variable_get('draft_autosave_interval_'. $user->uid, 30),
+      '#description' => t('Time interval (Seconds) between autosaves, must be greater than 10'),
+      '#size' => 6,
+    );
+  }
+  return $form;
+}
+
+/**
+ * Validate user input from the user account form
+ */
+function draft_user_validate($edit, $user) {
+  if (!variable_get('draft_disable_autosave', 0)) {
+    if (isset($edit['draft']['draft_autosave_interval'])) {
+      // Catch if the user tries to enter a non numeric value for the interval
+      if (is_numeric($edit['draft']['draft_autosave_interval'])) {
+        if ($edit['draft']['draft_autosave_interval'] < 10) {
+          form_set_error('draft_autosave_interval', t('Autosave Interval must be greater than or equal to 10'));
+        }
+      }
+      else {
+        form_set_error('draft_autosave_interval', t('Autosave Interval must be a numeric value'));
+      }
+    }
+  }
+}
+
+/**
+ * Update the user input from the user account form
+ */
+function draft_user_update($edit, $user, $category) {
+  if ($category == 'account' && user_access('access save as draft') && !variable_get('draft_disable_autosave', 0)) {
+    // If autosave value is set in the edit form we can set the variable otherwise reset to 0
+    if (isset($edit['draft']['draft_autosave'])) {
+      variable_set('draft_autosave_'. $user->uid, $edit['draft']['draft_autosave']);
+    }
+    else {
+      variable_set('draft_autosave_'. $user->uid, 0);
+    }
+    // If the draft autosave interval is set and it is numeric then set it
+    // If not numeric or not set, reset the value back to the draft interval for safety
+    if (isset($edit['draft']['draft_autosave_interval']) && is_numeric($edit['draft']['draft_autosave_interval'])) {
+      variable_set('draft_autosave_interval_'. $user->uid, $edit['draft']['draft_autosave_interval']);
+    }
+    else {
+      variable_set('draft_autosave_interval_'. $user->uid, 30);
+    }
+  }
+}
+
+/**
+ * Helper function to retrieve the fields for the node type
+ *
+ * @param $node_type
+ *      Type of node we are currently operating on
+ */
+function _draft_content_type_fields($node_type = NULL) {
+  $array = array('' => t('Select One'));
+  $fields = array();
+  if (!is_null($node_type) && drupal_strlen($node_type) > 0) {
+    $cfields = content_types($node_type);
+    // Do not do this for creation of new types
+    if (is_array($cfields) && !empty($cfields)) {
+      if (is_array($cfields['fields']) && !empty($cfields['fields'])) {
+        // Traverse the fields so we can retrieve the information
+        foreach ($cfields['fields'] as $k => $v) {
+          if (isset($v['widget']['label'])) {
+            $fields[$k] = $v['widget']['label'];
+          }
+          else {
+            $fields[$k] = $k;
+          }
+        }
+      }
+      if (is_array($cfields['extra']) && !empty($cfields['extra'])) {
+        // Traverse the Extra portion inside the node type
+        foreach ($cfields['extra'] as $k => $v) {
+          if (isset($v['label'])) {
+            $fields[$k] = $v['label'];
+          }
+          else {
+            $fields[$k] = $k;
+          }
+        }
+      }
+    }
+    asort($fields);
+  }
+  return empty($fields) ? $array : $array += $fields;
+}
+
+/**
+ * Wrapper function for tt() if i18nstrings enabled.
+ */
+function draft_tt($name, $string, $langcode = NULL, $update = FALSE) {
+  if (module_exists('18nstrings')) {
+    return tt($name, $string, $langcode, $update);
+  }
+  else {
+    return $string;
+  }
+}

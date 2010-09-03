@@ -1,0 +1,21 @@
+<?php
+// $Id: draft_views.install,v
+
+/**
+ * Implementation of hook_enable().
+ */
+function draft_views_enable() {
+  drupal_set_message(t('Draft Views module successfully installed.'));
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function draft_views_install() {
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function draft_views_uninstall() {
+}

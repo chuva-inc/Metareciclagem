@@ -1,0 +1,24 @@
+/* $id */
+
+.draft_save {
+  background-color: #000080;
+  color: #fff;
+  z-index: 1000;
+  position: fixed;
+  display: none;
+  text-align: center;
+  padding: 8px 8px 5px 8px;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 15px;
+  border-bottom: 2px solid #ff0000; }
+  .draft_save .title {
+    font-weight: bold;
+    color: #fff; }
+
+* html .draft_save {
+  top: 0;
+  right: 0;
+  position: absolute !important; }
+

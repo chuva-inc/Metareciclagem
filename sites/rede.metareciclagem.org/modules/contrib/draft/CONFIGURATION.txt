@@ -1,0 +1,10 @@
+// $Id: CONFIGURATION.txt,v 1.1.2.8 2010/01/29 16:23:50 darrenferguson Exp $
+
+In order to enable drafts on content types you should go to the Admin > Content Types page.
+In the edit portion of the Content Type under Workflow will be the ability to enable drafts
+for that specific type of content. You will also be able to pick the fields in the content 
+type that you wish to be the title and the body for the draft incase it is not obvious in 
+the content type for the draft module. If these are not set the module will utilize title 
+and body as fall backs.
+
+

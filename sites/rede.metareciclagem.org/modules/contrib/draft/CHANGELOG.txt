@@ -1,0 +1,82 @@
+//$Id: CHANGELOG.txt,v 1.1.2.18 2010/01/29 16:23:50 darrenferguson Exp $
+
+DRAFT 6.x.1-dev
+===============
+Module Updates:
+  - Moved around the module splitting the main functionality out into seperate files so that the .module 
+    file is as small as possible in order to assist with sites that have large numbers of modules. 
+
+DRAFT 6.x.1-6
+=============
+New Feature:
+  - #424592 Added hook_draft() to the module this allows other modules that utilize ajax in order
+            to add more elements too the forms too populate the form array based on the information
+            stored in the drafts table before the form is displayed. This allows for the module to
+            work correctly with these module provided someone writes a handler to provide that information
+
+Bug fixes:
+  - #435532 Fixed bug when the user creates a new content type the system would not check
+            if the returned fields were indeed valid since on initial creation nothing would
+            be valid however the system still wanted to utilize it as an array
+
+DRAFT 6.x-1-5
+=============
+Bug fixes:
+  - #420564 Fixed bug where hitting Preview would re-populate the form with the draft
+            information instead of preserving the users changes that they were previewing
+
+
+DRAFT 6.x-1-4
+=============
+Bug fixes:
+  - #420394 Added check for user permissions in the user edit form since the module
+            was always showing the draft information even if the user did not have
+            sufficient privileges to access drafts in the system
+
+DRAFT 6.x-1-3
+=============
+
+Main features:
+  - #415122 Added the ability to go back to the node edit when using the save
+            draft functionality on an existing node. This will save the system
+            creating a new node every time and will instead update the existing
+            node already created in the system.
+
+Bug fixes:
+  - #418314 Updating the FCKEditor code so that the html is there before it finishes
+            loading that way the data is put correctly in the FCKEditor box for the
+            textarea
+  - #416100 Added handling so the module would not fail if the content module
+            does not exist in the users installation. Do not want to make the
+            content module a dependency so have added code to fallback to a default
+            if the content module does not exist. (This code was introduced
+            originally to handle the admin selecting the Title and Body field from
+            the content types list of known fields supplied by the content module)
+
+DRAFT 6.x-1-2
+=============
+
+Main features:
+  - #368017 Split Drafts and Views so there is no initial reliance on views
+            PHP view has been added to the main drafts module so people can see
+            their drafts
+
+Module changes:
+  - #379838 Portuguese - Brazilian translation (thansk to lourenzo)
+  - #367165 updated default fields shown in the view (view was updated to
+            accomodate the new fields we have in the database)
+  - #361812 added configurable view url for the draft views module so the
+            user can specify it if they change the draft view url
+
+Bug fixes:
+  - #406648 added units for the autosave interval in administrator settings
+  - #367184 added same as above and also for user form settings
+  - #368286 shortened the textfields utilized for autosave intervals
+  - #369042 reworked so cron will not delete the draft is the admin specifies
+  - #367171 updated the processing draft moved to right hand corner instead of
+            bulky div in the middle of the users screen
+  - #353252 fixed bug with node names and underscores not being handled properly
+  - #367180 provided user feedback when draft was loading since it looked like
+            nothing was happening for the draft populate form timeout
+  - #348165 code updated for the FCKEditor and verified with their site to work
+  - #361809 fixed issue where preview button would stop drafts from being saved

@@ -1,0 +1,74 @@
+<?php
+// $Id: draft.install,v
+
+/**
+ * Implementation of hook_enable().
+ */
+function draft_enable() {
+  drupal_set_message(t('Draft module successfully installed.'));
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function draft_install() {
+  variable_set('draft_schema_version', 6001);
+  drupal_install_schema('draft');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function draft_uninstall() {
+  drupal_uninstall_schema('draft');
+  // Removing the variables the module will have utilized
+  variable_del('draft_autosave_interval');
+  variable_del('draft_form_elements_ignore');
+  variable_del('draft_on_edit');
+}
+
+/**
+ * Implementation of hook_schema()
+ */
+function draft_schema() {
+  return array(
+    'drafts' => array(
+      'description' => t("Stores drafts in the system"),
+      'fields' => array(
+        'draft_id' => array('description' => t("Primary key: Draft ID"), 'type' => 'serial', 'not null'    => TRUE),
+        'node_type' => array('description' => t("Node Type for the draft"), 'type' => 'varchar', 'length' => 32, 'not null' => TRUE),
+        'uid' => array('description' => t("User who created the draft"), 'type' => 'int', 'length' => 11, 'not null'    => TRUE),
+        'title' => array('description' => t('Title data from the node type'), 'type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+        'body' => array('description' => t('Body data from the node type'), 'type' => 'text', 'not null' => FALSE, 'size' => 'big'),
+        'updated' => array('description' => t('Time of last update / creation'), 'type' => 'int', 'length' => 11, 'not null' => TRUE),
+        'data' => array('description' => t('Serialized data about the draft we have saved'), 'type' => 'text', 'not null' => FALSE, 'size' => 'big'),
+        'cron_remove' => array('description' => t('Lets Cron know if it can remove the record'), 'type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0),
+      ),
+      'primary key' => array('draft_id'),
+    ),
+  );
+}
+
+/**
+ * Add 'title' field for the drafts we utilize in the system
+ * Add 'body' field for the drafts we utilize in the system
+ * Add 'cron_remove' field for the drafts we utilize in the system
+ */
+function draft_update_6000() {
+  $ret = array();
+  db_add_field($ret, 'drafts', 'title', array('type' => 'varchar', 'length' => 255, 'not null' => FALSE));
+  db_add_field($ret, 'drafts', 'body', array('type' => 'text', 'not null' => FALSE, 'size' => 'big'));
+  db_add_field($ret, 'drafts', 'cron_remove', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
+  variable_set('draft_schema_version', 6000);
+  return $ret;
+}
+
+/**
+ *
+ */
+function draft_update_6001() {
+  $updates = array();
+  $updates[] = update_sql("UPDATE {drafts} SET cron_remove = 1");
+  variable_set('draft_schema_version', 6001);
+  return $updates;
+}

@@ -1,0 +1,219 @@
+# $Id: pt-br_16.po,v 1.1.2.3 2009/08/10 20:26:11 darrenferguson Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  draft.views.inc,v 1.1.2.2 2008/11/14 19:44:34 darrenferguson
+#  draft.module,v 1.2.2.10 2008/11/14 19:44:34 darrenferguson
+#  draft.info,v 1.1.2.3 2008/11/14 19:44:34 darrenferguson
+#  draft.install: n/a
+#  includes/draft_views_handler_field_draft_view.inc: n/a
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-02-22 03:25-0300\n"
+"PO-Revision-Date: 2009-02-22 03:39-0300\n"
+"Last-Translator: Lourenzo Ferreira <lourenzo@gmail.com>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: draft.views.inc:35;40
+#: draft.module:22
+#: draft.info:0
+msgid "Draft"
+msgstr "Rascunho"
+
+#: draft.views.inc:41
+msgid "Drafts table holding all draft content not yet published"
+msgstr "A tabela de rascunhos contendo todos os rascunhos ainda não foi publicada"
+
+#: draft.views.inc:61
+msgid "Draft ID"
+msgstr "ID do rascunho"
+
+#: draft.views.inc:62
+msgid "The Draft ID"
+msgstr "O ID do rascunho"
+
+#: draft.views.inc:71
+msgid "User ID"
+msgstr "ID do usuário"
+
+#: draft.views.inc:72
+msgid "The user's ID"
+msgstr "O ID do usuário"
+
+#: draft.views.inc:81
+msgid "Node Type"
+msgstr "Tipo de Conteúdo"
+
+#: draft.views.inc:82
+#: draft.install:43
+msgid "Node Type for the draft"
+msgstr "Tipo de conteúdo do rascunho"
+
+#: draft.views.inc:91
+msgid "Title"
+msgstr "Título"
+
+#: draft.views.inc:92
+msgid "Data title"
+msgstr "Título do conteúdo"
+
+#: draft.views.inc:101
+msgid "Updated"
+msgstr "Atualizado"
+
+#: draft.views.inc:102
+msgid "Last update for draft"
+msgstr "Última atualização do rascunho"
+
+#: draft.views.inc:112
+msgid "View Draft"
+msgstr "Visualizar rascunho"
+
+#: draft.views.inc:113
+msgid "Provide a simple link to view the draft."
+msgstr "Provê um link simples para visualizar o rascunho."
+
+#: draft.module:47
+msgid "Draft Settings"
+msgstr "Configurações dos rascunhos"
+
+#: draft.module:50
+msgid "Draft Autosave Interval"
+msgstr "Intervalo de salvamento automático dos rascunhos"
+
+#: draft.module:53
+msgid "Time interval between automatic savings of the form"
+msgstr "Intervalo de tempo entre os salvamentos automáticos do formulário"
+
+#: draft.module:57
+msgid "Ignore form elements"
+msgstr "Ignorar os elementos do formulário"
+
+#: draft.module:59
+msgid "List of form elements spilt by \"|\" that we do not wish to save i.e. form token, op buttons etc"
+msgstr "Liste os elementos que deseja excluir do rascunho separados por \"|\", por exemplo o form token, botões op, etc."
+
+#: draft.module:63
+msgid "Allow drafts when editing"
+msgstr "Permitir salvar rascunhos na edição"
+
+#: draft.module:65
+msgid "If checked then the module will allow you to save as draft when editing an already existing node"
+msgstr "Se marcado, o módulo permitirá que você salve como rascunho quando estiver editando um node"
+
+#: draft.module:146;177
+msgid "Save As Draft"
+msgstr "Salvar como Rascunho"
+
+#: draft.module:179
+msgid "Disabled"
+msgstr "Desabilitado"
+
+#: draft.module:179
+msgid "Enabled"
+msgstr "Habilitado"
+
+#: draft.module:205;237
+msgid "No draft id was received by the system"
+msgstr "Nenhum id de rascunho foi recebido pelo sistema"
+
+#: draft.module:221
+msgid "Are you sure you wish to remove the draft?"
+msgstr "Tem certeza de que deseja remover o rascunho?"
+
+#: draft.module:224
+#: includes/draft_views_handler_field_draft_view.inc:20
+msgid "Delete"
+msgstr "Apagar"
+
+#: draft.module:225
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: draft.module:234
+msgid "Draft successfully removed from the system"
+msgstr "O rascunho foi removido do sistema com sucesso"
+
+#: draft.module:278
+msgid "Draft Autosave Settings"
+msgstr "Configurações de salvamento automático de rascunhos"
+
+#: draft.module:284
+msgid "Enable Autosave"
+msgstr "Habilitar Salvamento Automático"
+
+#: draft.module:286
+msgid "If checked autosave functionality will be enabled on administer specified node types"
+msgstr "Se marcado a função salvamento automático será habilitada para os tipos de conteúdo especificados"
+
+#: draft.module:290
+msgid "Autosave Interval"
+msgstr "Intervalo de Salvamento Automático"
+
+#: draft.module:292
+msgid "Time interval between autosaves, must be greater than 10000"
+msgstr "O intervalo de tempo entre os salvamentos automáticos deve ser maior que 10000"
+
+#: draft.module:304
+msgid "Autosave Interval must be greate than or equal to 10000"
+msgstr "O intervalo de salvamento automático deve ser igual ou maior que 10000"
+
+#: draft.module:14
+msgid "access save as draft"
+msgstr "acessar salvar como rascunho"
+
+#: draft.module:23
+msgid "Configure draft settings."
+msgstr "Configurar as opções para rascunhos."
+
+#: draft.module:29
+msgid "Remove Draft"
+msgstr "Apagar Rascunho"
+
+#: draft.module:35
+msgid "Save Draft"
+msgstr "Salvar Rascunho"
+
+#: draft.module:0
+msgid "draft"
+msgstr "rascunho"
+
+#: draft.install:8
+msgid "Draft module successfully installed."
+msgstr "O módulo Draft foi instalado com sucesso"
+
+#: draft.install:35
+msgid "Stores drafts in the system"
+msgstr "Salva rascunhos no sistema"
+
+#: draft.install:38
+msgid "Primary key: Draft ID"
+msgstr "Chave Primária: ID do Rascunho"
+
+#: draft.install:49
+msgid "User who created the draft"
+msgstr "Usuário que criou o rascunho"
+
+#: draft.install:55
+msgid "Time of last update / creation"
+msgstr "Tempo da útima edição / adição"
+
+#: draft.install:61
+msgid "Serialized data about the draft we have saved"
+msgstr "Foram salvos dados serializados sobre o rascunho"
+
+#: draft.info:0
+msgid "Provides the ability to save as draft for Drupal"
+msgstr "Provê a possibilidade de salvar como rascunho no Drupal"
+
+#: includes/draft_views_handler_field_draft_view.inc:18
+msgid "View"
+msgstr "Visualizar"
+

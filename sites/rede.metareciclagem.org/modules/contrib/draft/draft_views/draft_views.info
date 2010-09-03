@@ -1,0 +1,15 @@
+; $Id: draft_views.info,v 1.1.2.7 2009/09/25 20:29:12 darrenferguson Exp $
+name = Draft Views
+description = Provides views capability for the Draft module
+version = "6.x"
+core = 6.x
+dependencies[] = draft
+dependencies[] = views
+
+
+; Information added by drupal.org packaging script on 2010-01-29
+version = "6.x-1.8"
+core = "6.x"
+project = "draft"
+datestamp = "1264793704"
+
