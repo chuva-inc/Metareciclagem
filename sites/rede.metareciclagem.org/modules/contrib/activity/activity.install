@@ -1,188 +1,266 @@
 <?php
-// $Id: activity.install,v 1.1.2.1.2.6.2.4 2009/03/05 04:38:11 sirkitree Exp $
+// $Id: activity.install,v 1.1.2.1.2.6.2.4.2.17 2010/07/18 21:17:20 scottreynolds Exp $
 
-/**
- * @file
- * Install file for activity module.
- */
+function activity_install() {
+  drupal_install_schema('activity');
+  // Set Trigger's weight to 2 so that it will fire AFTER pathauto. This makes
+  // pathauto alias' work.
+  if (activity_bad_trigger_weight()) {
+    drupal_set_message(t('In order for proper Pathauto behavior with Activity module, the Trigger module\'s weight needs to be fixed up. !clickhere', array('!clickhere' => l(t('Click here to fix Trigger\'s weight'), 'admin/activity/weight', array('query' => drupal_get_destination())))), 'error');
+  }
+}
 
-/**
- * Implementation of hook_schema().
- */
 function activity_schema() {
   $schema['activity'] = array(
-    'description' => t('The {activity} table stores activity data'),
+    'description' => 'Provides a place to record activity messages for display.',
     'fields' => array(
       'aid' => array(
+        'description' => 'The primary identifier for any activity',
         'type' => 'serial',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
       ),
       'uid' => array(
+        'description' => 'The user id of whomever performed the activity being recorded.',
         'type' => 'int',
         'not null' => TRUE,
-        'default' => 0,
+        'unsigned' => TRUE,
       ),
-      'module' => array(
+      'op' => array(
+        'description' => 'The operation being performed (update, insert, etc.)',
         'type' => 'varchar',
-        'length' => 50,
+        'length' => '50',
         'not null' => TRUE,
-        'default' => '',
       ),
       'type' => array(
+        'description' => 'The type of object being acted upon (node, user, etc.)',
         'type' => 'varchar',
-        'length' => 25,
+        'length' => '50',
         'not null' => TRUE,
-        'default' => '',
+       ),
+      'nid' => array(
+        'description' => 'A foreign key used with node_access table. Can be NULL for all non-node, comment activities',
+        'type' => 'int',
+        'unsigned' => TRUE,
       ),
-      'operation' => array(
-        'type' => 'varchar',
-        'length' => 25,
-        'not null' => TRUE,
-        'default' => '',
+      'eid' => array(
+        'description' => 'Entity ID used to maintain the relationship between activity and the entity that created the activity',
+        'type' => 'int',
+        'default value' => NULL,
+        'unsigned' => TRUE,
       ),
       'created' => array(
+        'description' => 'When the activity was recorded',
         'type' => 'int',
         'not null' => TRUE,
+        'unsigned' => TRUE,
       ),
-      'data' => array(
-        'type' => 'text',
+      'actions_id' => array(
+        'description' => 'Foreign key to the actions table.',
+        'type' => 'varchar',
+        'length' => 255,
         'not null' => TRUE,
+        'default' => '0',
+      ),
+      'status' => array(
+        'description' => 'Whether or not this Activity is published',
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 1,
       ),
     ),
     'primary key' => array('aid'),
     'indexes' => array(
-      'module' => array('module'),
-      'created' => array('created'),
-    ),
-  );
-  $schema['activity_targets'] = array(
-    'description' => t('The {activity_targets} table stores activity target data'),
-    'fields' => array(
-      'aid' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-      ),
-      'target_uid' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-      ),
-      'target_role' => array(
-        'type' => 'varchar',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-    ),
-    'primary key' => array('aid', 'target_uid'),
-    'indexes' => array(
-      'target_uid_target_role' => array('target_uid', 'target_role'),
-      'target_role' => array('target_role'),
-    ),
-  );
-  $schema['activity_comments'] = array(
-    'description' => t('Store comments left on an activity ID.'),
-    'fields' => array(
-      'acid' => array(
-        'description' => t('The unique ID that represents this comment.'),
-        'not null'    => TRUE,
-        'type'        => 'serial',
-      ),
-      'aid' => array(
-        'default'     => 0,
-        'description' => t('The {activity}.aid that represents this activity.'),
-        'not null'    => TRUE,
-        'type'        => 'int',
-      ),
-      'uid' => array(
-        'default'     => 0,
-        'description' => t('The {users}.uid of the user leaving a comment on this activity.'),
-        'not null'    => TRUE,
-        'type'        => 'int',
-      ),
-      'timestamp' => array(
-        'default'     => 0,
-        'description' => t('The time the comment was created, as a Unix timestamp.'),
-        'not null'    => TRUE,
-        'type'        => 'int',
-      ),
-      'comment' => array(
-        'description' => t('The comment body.'),
-        'not null'    => TRUE,
-        'size'        => 'big',
-        'type'        => 'text',
-      ),
-    ),
-    'primary key'     => array('acid'),
-    'indexes'         => array(
-      'aid'   => array('aid'),
-      'uid'   => array('uid'),
+      'nid' => array('nid'),
+      'eid' => array('eid'),
+      'created' => array('created'), // Probably not at all useful.
+      'actions_id' => array('actions_id'),
     ),
   );
   
+  $schema['activity_targets'] = array(
+    'fields' => array(
+      'aid' => array(
+        'description' => 'Foreign key to the activity table',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'uid' => array(
+        'description' => "The uid for which this message is for",
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'amid' => array(
+        'description' => "The message id for this uid/aid combination",
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'language' => array(
+        'description' => "The  IS0-3166 name of the langauge for the associated message.",
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => '12',
+      ),
+    ),
+    'primary key' => array('aid', 'uid', 'language'),
+    'unique keys' => array(
+      'amid' => array('amid'),
+    ),
+  );
+  
+  $schema['activity_messages'] = array(
+    'fields' => array(
+      'amid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The Unique id of the message',
+      ),
+      'message' => array(
+        'descripiton' => 'The full plaintext message',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('amid'),
+  );
+
+  $schema['activity_access'] = array(
+    'description' => 'Provides access control on a very granular level to activity items',
+    'fields' => array(
+      'aid' => array(
+        'description' => 'The primary identifier for an activity',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'realm' => array(
+        'description' => 'The module providing the access control',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'value' => array(
+        'description' => 'The provided value from the implementing module. E.g a uid, nid or a tid',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'unsigned' => TRUE,
+      ),
+    ),
+    // UGG!!!
+    'primary key' => array('aid', 'realm', 'value'),
+  );
   return $schema;
 }
 
-/**
- * Implementation of hook_install().
- */
-function activity_install() {
-  drupal_install_schema('activity');
-}
-
-/**
- * Implementation of hook_uninstall().
- */
 function activity_uninstall() {
   drupal_uninstall_schema('activity');
-  variable_del('activity_page_pager');
-  variable_del('activity_purge');
-  variable_del('activity_time_limit');
-  variable_del('activity_user_optout');
-  variable_del('activity_user_profile_records');
-  db_query("DELETE FROM {variable} WHERE name LIKE 'activity_block_%'");
+
+  // clean up actions and triggers
+  db_query("DELETE FROM {trigger_assignments} WHERE aid IN (SELECT aid FROM {actions} WHERE callback = 'activity_record')");
+  db_query("DELETE FROM {actions} WHERE callback = 'activity_record'");
+
+  // clean variable table
+  db_query("DELETE FROM {variable} WHERE name = 'activity_expire' OR name = 'activity_count_expire' OR name = 'activity_access_realms'");
 }
 
 /**
- * In converting to Drupal 6 we should drop the use of
- * the sequences table and instead use auto incrementing columns
+ * Implementation of hook_requirements().
  */
-function activity_update_6000() {
-  $ret = array();
-  db_drop_primary_key($ret, 'activity');
-  db_change_field($ret, 'activity', 'aid', 'aid_old', array('type' => 'int', 'not null' => TRUE));
-  db_add_field($ret, 'activity', 'aid', array('type' => 'serial', 'not null' => TRUE), array('primary key' => array('aid')));
-  update_sql('UPDATE {activity} SET aid = aid_old');
-  db_drop_field($ret, 'activity', 'aid_old');
-  return $ret;
-}
-
-/**
- * A column for the user ID is being added back to make certain things
- * easier to do going forward
- */
-function activity_update_6100() {
-  $ret = array();
-  if (!db_column_exists('activity', 'uid')) {
-    db_add_field($ret, 'activity', 'uid', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
-    $activities = db_query('SELECT aid, module, data FROM {activity}');
-    while ($activity = db_fetch_object($activities)) {
-      $aid = $activity->aid;
-      $data = unserialize($activity->data);
-      $uid = ($activity->module == 'user_relationshipsactivity' ? $data['requester-id'] : $data['author-uid']);
-      db_query('UPDATE {activity} SET uid = %d WHERE aid = %d', $uid, $aid);
-    }
+function activity_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+  $views_schema_version = db_result(db_query("SELECT schema_version FROM {system} WHERE name = 'views'"));
+  if (intval($views_schema_version) < 6006) {
+    $requirements['activity_views'] = array(
+      'title' => $t('Activity Views'),
+      'description' => $t('Activity2 requires Views >= 6.2. It can be downloaded !release. The change that is required by Activity2 is !issue', array('!release' => l('here', 'http://drupal.org/node/488082'), '!issue' => l('#419270', 'http://drupal.org/node/419270'))),
+      // set the severity to warning on install because we don't want to stop the install...
+      'severity' => ($phase == 'install') ? REQUIREMENT_WARNING : REQUIREMENT_ERROR,
+    );
   }
 
+  if (activity_bad_trigger_weight()) {
+    $requirements['activity_trigger_weight'] = array(
+      'title' => $t('Activity Trigger Weight'),
+      'description' => $t('Activity2 requires Trigger\'s weight be greater then Pathauto\'s in order to produce proper aliased paths. !clickhere to fix that', array('!clickhere' => l(t('Click here'), 'admin/activity/weight', array('query' => drupal_get_destination())))),
+      'severity' => REQUIREMENT_WARNING,
+    );
+  }
+  return $requirements;
+}
+
+/**
+ * Sets Trigger modules weight to be higher then pathauto.
+ */
+function activity_fix_trigger_weight() {
+  db_query("UPDATE {system} SET weight = 2 WHERE name = 'trigger'");
+  drupal_goto();
+}
+
+/**
+ * Check to see if we need to fix the Trigger weight.
+ */
+function activity_bad_trigger_weight() {
+  // Verify Triggers weight.
+  $pathauto_weight = db_result(db_query("SELECT weight FROM {system} WHERE name = 'pathauto'"));
+  if ($pathauto_weight !== FALSE) {
+    $trigger_weight = db_result(db_query("SELECT weight FROM {system} WHERE name = 'trigger'"));
+    return $trigger_weight <= $pathauto_weight;
+  }
+  return FALSE;
+}
+
+/**
+ * Update the Activity Messages.amid field to be not null.
+ * @see: http://drupal.org/node/778662
+ */
+function activity_update_6201() {
+  $ret = array();
+  db_change_field($ret, 'activity_messages', 'amid', 'amid', array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE));
   return $ret;
 }
 
 /**
- * A new table activity_comments is added to store comments on Activity
- * records.
+ * Update {activity} table to have the actions_id field.
+ * @see: http://drupal.org/node/463854
  */
-function activity_update_6101() {
-  // install the table, we can pull this right out of our existing schema
-  $schema['activity_comments'] = drupal_get_schema_unprocessed('activity', 'activity_comments');
+function activity_update_6202() {
   $ret = array();
-  db_create_table($ret, 'activity_comments', $schema['activity_comments']);
+
+  db_add_field($ret, 'activity', 'actions_id', array(
+        'description' => 'Foreign key to the actions table.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+    array('indexes' => array('actions_id' => array('actions_id'))));
+
+  return $ret;
+}
+
+/**
+ * Update {activity} table to have a status field
+ * @see: http://drupal.org/node/582230
+ */
+function activity_update_6203() {
+  $ret = array();
+
+  db_add_field ($ret, 'activity', 'status', array(
+      'description' => 'Whether or not this Activity is published',
+      'type' => 'int',
+      'size' => 'tiny',
+      'default' => 1,
+    )
+ );
+
   return $ret;
 }

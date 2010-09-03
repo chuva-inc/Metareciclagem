@@ -1,0 +1,11 @@
+name = Activity comments
+description = "Allow users to comment on activities"
+core = 6.x
+dependencies[] = activity
+package = Activity
+; Information added by drupal.org packaging script on 2010-08-04
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "activity"
+datestamp = "1280880092"
+
