@@ -5,6 +5,17 @@
  */
 
 /**
+ * Skip navigation ====================================================
+ *
+ * 508 compliance link for skipping navigation elements.
+ */
+#skipnav {
+  position:absolute;
+  left:-1000px;
+  top:-1000px;
+  }
+
+/**
  * Page width limiter =================================================
  *
  * Can be nested within major structural elements to allow full-width
@@ -20,6 +31,13 @@
  */
 ul.links li,
 ul.links li a { float:left; }
+
+ul.links.inline,
+ul.links.inline li,
+ul.links.inline li a {
+  float:none;
+  display:inline;
+  }
 
 /**
  * Prose ==============================================================
@@ -72,20 +90,21 @@ ul.links li a { float:left; }
 .prose ol li,
 .prose ul li {
   display:list-item;
-  list-style:disc;
   margin:0px 0px 0px 30px;
   padding:0px;
   }
 
 .prose ol li { list-style:decimal; }
 
+.prose ul li { list-style:disc; }
+
 .prose img { display:block; }
 
 /* Excluding Drupal structures */
-.prose ul.links,
-.prose ul.links li,
-.prose div.item-list ul,
-.prose div.item-list li {
+.prose .links,
+.prose .links li,
+.prose .item-list ul,
+.prose .item-list li {
   margin:0px;
   padding:0px;
   list-style:none;
@@ -117,14 +136,14 @@ input.form-submit { cursor:pointer; }
 input.form-radio,
 input.form-checkbox { vertical-align:middle; }
 
-div.form-item div.description,
-div.description {
+.form-item .description,
+.description {
   color:#666;
   font-size:11px;
   }
 
-div.collapsible h2.fieldset-title { cursor:pointer; }
-div.collapsed div.fieldset-content { display:none; }
+fieldset.collapsible .fieldset-title { cursor:pointer; }
+html.js fieldset.collapsed .fieldset-content { display:none; }
 
 /**
  * Views ==============================================================
