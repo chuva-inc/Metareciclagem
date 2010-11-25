@@ -1,5 +1,5 @@
 <?php
-// $Id: mollom.install,v 1.2.2.33 2010/09/12 23:44:14 dries Exp $
+// $Id: mollom.install,v 1.2.2.36 2010/10/28 02:04:52 dries Exp $
 
 /**
  * @file
@@ -86,15 +86,22 @@ function mollom_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'did' => array(
+      'id' => array(
         'description' => 'Unique entity ID of the content.',
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
         'default' => '',
       ),
-      'session' => array(
-        'description' => "Content author's session ID.",
+      'session_id' => array(
+        'description' => 'Session hash returned by Mollom.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'form_id' => array(
+        'description' => 'The form_id of the form being protected.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -130,8 +137,16 @@ function mollom_schema() {
         'default' => '',
       ),
     ),
-    'indexes' => array('session' => array('session')),
-    'primary key' => array('entity', 'did'),
+    'indexes' => array('session_id' => array('session_id')),
+    'primary key' => array('entity', 'id'),
+    'foreign keys' => array(
+      'mollom_form_id' => array(
+        'table' => 'mollom_form',
+        'columns' => array(
+          'form_id' => 'form_id',
+        ),
+      ),
+    ),
   );
 
   $schema['mollom_form'] = array(
@@ -156,6 +171,13 @@ function mollom_schema() {
         'type' => 'text',
         'not null' => FALSE,
         'serialize' => TRUE,
+      ),
+      'discard' => array(
+        'description' => 'Whether to discard (1) or retain (0) bad posts.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
       ),
       'enabled_fields' => array(
         'description' => 'Form elements to analyze.',
@@ -209,7 +231,12 @@ function mollom_uninstall() {
  */
 function mollom_update_1() {
   $ret = array();
-  db_add_field($ret, 'mollom', 'languages', array('type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'default' => ''));
+  db_add_field($ret, 'mollom', 'languages', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+    'default' => '',
+  ));
   return $ret;
 }
 
@@ -238,7 +265,7 @@ function mollom_update_3() {
     $mode = variable_get($name, NULL);
     // $mode was stored as 1; convert to MOLLOM_MODE_ANALYSIS.
     if (isset($mode)) {
-      variable_set($name, MOLLOM_MODE_ANALYSIS);
+      variable_set($name, 2);
     }
   }
 }
@@ -260,22 +287,26 @@ function mollom_update_6105() {
   $schema = array(
     'fields' => array(
       'form_id' => array(
+        'description' => 'The protected form ID.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
       'mode' => array(
+        'description' => 'Protection mode for the form.',
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,
         'default' => 0,
       ),
       'enabled_fields' => array(
+        'description' => 'Form elements to analyze.',
         'type' => 'text',
         'serialize' => TRUE,
       ),
       'module' => array(
+        'description' => 'Module name owning the form.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -310,14 +341,12 @@ function mollom_update_6105() {
 
 /**
  * Add the {mollom}.form_id column.
- *
- * @todo Rename 'did' column after mollom_set_data() and mollom_get_data() have
- *   been removed.
  */
 function mollom_update_6106() {
   $ret = array();
   // Add the 'entity' column.
   db_add_field($ret, 'mollom', 'entity', array(
+    'description' => 'Entity type of the content.',
     'type' => 'varchar',
     'length' => 32,
     'not null' => TRUE,
@@ -340,6 +369,7 @@ function mollom_update_6106() {
   // @todo We do not change the type to 'int' here to still support named
   //   identifiers. Reconsider this.
   db_change_field($ret, 'mollom', 'did', 'did', array(
+    'description' => 'Unique entity ID of the content.',
     'type' => 'varchar',
     'length' => 32,
     'not null' => TRUE,
@@ -377,6 +407,7 @@ function mollom_update_6109() {
   $ret = array();
   if (db_column_exists('mollom_form', 'fields')) {
     db_change_field($ret, 'mollom_form', 'fields', 'enabled_fields', array(
+      'description' => 'Form elements to analyze.',
       'type' => 'text',
       'serialize' => TRUE,
     ));
@@ -420,6 +451,7 @@ function mollom_update_6112() {
   $ret = array();
   if (!db_column_exists('mollom', 'changed')) {
     db_add_field($ret, 'mollom', 'changed', array(
+      'description' => 'Unix timestamp when the data was changed.',
       'type' => 'int',
       'not null' => TRUE,
       'default' => 0,
@@ -437,6 +469,7 @@ function mollom_update_6113() {
   // Add {mollom_form}.checks.
   if (!db_column_exists('mollom_form', 'checks')) {
     db_add_field($ret, 'mollom_form', 'checks', array(
+      'description' => 'Text analyis checks to perform.',
       'type' => 'text',
       'not null' => FALSE,
       'serialize' => TRUE,
@@ -465,6 +498,7 @@ function mollom_update_6114() {
 
   // Change {mollom}.quality from varchar into float.
   db_change_field($ret, 'mollom', 'quality', 'quality', array(
+    'description' => 'Text analysis quality check result.',
     'type' => 'float',
     'size' => 'tiny',
     'not null' => FALSE,
@@ -473,6 +507,7 @@ function mollom_update_6114() {
   // Add {mollom}.spam.
   if (!db_column_exists('mollom', 'spam')) {
     db_add_field($ret, 'mollom', 'spam', array(
+      'description' => 'Text analysis spam check result.',
       'type' => 'int',
       'size' => 'tiny',
       'not null' => FALSE,
@@ -490,5 +525,107 @@ function mollom_update_6114() {
 
   // Addition of {mollom}.profanity deferred to D7.
 
+  return $ret;
+}
+
+/**
+ * Add {mollom}.form_id column to look up the originating form_id for an entity.
+ */
+function mollom_update_6115() {
+  $ret = array();
+  if (!db_column_exists('mollom', 'form_id')) {
+    db_add_field($ret, 'mollom', 'form_id', array(
+      'description' => 'The form_id of the form being protected.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => TRUE,
+      'default' => '',
+    ));
+    // Update simple cases first.
+    $ret[] = update_sql("UPDATE {mollom} SET form_id = 'user_register' WHERE entity = 'user'");
+    $ret[] = update_sql("UPDATE {mollom} SET form_id = 'contact_mail_page' WHERE entity = 'session'");
+    // Also perform simple update on behalf of Webform, as that is a very common
+    // use-case.
+    $ret[] = update_sql("UPDATE {mollom} SET form_id = CONCAT('webform_client_form_', did) WHERE entity = 'webform'");
+
+    // Update node entity data records.
+    $result = db_query("SELECT n.type, m.did
+      FROM {mollom} m
+      INNER JOIN {node} n ON n.nid = m.did
+      WHERE m.entity = 'node'");
+    $ids = array();
+    while ($row = db_fetch_object($result)) {
+      $ids[$row->type][] = $row->did;
+    }
+    foreach ($ids as $type => $nids) {
+      $in = implode(',', $nids);
+      $ret[] = update_sql("UPDATE {mollom} SET form_id = '{$type}_node_form' WHERE entity = 'node' AND did IN ($in)");
+    }
+
+    // Update comment entity data records.
+    // In Drupal 6, there is only one 'comment_form'. The corresponding update
+    // to Drupal 7 takes into account that {mollom}.form_id can already exist,
+    // and if it does, only comment form IDs are updated accordingly.
+    $ret[] = update_sql("UPDATE {mollom} SET form_id = 'comment_form' WHERE entity = 'comment'");
+  }
+  return $ret;
+}
+
+/**
+ * Rename {mollom}.did to .id, and {mollom}.session to .session_id.
+ */
+function mollom_update_6116() {
+  $ret = array();
+  db_drop_primary_key($ret, 'mollom');
+  if (!db_column_exists('mollom', 'id')) {
+    db_change_field($ret, 'mollom', 'did', 'id', array(
+      'description' => 'Unique entity ID of the content.',
+      'type' => 'varchar',
+      'length' => 32,
+      'not null' => TRUE,
+      'default' => '',
+    ));
+  }
+  db_add_primary_key($ret, 'mollom', array('entity', 'id'));
+
+  db_drop_index($ret, 'mollom', 'session');
+  if (!db_column_exists('mollom', 'session_id')) {
+    db_change_field($ret, 'mollom', 'session', 'session_id', array(
+      'description' => 'Session hash returned by Mollom.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => TRUE,
+      'default' => '',
+    ));
+  }
+  db_add_index($ret, 'mollom', 'session_id', array('session_id'));
+  return $ret;
+}
+
+/**
+ * Add {mollom_form}.discard and {mollom}.moderate columns.
+ */
+function mollom_update_6117() {
+  $ret = array();
+  if (!db_column_exists('mollom_form', 'discard')) {
+    db_add_field($ret, 'mollom_form', 'discard', array(
+      'description' => 'Whether to discard (1) or retain (0) bad posts.',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 1,
+    ));
+  }
+  return $ret;
+}
+
+/**
+ * Remove the {mollom}.moderate column introduced in mollom_update_6117().
+ */
+function mollom_update_6118() {
+  $ret = array();
+  if (db_column_exists('mollom', 'moderate')) {
+    db_drop_field($ret, 'mollom', 'moderate');
+  }
   return $ret;
 }

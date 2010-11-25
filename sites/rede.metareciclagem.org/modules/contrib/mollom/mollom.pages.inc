@@ -1,5 +1,5 @@
 <?php
-// $Id: mollom.pages.inc,v 1.1.2.16 2010/08/07 02:49:44 dries Exp $
+// $Id: mollom.pages.inc,v 1.1.2.17 2010/10/16 16:05:13 sun Exp $
 
 /**
  * @file
@@ -110,16 +110,16 @@ function mollom_report_form_submit($form, &$form_state) {
     // Load the Mollom session data.
     if ($entity == 'session') {
       $data = new stdClass;
-      $data->session = $id;
+      $data->session_id = $id;
     }
     else {
       $data = mollom_data_load($entity, $id);
     }
 
     // Send feedback to Mollom, if we have session data.
-    if (isset($data->session) && isset($form_state['values']['feedback']) && $form_state['values']['feedback'] != 'none') {
+    if (isset($data->session_id) && isset($form_state['values']['feedback']) && $form_state['values']['feedback'] != 'none') {
       // @todo Check the actual reponse.
-      _mollom_send_feedback($data->session, $form_state['values']['feedback']);
+      _mollom_send_feedback($data->session_id, $form_state['values']['feedback']);
       drupal_set_message(t('The content was successfully reported as inappropriate.'));
     }
 

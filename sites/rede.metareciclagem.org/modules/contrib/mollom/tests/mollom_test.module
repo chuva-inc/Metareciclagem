@@ -1,5 +1,5 @@
 <?php
-// $Id: mollom_test.module,v 1.1.2.10 2010/09/12 23:44:15 dries Exp $
+// $Id: mollom_test.module,v 1.1.2.13 2010/10/28 02:04:52 dries Exp $
 
 /**
  * @file
@@ -18,6 +18,7 @@ function mollom_test_xmlrpc() {
     'mollom.checkContent' => 'mollom_test_check_content',
     'mollom.getImageCaptcha' => 'mollom_test_get_captcha',
     'mollom.checkCaptcha' => 'mollom_test_check_captcha',
+    'mollom.sendFeedback' => 'mollom_test_send_feedback',
  );
 }
 
@@ -176,16 +177,40 @@ function mollom_test_check_captcha($data) {
 }
 
 /**
+ * XML-RPC callback for mollom.sendFeedback to send feedback for a moderated post.
+ */
+function mollom_test_send_feedback($data) {
+  $storage = variable_get(__FUNCTION__, array());
+  $storage[] = $data;
+  variable_set(__FUNCTION__, $storage);
+
+  if (in_array($data['feedback'], array('spam', 'profanity', 'low-quality', 'unwanted', 'ham'))) {
+    return TRUE;
+  }
+  xmlrpc_error(MOLLOM_ERROR);
+}
+
+/**
  * Implements hook_menu().
  */
 function mollom_test_menu() {
   $items['mollom-test/form'] = array(
-    'title' => 'Mollom test form',
+    'title' => 'Mollom test',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mollom_test_form'),
     'access callback' => TRUE,
   );
   return $items;
+}
+
+/**
+ * Implements hook_forms().
+ */
+function mollom_forms() {
+  $forms['mollom_basic_test_form'] = array(
+    'callback' => 'mollom_test_form',
+  );
+  return $forms;
 }
 
 /**
@@ -195,6 +220,18 @@ function mollom_test_mollom_form_list() {
   $forms['mollom_test_form'] = array(
     'title' => 'Mollom test form',
     'entity' => 'mollom_test',
+    'entity delete multiple callback' => 'mollom_test_delete_multiple',
+    'moderation callback' => 'mollom_test_mollom_form_moderation',
+  );
+  // The basic test form is identical to the mollom_test_form, but only
+  // registers minimal information (e.g., no entity or moderation callback) to
+  // integrate with Mollom.
+  $forms['mollom_basic_test_form'] = array(
+    'title' => 'Mollom basic test form',
+  );
+  // Same as above, but supports elements for text analysis.
+  $forms['mollom_basic_elements_test_form'] = array(
+    'title' => 'Mollom basic elements test form',
   );
   return $forms;
 }
@@ -203,10 +240,11 @@ function mollom_test_mollom_form_list() {
  * Implements hook_mollom_form_info().
  */
 function mollom_test_mollom_form_info($form_id) {
+  if ($form_id == 'mollom_basic_test_form') {
+    return array();
+  }
   $form_info = array(
-    'title' => 'Mollom test form',
     'bypass access' => array('administer mollom'),
-    'entity' => 'mollom_test',
     'elements' => array(
       'title' => 'Title',
       'body' => 'Body',
@@ -227,20 +265,22 @@ function mollom_test_mollom_form_info($form_id) {
  * Form builder for Mollom test form.
  */
 function mollom_test_form(&$form_state, $mid = NULL) {
-  if (empty($form_state['storage'])) {
-    $body = '';
-    if (isset($mid)) {
-      $body = db_result(db_query("SELECT body FROM {mollom_test} WHERE mid = %d", $mid));
-    }
-    $form_state['storage'] = array(
-      'mid' => $mid,
-      'title' => '',
-      'body' => $body,
-      'exclude' => '',
-      'parent' => array('child' => ''),
-      'field' => array(),
-    );
+  // Drupal 6 defaults 'storage' to NULL.
+  if (!isset($form_state['storage'])) {
+    $form_state['storage'] = array();
   }
+  if (isset($mid) && ($record = mollom_test_load($mid))) {
+    $form_state['storage'] = $record;
+  }
+  $form_state['storage'] += array(
+    'mid' => $mid,
+    'title' => '',
+    'body' => '',
+    'exclude' => '',
+    'parent' => array('child' => ''),
+    'field' => array(),
+    'status' => 1,
+  );
   // Always add an empty field the user can submit.
   $form_state['storage']['field']['new'] = '';
 
@@ -288,9 +328,16 @@ function mollom_test_form(&$form_state, $mid = NULL) {
   $form['field']['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Add',
-    '#validate_parents' => array('field'),
     '#submit' => array('mollom_test_form_field_submit'),
     '#weight' => 1000,
+  );
+
+  $form['status'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Published',
+    '#default_value' => $form_state['storage']['status'],
+    // For simplicity, re-use Mollom module's administration permission.
+    '#access' => user_access('administer mollom'),
   );
 
   $form['submit'] = array('#type' => 'submit', '#value' => 'Submit');
@@ -302,10 +349,16 @@ function mollom_test_form(&$form_state, $mid = NULL) {
  * Form element submit handler for mollom_test_form().
  */
 function mollom_test_form_field_submit($form, &$form_state) {
-  // Store the new value and clear out the 'new' field.
+  // Remove all empty values of the multiple value field.
+  $form_state['values']['field'] = array_filter($form_state['values']['field']);
+  // Update the storage with submitted values.
   $form_state['storage'] = $form_state['values'];
-  $form_state['storage']['field'][] = $form_state['values']['field']['new'];
+  // Store the new value and clear out the 'new' field.
+  if (isset($form_state['values']['field']['new'])) {
+    $form_state['storage']['field'][] = $form_state['values']['field']['new'];
+  }
   unset($form_state['input']['field']['new']);
+
   $form_state['rebuild'] = TRUE;
 }
 
@@ -338,4 +391,29 @@ function mollom_test_form_alter(&$form, &$form_state, $form_id) {
     $form_state['mollom']['require_analysis'] = FALSE;
     $form_state['mollom']['require_captcha'] = FALSE;
   }
+}
+
+/**
+ * Mollom form moderation callback for a mollom_test record.
+ */
+function mollom_test_mollom_form_moderation(&$form, &$form_state) {
+  $form_state['values']['status'] = 0;
+}
+
+/**
+ * Loads a {mollom_test} data record by id.
+ */
+function mollom_test_load($mid) {
+  return db_fetch_array(db_query('SELECT * FROM {mollom_test} WHERE mid = %d', array($mid)));
+}
+
+/**
+ * Deletes multiple stored {mollom_test} data records.
+ *
+ * @param $mids
+ *   The mids to delete.
+ */
+function mollom_test_delete_multiple(array $mids) {
+  $placeholders = db_placeholders($mids);
+  db_query("DELETE FROM {mollom_test} WHERE mid IN ($placeholders)", $mids);
 }
