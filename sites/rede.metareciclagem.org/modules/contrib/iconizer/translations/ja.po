@@ -1,0 +1,131 @@
+# $Id: ja.po,v 1.1.2.1 2008/05/02 09:21:19 imagine Exp $
+# -----------------------------------------------------------------------------
+# Japanese translation of Drupal (modules-iconizer)
+#
+# Copyright (c) 2006-2008  Drupal Japan  ( http://drupal.jp/ )  /
+#                          Takafumi      ( jp.drupal@imagine **reverse order**)
+#
+# Generated from file:
+#  iconizer.admin.inc: n/a
+#  iconizer.module,v 1.1.4.3 2008/03/06 10:54:45 thepanz
+#  iconizer.info,v 1.1.4.1 2008/02/28 16:04:01 thepanz
+#
+# -----------------------------------------------------------------------------
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2008-05-01 19:51+0900\n"
+"Last-Translator: Takafumi <jp.drupal@imagine **reverse order**>\n"
+"Language-Team: Drupal Japan\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: iconizer.admin.inc:13
+msgid "The themes directory does not exist, or is not writable."
+msgstr "テーマディレクトリが存在しないか、書き込み可能ではありません。"
+
+#: iconizer.admin.inc:17
+msgid "Icon themes settings"
+msgstr "アイコンテーマの設定"
+
+#: iconizer.admin.inc:23
+msgid "Enable icons themes"
+msgstr "アイコンテーマを有効化"
+
+#: iconizer.admin.inc:25
+msgid "Enable this feature to access and choose icons themes for 'Admin', 'Files' and 'Protocols'"
+msgstr "アイコンテーマを使用するかどうかを指定してください。 ここにチェックを入れると、「管理」「ファイル」「プロトコル」用のアイコンテーマが選択できるようになります。"
+
+#: iconizer.admin.inc:29
+msgid "Themes path"
+msgstr "テーマパス"
+
+#: iconizer.admin.inc:33
+msgid "Subdirectory in the directory \"%dir\" where iconizer themes be stored."
+msgstr "Iconizerのテーマを保存する、\"%dir\" でのサブディレクトリを入力してください。"
+
+#: iconizer.admin.inc:41
+msgid "Admin link icons"
+msgstr "管理リンクのアイコン"
+
+#: iconizer.admin.inc:48
+msgid "Files link icons"
+msgstr "ファイルリンクのアイコン"
+
+#: iconizer.admin.inc:55
+msgid "Protocols link icons"
+msgstr "プロトコルリンクのアイコン"
+
+#: iconizer.admin.inc:63
+msgid "Enable icons in Admin pages"
+msgstr "管理ページでのアイコンを有効化"
+
+#: iconizer.admin.inc:68
+msgid "Enable icons for files links"
+msgstr "ファイルリンク用のアイコンを有効化"
+
+#: iconizer.admin.inc:73
+msgid "Enable icons for protocols links"
+msgstr "プロトコルリンク用のアイコンを有効化"
+
+#: iconizer.admin.inc:82
+msgid "Choose Admin icons theme"
+msgstr "管理アイコン用テーマ"
+
+#: iconizer.admin.inc:85
+msgid "Theme for Admin links icons."
+msgstr "管理リンクアイコン用のテーマを指定してください。"
+
+#: iconizer.admin.inc:89
+msgid "Choose Files icons theme"
+msgstr "ファイルアイコン用テーマ"
+
+#: iconizer.admin.inc:92
+msgid "Theme for Files links icons."
+msgstr "ファイルリンクアイコン用のテーマを指定してください。"
+
+#: iconizer.admin.inc:96
+msgid "Choose Protocols icons theme"
+msgstr "プロトコルアイコン用テーマ"
+
+#: iconizer.admin.inc:99
+msgid "Theme for Protocols links icons."
+msgstr "プロトコルリンクアイコン用のテーマを指定してください。"
+
+#: iconizer.admin.inc:103
+msgid "The themes have been disabled."
+msgstr "テーマが無効にされました。"
+
+#: iconizer.module:17
+msgid "Adds icons next to links in Admin-section and well-know protocols and files"
+msgstr "管理セクション、ウェルノウンプロトコル、ファイルの各リンクの隣にアイコンを加えます。"
+
+#: iconizer.module:30
+msgid "display iconizer links"
+msgstr "Iconizerリンクの表示"
+
+#: iconizer.module:31
+msgid "manage iconizer settings"
+msgstr "Iconizer設定の管理"
+
+#: iconizer.module:43
+msgid "Iconizer settings"
+msgstr "Iconizerの設定"
+
+#: iconizer.module:44
+msgid "Admin iconizer settings: Admin-links, files, protocols and themes"
+msgstr "Iconizer設定の管理： 管理リンク、ファイル、プロトコル、テーマ"
+
+#: iconizer.module:0
+msgid "iconizer"
+msgstr "iconizer"
+
+#: iconizer.info:0
+msgid "Iconizer"
+msgstr "Iconizer"
+
+#: iconizer.info:0
+msgid "Adds icons next to links in Admin-section, well-know protocols and files links."
+msgstr "管理セクション、ウェルノウンプロトコル、ファイルの各リンクの隣にアイコンを加えます。"
+

@@ -4,9 +4,9 @@ description = Adds advanced options to the ImageMagick image toolkit.
 package = Image
 core = 6.x
 
-; Information added by drupal.org packaging script on 2010-08-25
-version = "6.x-1.0-beta6"
+; Information added by drupal.org packaging script on 2010-10-14
+version = "6.x-1.0"
 core = "6.x"
 project = "image"
-datestamp = "1282744308"
+datestamp = "1287043582"
 

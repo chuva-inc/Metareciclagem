@@ -1,5 +1,5 @@
 <?php
-/* $Id: iconizer.module,v 1.1.4.3 2008/03/06 10:54:45 thepanz Exp $ */
+/* $Id: iconizer.module,v 1.1.4.4 2009/06/15 10:21:00 thepanz Exp $ */
 /**
 * Iconizer module: adds icons before links in Admin section.
 * @author: thePanz ( thePanz@gmail.com )
@@ -81,6 +81,8 @@ function _iconizer_add_css() {
   }
   if(variable_get('iconizer_files_icons', 0) == 1) {
     drupal_add_css(_iconizer_files_css(variable_get('iconizer_files_icons_theme', 'default')),'module','screen');
+    
+    drupal_add_css(drupal_get_path('module','iconizer'). '/files_icons-override.css','module','screen');
   }  
   if(variable_get('iconizer_proto_icons', 0) == 1) {
     drupal_add_css(_iconizer_proto_css(variable_get('iconizer_proto_icons_theme', 'default')),'module','screen');

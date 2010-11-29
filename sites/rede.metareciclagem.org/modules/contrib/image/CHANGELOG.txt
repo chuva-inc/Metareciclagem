@@ -1,10 +1,29 @@
-// $Id: CHANGELOG.txt,v 1.144.2.20 2010/08/25 13:35:11 joachim Exp $
+// $Id: CHANGELOG.txt,v 1.144.2.31 2010/10/14 07:56:19 joachim Exp $
 
 Image x.x-x.x, xxxx-xx-xx
 ------------------------
 
 
 Image 6.x-1.x, xxxx-xx-xx
+-------------------------
+
+
+Image 6.x-1.0, 2010-10-14
+-------------------------
+#933612 by joachim: Fixed image gallery term titles to pass W3C validation.
+#875114 by joachim: Fixed missing description field in gallery terms view.
+#929868 by joachim: Fixed undefined variable error in
+  theme_image_attach_attached_images().
+#925122 by joachim: Fixed missing default attributes key in theme function.
+#925098 by joachim: Fixed views classes variable not defined in gallery terms
+  style plugin template.
+#747900 by Karlheinz, joachim, sun: Fixed warning when no images are attached.
+#916128 by joachim: Fixed undefined variable error in image_attach_validate().
+#910370 by jonathan1055: Fixed attached image not shown for teaser in preview.
+#575790 by mokko: Fixed CSS for galleries to work on IE*.
+
+
+Image 6.x-1.0-BETA6, 2010-08-25
 -------------------------
 #207557 by joachim: (Revisited) Fixed update errors due to duplicate data in 
   Drupal 5 files table.

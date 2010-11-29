@@ -1,0 +1,16 @@
+** 1.x-dev **
+	-- 2009-07-27 --
+	+ Added more comments in "file_icons-override.css.example" file
+	
+  -- 2009-06-15 --
+  + Added files_icons.css overriding with "files_icons-override.css" (if exists)	
+  
+  -- 2009-04-08 --
+  + Added .phps file-icon handler (with icon)
+  - Fixed missing icon_dmg.gif
+  - Fixed missing icon_ical.gif
+  - Fixed missing icon_plugin.gif
+  + Added GaduGadu (gg:) protocol handler
+  
+  -- 2008-04-02 --
+  + Added .7z file-icon handler

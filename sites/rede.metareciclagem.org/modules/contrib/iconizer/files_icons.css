@@ -1,10 +1,10 @@
 /**
-* $Id: files_icons.css,v 1.1.4.2 2008/04/30 15:13:43 thepanz Exp $
+* $Id: files_icons.css,v 1.1.4.6 2010/10/17 13:05:00 thepanz Exp $
 * CSS and Icons taken from:
 * http://pooliestudios.com/projects/iconize/
 */
 
-a[href$='.doc'], a[href$='.rtf'] {
+a[href$='.doc'], a[href$='.docx'], a[href$='.rtf'] {
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_doc.gif) no-repeat center right;
 }
@@ -14,7 +14,7 @@ a[href$='.txt'] {
 	background: transparent url(files_icons/icon_txt.gif) no-repeat center right;
 }
 
-a[href$='.xls'] {
+a[href$='.xls'], a[href$='.xlsx'] {
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_xls.gif) no-repeat center right;
 }
@@ -27,6 +27,11 @@ a[href$='.rss'], a[href$='.atom'] {
 a[href$='.opml'] { 
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_opml.gif) no-repeat center right;
+}
+
+a[href$='.phps'] { 
+	padding: 5px 20px 5px 0;
+	background: transparent url(files_icons/icon_phps.gif) no-repeat center right;
 }
 
 a[href$='.vcard'] { 
@@ -44,12 +49,12 @@ a[href$='.dmg'], a[href$='.app'] {
 	background: transparent url(files_icons/icon_dmg.gif) no-repeat center right;
 }
 
-a[href$='.pps'] { 
+a[href$='.pps'], a[href$='.ppt'], a[href$='.pptx']{ 
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_pps.gif) no-repeat center right;
 }
 
-a[href$='.pdf'] { 
+a[href$='.pdf'], a[href*='.pdf#page='] { 
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_pdf.gif) no-repeat center right;
 }
@@ -64,7 +69,7 @@ a[href$='.fla'], a[href$='.swf'] {
 	background: transparent url(files_icons/icon_flash.gif) no-repeat center right;
 }
 
-a[href$='.zip'], a[href$='.rar'], a[href$='.gzip'], a[href$='.bzip'], a[href$='.ace'] { 
+a[href$='.zip'], a[href$='.rar'], a[href$='.gzip'], a[href$='.bzip'], a[href$='.ace'], a[href$='.7z'] { 
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_archive.gif) no-repeat center right;
 }
@@ -89,6 +94,11 @@ a[href$='.jpg'], a[href$='.gif'], a[href$='.png'], a[href$='.bmp'], a[href$='.jp
 	background: transparent url(files_icons/icon_pic.gif) no-repeat center right;
 }
 
+a[rel*='lightbox['] {
+	padding: inherit;
+	background: none;
+}
+
 a[href$='.mov'], a[href$='.wmv'], a[href$='.mp4'], a[href$='.avi'], a[href$='.mpg'] { 
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_film.gif) no-repeat center right;
@@ -99,7 +109,17 @@ a[href$='.mp3'], a[href$='.wav'], a[href$='.ogg'], a[href$='.wma'], a[href$='.m4
 	background: transparent url(files_icons/icon_music.gif) no-repeat center right;
 }
 
-a[href$='.torrent] { 
+a[href$='.torrent'] { 
 	padding: 5px 20px 5px 0;
 	background: transparent url(files_icons/icon_torrent.gif) no-repeat center right;
+}
+
+a[href$='.odt'] { 
+	padding: 5px 20px 5px 0;
+	background: transparent url(files_icons/odt.gif) no-repeat center right;
+}
+
+a[href$='.odp'] { 
+	padding: 5px 20px 5px 0;
+	background: transparent url(files_icons/odp.gif) no-repeat center right;
 }

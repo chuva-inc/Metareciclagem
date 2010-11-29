@@ -1,4 +1,4 @@
-/* $Id: imce-content.css,v 1.2.2.3 2010/05/15 13:32:44 ufku Exp $ */
+/* $Id: imce-content.css,v 1.2.2.6 2010/10/06 04:38:09 ufku Exp $ */
 
 /*Body*/
 body.imce {
@@ -32,7 +32,7 @@ body.imce {
 #imce-content label.option {
   font-weight: normal;
 }
-#imce-content input.form-text, #imce-content input[type=text], #imce-content input.form-file, #imce-content input[type=file], #imce-content select {
+#imce-content input.form-text, #imce-content input[type=text], #imce-content input.form-file, #imce-content input[type=file], #imce-content select, #imce-content textarea {
   border: 1px inset #aaa;
   padding: 2px;
   background-color: #fff;
@@ -55,6 +55,9 @@ body.imce {
 }
 #imce-content .form-item {
   margin: 4px 0;
+}
+#imce-content .form-item .description {
+  font-size: 0.9em;
 }
 #imce-content strong, #imce-content h4 {
   font-weight: bold;
@@ -269,7 +272,7 @@ body.imce {
   position: relative;
 }
 #op-close-link {
-  display: inline-block;
+  display: none;
   position: absolute;
   z-index: 3;
   top: 2px;
@@ -277,7 +280,6 @@ body.imce {
   width: 16px;
   height: 16px;
   background: url(close.png) no-repeat 50% 50%;
-  visibility: hidden;
 }
 #ops-list {
 }
@@ -321,6 +323,25 @@ body.imce {
 #op-item-sendto a {
   background-image: url(sendto.png);
 }
+#op-item-help a {
+  background-image: url(help.png);
+}
+#op-item-changeview a {
+  background-image: url(view-box.png);
+}
+.box-view #op-item-changeview a {
+  background-image: url(view-list.png);
+}
+#op-item-help a, #op-item-changeview a {
+  white-space: nowrap;
+  overflow: hidden;
+  width: 1px;
+  padding: 5px 0 5px 25px;
+  background-position: 5px 50%;
+}
+#op-item-help, #op-item-changeview {
+  float: right !important;
+}
 
 /*resizers*/
 #imce-content .y-resizer {
@@ -338,41 +359,13 @@ body.imce {
   border-right: 1px solid #e0e3e5;
 }
 
-/*Help box*/
-#help-box {
-  position: absolute;
-  z-index: 9;
-  right: 0;
-  background: url(help.png) no-repeat 100% 0;
-  max-width: 500px;
-}
-#help-box-title {
-  cursor: help;
-}
-#help-box-title span {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  overflow: hidden;
-  visibility: hidden;
-}
-#help-box-content {
-  display: none;
-  padding: 10px;
-  border: 2px solid #344454;
-  background-color: #f5f5f5;
-}
-#help-box:hover #help-box-content, #help-box-content.hover {
-  display: block;
-}
-
 /*Message box*/
 #message-box {
   display: none;
   position: absolute;
   width: 60%;
   left: 20%;
-  top: 40%;
+  top: 32%;
   z-index: 10;
   padding: 5px;
   background-color: #fff;
@@ -409,7 +402,7 @@ body.imce {
 #file-preview {
   text-align: center;
 }
-.imce-hide, .js #forms-wrapper {
+.imce-hide, .js #forms-wrapper, #help-box {
   display: none;
 }
 
@@ -426,4 +419,35 @@ body.imce {
 }
 .ie-7 #ops-list a span {
   cursor: pointer;
+}
+.ie-7 #file-list-wrapper {
+  display: inline-block; /* Gives hasLayout */
+}
+
+/* File list in box view */
+.box-view #file-list tr {
+  display: block;
+  float: left;
+  border: 1px solid #ccf;
+  margin: 10px;
+}
+.box-view #file-list td {
+  border: 0;
+}
+.box-view #file-list td.name {
+  min-width: 0;
+  padding: 5px;
+  text-align: center;
+  vertical-align: middle;
+}
+.box-view #file-list td.name img {
+  margin: 0;
+}
+.box-view #file-list td.name span {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.box-view #file-list td.size, .box-view #file-list td.date, .box-view #file-list td.width, .box-view #file-list td.height {
+  display: none;
 }

@@ -1,9 +1,15 @@
 1. Install ---------------------------------------------
   
   Install this module as other modules: copy iconizer/ directory into your
-  sites/all/modules 
+  "sites/all/modules" directory
   
-  Then enable it under:
+  Admin-icons are avaiable for download from my Blog-post:
+  http://thepanz.netsons.org/post/drupal-iconizer-module/
+  Extract contents replacing ojld module's directory and admin_icons files
+  
+  The Admin_icons can't be included in this module due to GPL license issues.
+  
+  Then enable the module under:
     Administer > Site Building > Modules
   
   Change Icons display on/off in:
@@ -41,7 +47,7 @@
   - Views              (1/1)
   - Uploads            (1/1)
   - Localization       (1/1)
-  - Comments		       (1/1)
+  - Comments		   (1/1)
   - Statistics         (0/5) ***
   - Throttle           (1/1)
   - Book               (1/1)
@@ -55,7 +61,14 @@
   [...]
   - Others?
 
-4. To-Do -----------------------------------------------
+5. Icons Overriding ------------------------------------
+  If you need to override the files icons you can create a file called "files_icons-override.css"
+  with your customizations, place it in the module folder and it will be loaded after the default one.
+  
+  There is an example file called "files_icons-override.css.example", take a look at it! :)
+  Maybe you need to clear your cache before the override takes effect..
+
+5. To-Do -----------------------------------------------
   
   Fix/Enable Icons Themeing
   

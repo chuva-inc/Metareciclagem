@@ -1,5 +1,5 @@
 /**
-* $Id: proto_icons.css,v 1.1 2007/08/21 15:51:46 thepanz Exp $
+* $Id: proto_icons.css,v 1.1.4.1 2009/05/08 14:29:15 thepanz Exp $
 * CSS and Icons taken from:
 * http://pooliestudios.com/projects/iconize/
 */
@@ -37,6 +37,11 @@ a[href ^="callto:"] {
 a[href ^="skype:"] {
 	padding: 5px 20px 5px 0;
     background: transparent url(proto_icons/icon_skype.gif) no-repeat center right;
+}
+
+a[href ^="gg:"] {
+	padding: 5px 20px 5px 0;
+  background: transparent url(proto_icons/icon_gadugadu.gif) no-repeat center right;
 }
 
 /* email */

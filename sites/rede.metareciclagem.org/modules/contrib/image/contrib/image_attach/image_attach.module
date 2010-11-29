@@ -1,5 +1,5 @@
 <?php
-// $Id: image_attach.module,v 1.76.2.10 2010/08/25 09:56:36 joachim Exp $
+// $Id: image_attach.module,v 1.76.2.15 2010/10/03 08:35:51 joachim Exp $
 
 /**
  * @file image_attach.module
@@ -331,11 +331,17 @@ function image_attach_image_add_submit(&$form, &$form_state) {
  * attempts may create trash.
  */
 function image_attach_validate(&$form, &$form_state) {
+  // Test for whether a file is being uploaded cribbed from file_save_upload().
+  $uploading_new_image = isset($_FILES['files']) && $_FILES['files']['name']['image'] && is_uploaded_file($_FILES['files']['tmp_name']['image']);
+
   // Validate the number of attached images. Filter out the 'None' with array_filter.
   if ($maximum_images = variable_get('image_attach_maximum_' . $form['#node']->type, 0)) {
-    // Test for whether a file is being uploaded cribbed from file_save_upload().
-    $uploading_new_image = isset($_FILES['files']) && $_FILES['files']['name']['image'] && is_uploaded_file($_FILES['files']['tmp_name']['image']);
-    $num_images = count(array_filter($form_state['values']['iids']));
+    if (is_array($form_state['values']['iids'])) {
+      $num_images = count(array_filter($form_state['values']['iids']));
+    }
+    else {
+      $num_images = 0;
+    }
 
     $node_type_label = node_get_types('name', $form['#node']->type);
     if ($num_images >= $maximum_images && $uploading_new_image) {
@@ -484,15 +490,21 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
  * Helper function for hook_nodeapi: view op.
  * Loads all the required attached image nodes.
  *
- * @param $nids: an array of node ids.
- * @param $teaser: if true, only load the first of the node ids.
+ * @param $attached_nids
+ *  An array of node ids.
+ * @param $teaser
+ *  If true, only load the first of the node ids.
  *
- * @return: An numerical array of node objects.
+ * @return
+ *  An numerical array of node objects.
  */
 function _image_attach_node_load_attached($attached_nids, $teaser = FALSE) {
-  // If teaser, we only want the first node.
   if ($teaser) {
-    $attached_nids = array($attached_nids[0]);
+    // For the teaser we only want the first image from $attached_nids. 
+    // During normal node viewing the array is zero-keyed but during edit
+    // preview it is keyed by iid. Therefore using array_shift() will return the
+    // first image for either of these situations.
+    $attached_nids = array(array_shift($attached_nids));
   }
   foreach ($attached_nids as $nid) {
     $nodes[] = node_load($nid);
@@ -651,6 +663,7 @@ function theme_image_attach_attached_images($nid, $image_nodes = array(), $optio
   $options += array(
     'size' => IMAGE_THUMBNAIL,
     'link' => 'image',
+    'attributes' => array(),
   );
 
   $img_size = $options['size'];
@@ -698,7 +711,7 @@ function theme_image_attach_attached_images($nid, $image_nodes = array(), $optio
 
     $output .= '<div' . drupal_attributes($div_attributes) . '>';
     $image_img = image_display($image, $img_size);
-    if ($link_path) {
+    if (isset($link_path)) {
       $output .= l($image_img, $link_path, array('html' => TRUE));
     }
     else {

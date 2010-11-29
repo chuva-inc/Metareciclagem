@@ -1,0 +1,23 @@
+/**
+* $Id;$
+* Files icons overriding example file
+*/
+
+/**
+ * Removing icons on images file (.jpg, .gif, .png, .bmp, .jpeg, .svg, .eps) links
+ *  usefull when using Image module (as for issue http://drupal.org/node/405332)
+ */
+a[href$='.jpg'], a[href$='.gif'], a[href$='.png'], a[href$='.bmp'], a[href$='.jpeg'], a[href$='.svg'], a[href$='.eps'] { 
+	padding: inherit;
+	background: none;
+}
+
+/**
+ * Example of adding a custom file icon.
+ * The matched file extension is ".foo" and the displayed icon is the
+ * picture called "files_icons/icon_for_foo_estension.gif"
+ */
+a[href$='.foo'] {
+	padding: 5px 20px 5px 0;
+	background: transparent url(files_icons/icon_for_foo_estension.gif) no-repeat center right;
+}

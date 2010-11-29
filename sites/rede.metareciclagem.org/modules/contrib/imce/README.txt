@@ -1,4 +1,4 @@
-// $Id: README.txt,v 1.12.2.3 2010/06/02 08:33:21 ufku Exp $
+// $Id: README.txt,v 1.12.2.4 2010/10/06 04:38:09 ufku Exp $
 
 IMCE
 http://drupal.org/project/imce
@@ -68,8 +68,8 @@ Install http://drupal.org/project/imce_wysiwyg bridge module and enable IMCE as 
 BUEditor:
 IMCE is integrated in image and link dialogs.
 
-FCKeditor(without WYSIWYG): 
-Fckeditor profile->File browser settings->IMCE integration
+(F)CKeditor(without WYSIWYG): 
+(F)ckeditor profile->File browser settings->IMCE integration
 
 If your application is not one of the above, please keep reading in order to learn how to integrate IMCE.
 
