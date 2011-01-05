@@ -1,4 +1,4 @@
-// $Id: CHANGELOG.txt,v 1.144.2.31 2010/10/14 07:56:19 joachim Exp $
+// $Id: CHANGELOG.txt,v 1.144.2.32 2010/12/22 00:09:59 joachim Exp $
 
 Image x.x-x.x, xxxx-xx-xx
 ------------------------
@@ -6,6 +6,11 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+
+
+Image 6.x-1.1, 2010-12-22
+-------------------------
+by sun: Fixed output of image gallery title.
 
 
 Image 6.x-1.0, 2010-10-14

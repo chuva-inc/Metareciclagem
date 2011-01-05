@@ -1,6 +1,12 @@
-** 1.x-dev **
-	-- 2009-07-27 --
-	+ Added more comments in "file_icons-override.css.example" file
+Branch: 1.x-dev
+  + Added "Hide description" admin icons
+  + Added Admin-icons: Node Import, VotingAPI, RealName
+  + Added jQuery for admin settings (to be continued..)
+  + Added Files-icons visibility settings
+  + Added new Admin icons (OG, Devel, Coder, User_import, KT ...)
+
+  -- 2009-07-27 --
+  + Added more comments in "file_icons-override.css.example" file
 	
   -- 2009-06-15 --
   + Added files_icons.css overriding with "files_icons-override.css" (if exists)	
