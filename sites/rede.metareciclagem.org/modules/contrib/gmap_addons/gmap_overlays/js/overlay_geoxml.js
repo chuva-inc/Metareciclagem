@@ -1,16 +1,13 @@
 /**
  *  Handle overlays via GGeoXml.
  */
-/* $Id: overlay_geoxml.js,v 1.2 2008/09/30 20:33:57 bdragon Exp $ */
+/* $Id: overlay_geoxml.js,v 1.3 2011/01/26 01:52:52 bdragon Exp $ */
 
 Drupal.gmap.clientsidexml = {};
 
 Drupal.gmap.addHandler('gmap', function(elem) {
   var obj = this;
   obj.bind('init', function() {
-
-  alert (obj.map.getContainer().id);
-
     $.each(obj.vars.overlay, function(i,d) {
       switch (d.type) {
         case 'georss':

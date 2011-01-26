@@ -4,9 +4,9 @@ description = Filter to allow insertion of a google map into a node
 package = Location
 dependencies = gmap content gmap_macro_builder
 
-; Information added by drupal.org packaging script on 2010-07-11
+; Information added by drupal.org packaging script on January 1, 1970 - 00:00
 version = "6.x-1.x-dev"
 core = "6.x"
 project = "gmap_addons"
-datestamp = "1278834409"
+datestamp = "1296044539"
 

@@ -8,7 +8,7 @@ It extends both the macro and the api interfaces.
 
 Add 'overlay' sections into your macro.
 
-[gmap |overlay=kml:http://mapgadgets.googlepages.com/cta.kml]
+[gmap |overlay=kml:http://gmaps-samples.googlecode.com/svn/trunk/ggeoxml/cta.kml]
 [gmap |overlay=clientsidekml:/path/to/file.kml]
 [gmap |overlay=georss:http://slashgeo.org/index.rss]
 [gmap |overlay=traffic:]

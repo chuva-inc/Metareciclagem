@@ -1,4 +1,4 @@
-/* $Id: gmap_markerlist.js,v 1.1 2009/02/26 22:42:48 bdragon Exp $ */
+/* $Id: gmap_markerlist.js,v 1.2 2011/01/26 02:20:23 bdragon Exp $ */
 
 (function () {
   var MarkerList = function (gmap) {
@@ -9,7 +9,7 @@
     this.map = map;
     this.markerlist = document.createElement("div");
     map.getContainer().appendChild(this.markerlist);
-    $(this.markerlist).addClass('gmap_markerlist').append('<ul></ul>');
+    $(this.markerlist).addClass('gmap_markerlist').hide().append('<ul></ul>');
     return this.markerlist;
   }
   MarkerList.prototype.test = function (str) {
@@ -20,6 +20,7 @@
     $('<li>' + marker.opts.title + '</li>').appendTo($('ul', this.markerlist)).click(function () {
       obj.change('clickmarker', -1, marker);
     });
+    $(this.markerlist).show();
   }
   MarkerList.prototype.getDefaultPosition = function () {
     return new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(7, 33));
