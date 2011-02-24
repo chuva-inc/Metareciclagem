@@ -1,5 +1,5 @@
 <?php
-// $Id: googleanalytics.module,v 1.36.2.30 2011/01/20 22:29:03 hass Exp $
+// $Id: googleanalytics.module,v 1.36.2.34 2011/02/07 14:16:20 hass Exp $
 
 /*
  * @file
@@ -86,6 +86,9 @@ function googleanalytics_init() {
     if (($track_download = variable_get('googleanalytics_trackfiles', 1)) && ($trackfiles_extensions = variable_get('googleanalytics_trackfiles_extensions', GA_TRACKFILES_EXTENSIONS))) {
       $link_settings['trackDownload'] = $track_download;
       $link_settings['trackDownloadExtensions'] = $trackfiles_extensions;
+    }
+    if ($track_outbound_as_pageview = variable_get('googleanalytics_trackoutboundaspageview', 0)) {
+      $link_settings['trackOutboundAsPageview'] = $track_outbound_as_pageview;
     }
     if (!empty($link_settings)) {
       drupal_add_js(array('googleanalytics' => $link_settings), 'setting', 'header');
@@ -231,7 +234,13 @@ function googleanalytics_footer($main = 0) {
 
     // Should a local cached copy of ga.js be used?
     if (variable_get('googleanalytics_cache', 0) && $url = _googleanalytics_cache('http://www.google-analytics.com/ga.js')) {
-      $script .= 'ga.src = "' . $url . '";';
+      // A dummy query-string is added to filenames, to gain control over
+      // browser-caching. The string changes on every update or full cache
+      // flush, forcing browsers to load a new copy of the files, as the
+      // URL changed.
+      $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
+
+      $script .= 'ga.src = "' . $url . $query_string . '";';
     }
     else {
       $script .= 'ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";';
@@ -307,11 +316,6 @@ function googleanalytics_cron() {
  *   The path to the local javascript file on success, boolean FALSE on failure.
  */
 function _googleanalytics_cache($location, $sync_cached_file = FALSE) {
-  // A dummy query-string is added to filenames, to gain control over
-  // browser-caching. The string changes on every update or full cache
-  // flush, forcing browsers to load a new copy of the files, as the
-  // URL changed.
-  $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
 
   $path = file_create_path('googleanalytics');
   $file_destination = $path . '/' . basename($location);
@@ -344,14 +348,14 @@ function _googleanalytics_cache($location, $sync_cached_file = FALSE) {
           watchdog('googleanalytics', 'Locally cached tracking code file has been saved.', array(), WATCHDOG_INFO);
 
           // Return the local JS file path.
-          return base_path() . $file_destination . $query_string;
+          return base_path() . $file_destination;
         }
       }
     }
   }
   else {
     // Return the local JS file path.
-    return base_path() . $file_destination . $query_string;
+    return base_path() . $file_destination;
   }
 }
 
@@ -410,22 +414,23 @@ function _googleanalytics_visibility_user($account) {
  */
 function _googleanalytics_visibility_roles($account) {
 
-  $enabled = FALSE;
+  $visibility = variable_get('googleanalytics_visibility_roles', 0);
+  $enabled = $visibility;
   $roles = variable_get('googleanalytics_roles', array());
 
   if (array_sum($roles) > 0) {
-    // One or more roles are selected for tracking.
+    // One or more roles are selected.
     foreach (array_keys($account->roles) as $rid) {
-      // Is the current user a member of one role enabled for tracking?
+      // Is the current user a member of one of these roles?
       if (isset($roles[$rid]) && $rid == $roles[$rid]) {
-        // Current user is a member of a role that should be tracked.
-        $enabled = TRUE;
+        // Current user is a member of a role that should be tracked/excluded from tracking.
+        $enabled = !$visibility;
         break;
       }
     }
   }
   else {
-    // No role is selected for tracking, therefor all roles should be tracked.
+    // No role is selected for tracking, therefore all roles should be tracked.
     $enabled = TRUE;
   }
 
@@ -480,7 +485,7 @@ function _googleanalytics_visibility_pages() {
  */
 function googleanalytics_token_values($type, $object = NULL, $options = array()) {
   if ($type == 'user') {
-    if (!empty($object)) {
+    if (!empty($object->roles)) {
       $account = $object;
     }
     else {

@@ -1,4 +1,4 @@
-// $Id: README.txt,v 1.7.2.6 2011/01/16 22:45:09 hass Exp $
+// $Id: README.txt,v 1.7.2.7 2011/02/07 16:56:07 hass Exp $
 
 Module: Google Analytics
 Author: Alexander Hass <http://drupal.org/user/85918>
@@ -50,9 +50,6 @@ Like the blocks visibility settings in Drupal core, there is now a
 choice for "Add if the following PHP code returns TRUE." Sample PHP snippets
 that can be used in this textarea can be found on the handbook page
 "Overview-approach to block visibility" at http://drupal.org/node/64135.
-
-A code snippet that creates opt-out by role functionality for unchecked roles
-can be found in the Google Analytics handbook at http://drupal.org/node/261997.
 
 Custom variables
 =================

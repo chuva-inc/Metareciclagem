@@ -1,5 +1,5 @@
 <?php
-// $Id: googleanalytics.admin.inc,v 1.13.2.16 2011/01/16 18:22:18 hass Exp $
+// $Id: googleanalytics.admin.inc,v 1.13.2.22 2011/02/07 15:45:42 hass Exp $
 
 /**
  * @file
@@ -51,6 +51,16 @@ function googleanalytics_admin_settings_form(&$form_state) {
     '#collapsible' => TRUE,
   );
 
+  $form['role_vis_settings']['googleanalytics_visibility_roles'] = array(
+    '#type' => 'radios',
+    '#title' => t('Add tracking for specific roles'),
+    '#options' => array(
+      t('Add to the selected roles only'),
+      t('Add to every role except the selected ones'),
+    ),
+    '#default_value' => variable_get('googleanalytics_visibility_roles', 0),
+  );
+
   $roles = user_roles();
   $role_options = array();
   foreach ($roles as $rid => $name) {
@@ -58,10 +68,10 @@ function googleanalytics_admin_settings_form(&$form_state) {
   }
   $form['role_vis_settings']['googleanalytics_roles'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Add tracking for specific roles'),
+    '#title' => t('Roles'),
     '#default_value' => variable_get('googleanalytics_roles', array()),
     '#options' => $role_options,
-    '#description' => t('Add tracking only for the selected role(s). If none of the roles are selected, all users will be tracked. If a user has any of the roles checked, that user will be tracked.'),
+    '#description' => t('If none of the roles are selected, all users will be tracked. If a user has any of the roles checked, that user will be tracked (or excluded, depending on the setting above).'),
   );
 
   // Page specific visibility configurations.
@@ -101,6 +111,7 @@ function googleanalytics_admin_settings_form(&$form_state) {
       '#default_value' => $pages,
       '#description' => $description,
       '#wysiwyg' => FALSE,
+      '#rows' => 10,
     );
   }
 
@@ -113,7 +124,7 @@ function googleanalytics_admin_settings_form(&$form_state) {
   );
   $form['linktracking']['googleanalytics_trackoutgoing'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Track outgoing links'),
+    '#title' => t('Track outbound links'),
     '#default_value' => variable_get('googleanalytics_trackoutgoing', 1),
     '#description' => t('Enables tracking of clicks on outgoing links.')
   );
@@ -135,6 +146,12 @@ function googleanalytics_admin_settings_form(&$form_state) {
     '#default_value' => variable_get('googleanalytics_trackfiles_extensions', GA_TRACKFILES_EXTENSIONS),
     '#description' => t('A pipe separated list of file extensions that should be tracked when clicked with regular expression support. Example: !extensions', array('!extensions' => GA_TRACKFILES_EXTENSIONS)),
     '#maxlength' => 255,
+  );
+  $form['linktracking']['googleanalytics_trackoutboundaspageview'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Track clicks on outbound links as page views'),
+    '#default_value' => variable_get('googleanalytics_trackoutboundaspageview', 0),
+    '#description' => t('By default outbound links are tracked as <em>Events</em>. In rare situations like tracking of <em>Goals</em> it may be required to track outbound clicks as page views.'),
   );
 
   // Backward compatibility only.
@@ -353,7 +370,7 @@ function googleanalytics_admin_settings_form_validate($form, &$form_state) {
   $form_state['values']['googleanalytics_codesnippet_after'] = trim($form_state['values']['googleanalytics_codesnippet_after']);
 
   if (!preg_match('/^UA-\d{4,}-\d+$/', $form_state['values']['googleanalytics_account'])) {
-    form_set_error('googleanalytics_account', t('A valid Google Analytics account number is case sensitive and formatted like UA-xxxxxx-x.'));
+    form_set_error('googleanalytics_account', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
   }
 
   // Clear obsolete local cache if cache has been disabled.
