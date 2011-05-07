@@ -41,8 +41,8 @@ tile:
   Opacity/minResolution/maxResolution
   Opacity:
     0.0 - 1.0 or 'gif'. Default is 1.0. The layer is assumed to be a PNG layer unless 'gif' is stated.
-  minResolution: Minimum zoom level for this layer. (Not working at the moment for overlays)
-  maxResolution: Maximum zoom level for this layer. (Not working at the moment for overlays)
+  minResolution: Minimum zoom level for this layer.
+  maxResolution: Maximum zoom level for this layer.
 
 ----------------------
 Notes on clientsidekml

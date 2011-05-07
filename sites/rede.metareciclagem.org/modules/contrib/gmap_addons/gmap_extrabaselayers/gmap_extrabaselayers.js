@@ -1,4 +1,3 @@
-// $Id: gmap_extrabaselayers.js,v 1.2 2008/09/30 20:33:57 bdragon Exp $
 
 
 Drupal.gmap.addHandler('gmap',function(elem) {

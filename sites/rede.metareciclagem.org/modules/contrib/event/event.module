@@ -1,5 +1,4 @@
 <?php
-// $Id: event.module,v 1.407 2010/02/26 10:20:50 killes Exp $ 
 
 define('EVENT_API', '5.2');
 define('EVENT_PATH', drupal_get_path('module', 'event'));

@@ -6,9 +6,9 @@ dependencies[] = content
 dependencies[] = gmap
 core = 6.x
 
-; Information added by drupal.org packaging script on January 1, 1970 - 00:00
+; Information added by drupal.org packaging script on 2011-03-30
 version = "6.x-1.x-dev"
 core = "6.x"
 project = "gmap_addons"
-datestamp = "1296044539"
+datestamp = "1301443753"
 

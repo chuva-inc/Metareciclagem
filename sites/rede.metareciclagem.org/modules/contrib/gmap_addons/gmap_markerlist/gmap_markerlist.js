@@ -1,4 +1,3 @@
-/* $Id: gmap_markerlist.js,v 1.2 2011/01/26 02:20:23 bdragon Exp $ */
 
 (function () {
   var MarkerList = function (gmap) {

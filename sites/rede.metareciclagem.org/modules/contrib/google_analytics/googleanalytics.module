@@ -1,5 +1,4 @@
 <?php
-// $Id: googleanalytics.module,v 1.36.2.34 2011/02/07 14:16:20 hass Exp $
 
 /*
  * @file
@@ -10,7 +9,10 @@
  * @author: Alexander Hass <http://drupal.org/user/85918>
  */
 
-define('GA_TRACKFILES_EXTENSIONS', '7z|aac|arc|arj|asf|asx|avi|bin|csv|doc|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|png|ppt|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls|xml|z|zip');
+define('GOOGLEANALYTICS_TRACKFILES_EXTENSIONS', '7z|aac|arc|arj|asf|asx|avi|bin|csv|doc|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|png|ppt|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls|xml|z|zip');
+
+// Remove tracking from all administrative pages, see http://drupal.org/node/34970.
+define('GOOGLEANALYTICS_PAGES', "admin\nadmin/*\nbatch\nnode/add*\nnode/*/*\nuser/*/*");
 
 /**
  * Implementation of hook_help().
@@ -83,7 +85,7 @@ function googleanalytics_init() {
     if ($track_mailto = variable_get('googleanalytics_trackmailto', 1)) {
       $link_settings['trackMailto'] = $track_mailto;
     }
-    if (($track_download = variable_get('googleanalytics_trackfiles', 1)) && ($trackfiles_extensions = variable_get('googleanalytics_trackfiles_extensions', GA_TRACKFILES_EXTENSIONS))) {
+    if (($track_download = variable_get('googleanalytics_trackfiles', 1)) && ($trackfiles_extensions = variable_get('googleanalytics_trackfiles_extensions', GOOGLEANALYTICS_TRACKFILES_EXTENSIONS))) {
       $link_settings['trackDownload'] = $track_download;
       $link_settings['trackDownloadExtensions'] = $trackfiles_extensions;
     }
@@ -134,7 +136,7 @@ function googleanalytics_footer($main = 0) {
     // Site search tracking support.
     $url_custom = '';
     if (module_exists('search') && variable_get('googleanalytics_site_search', FALSE) && arg(0) == 'search' && $keys = search_get_keys()) {
-      $url_custom = drupal_to_js(url('search/'. arg(1), array('query' => 'search='. $keys)));
+      $url_custom = '(window.googleanalytics_search_results) ? ' . drupal_to_js(url('search/'. arg(1), array('query' => 'search='. drupal_urlencode($keys)))) . ' : ' . drupal_to_js(url('search/'. arg(1), array('query' => 'search=no-results:'. drupal_urlencode($keys) .'&cat=no-results')));
     }
 
     // If this node is a translation of another node, pass the original
@@ -208,14 +210,25 @@ function googleanalytics_footer($main = 0) {
       // a workaround until "_anonymizeIp" has been implemented/fixed.
       $script .= '_gaq.push(["_gat._anonymizeIp"]);';
     }
+
+    // Domain tracking type.
+    global $cookie_domain;
+    $domain_mode = variable_get('googleanalytics_domain_mode', 0);
+
+    // Per RFC 2109, cookie domains must contain at least one dot other than the
+    // first. For hosts such as 'localhost' or IP Addresses we don't set a cookie domain.
+    if ($domain_mode == 1 && count(explode('.', $cookie_domain)) > 2 && !is_numeric(str_replace('.', '', $cookie_domain))) {
+      $script .= '_gaq.push(["_setDomainName", ' . drupal_to_js($cookie_domain) . ']);';
+    }
+
     if (!empty($segmentation)) {
       $script .= $segmentation;
     }
-    if (!empty($codesnippet_before)) {
-      $script .= $codesnippet_before;
-    }
     if (!empty($custom_var)) {
       $script .= $custom_var;
+    }
+    if (!empty($codesnippet_before)) {
+      $script .= $codesnippet_before;
     }
     if (empty($url_custom)) {
       $script .= '_gaq.push(["_trackPageview"]);';
@@ -280,11 +293,25 @@ function googleanalytics_user($type, $edit, &$account, $category = NULL) {
             break;
         }
 
+        // Disable tracking for visitors who have opted out from tracking via DNT (Do-Not-Track) header.
+        $disabled = FALSE;
+        if (variable_get('googleanalytics_privacy_donottrack', 1) && !empty($_SERVER['HTTP_DNT'])) {
+          $disabled = TRUE;
+
+          // Override settings value.
+          $account->googleanalytics['custom'] = FALSE;
+
+          $description .= '<span class="admin-disabled">';
+          $description .= ' ' . t('You have opted out from tracking via browser privacy settings.');
+          $description .= '</span>';
+        }
+
         $form['googleanalytics']['custom'] = array(
           '#type' => 'checkbox',
           '#title' => t('Enable user tracking'),
           '#description' => $description,
-          '#default_value' => isset($account->googleanalytics['custom']) ? $account->googleanalytics['custom'] : ($custom == 1)
+          '#default_value' => isset($account->googleanalytics['custom']) ? $account->googleanalytics['custom'] : ($custom == 1),
+          '#disabled' => $disabled,
         );
 
         return $form;
@@ -303,6 +330,20 @@ function googleanalytics_cron() {
     _googleanalytics_cache('http://www.google-analytics.com/ga.js', TRUE);
     variable_set('googleanalytics_last_cache', time());
   }
+}
+
+/**
+ * Implementation of hook_preprocess_search_results().
+ *
+ * Collects the number of search results. It need to be noted, that this
+ * function is not executed if the search result is empty.
+ */
+function googleanalytics_preprocess_search_results(&$variables) {
+  // There is no search result $variable available that hold the number of items
+  // found. But the pager item mumber can tell the number of search results.
+  global $pager_total_items;
+
+  drupal_add_js('window.googleanalytics_search_results = ' . intval($pager_total_items[0]) . ';', 'inline', 'header');
 }
 
 /**
@@ -388,7 +429,7 @@ function _googleanalytics_visibility_user($account) {
   $enabled = FALSE;
 
   // Is current user a member of a role that should be tracked?
-  if (_googleanalytics_visibility_roles($account)) {
+  if (_googleanalytics_visibility_header($account) && _googleanalytics_visibility_roles($account)) {
 
     // Use the user's block visibility setting, if necessary.
     if (($custom = variable_get('googleanalytics_custom', 0)) != 0) {
@@ -448,7 +489,7 @@ function _googleanalytics_visibility_pages() {
   if (!isset($page_match)) {
 
     $visibility = variable_get('googleanalytics_visibility', 0);
-    $setting_pages = variable_get('googleanalytics_pages', '');
+    $setting_pages = variable_get('googleanalytics_pages', GOOGLEANALYTICS_PAGES);
 
     // Match path if necessary.
     if (!empty($setting_pages)) {
@@ -478,6 +519,21 @@ function _googleanalytics_visibility_pages() {
 
   }
   return $page_match;
+}
+
+/**
+ * Based on headers send by clients this function returns TRUE if GA code should
+ * be added to the current page and otherwise FALSE.
+ */
+function _googleanalytics_visibility_header($account) {
+
+  if (($account->uid || variable_get('cache', 0) == 0) && variable_get('googleanalytics_privacy_donottrack', 1) && !empty($_SERVER['HTTP_DNT'])) {
+    // Disable tracking if caching is disabled or a visitors is logged in and
+    // have opted out from tracking via DNT (Do-Not-Track) header.
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /**

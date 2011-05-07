@@ -1,5 +1,4 @@
 <?php
-// $Id: me_plugin_argument_validate_me_alias.inc,v 1.1.2.1 2009/06/18 12:30:44 cdale Exp $
 
 /**
  * @file

@@ -1,4 +1,3 @@
-// $Id: gmap_debug.js,v 1.5 2009/02/12 18:50:58 bdragon Exp $
 
 Drupal.behaviors.gmap_debug = function (context) {
   $('#gmap-debug-forcesizecheck:not(.gmap-debug-processed)', context).addClass('gmap-debug-processed').each(function () {

@@ -1,5 +1,4 @@
 <?php
-// $Id: me.module,v 1.5.2.7.2.7 2009/05/01 09:40:23 cdale Exp $
 
 /**
  * @file
@@ -31,10 +30,14 @@ function me_help($path, $arg) {
 
 /**
  * Implementation of hook_theme_registry_alter().
+ *
+ * There is a different registry version for each theme,
+ * and this function will be called for each of them.
  */
 function me_theme_registry_alter(&$theme_registry) {
   if (isset($theme_registry['menu_item_link']['function'])) {
-    variable_set('me_theme_menu_item_link', $theme_registry['menu_item_link']['function']);
+    // remember the original function
+    $theme_registry['menu_item_link']['me_original_function'] = $theme_registry['menu_item_link']['function'];
     $theme_registry['menu_item_link']['function'] = 'me_theme_menu_item_link';
   }
 }
@@ -50,27 +53,50 @@ function me_preprocess_menu_item_link(&$vars) {
  * Implementation of theme_menu_item_link().
  */
 function me_theme_menu_item_link($link) {
-  _me_check_path($link);
+  static $_functions = array();
 
-  // Check if we got a valid function from the registry rebuild.
-  $function = me_variable_get('me_theme_menu_item_link');
-  if (empty($function) || !function_exists($function)) {
-    // If not, then go through the available themes to get the correct function to use.
-    if (isset($GLOBALS['custom_theme']) && function_exists($GLOBALS['custom_theme'] .'_menu_item_link')) {
-      $function = $GLOBALS['custom_theme'] .'_menu_item_link';
+  $theme = $GLOBALS['theme'];
+
+  if (!isset($_functions[$theme])) {
+    $registry = theme_get_registry();
+    if (function_exists($candidate = $registry['menu_item_link']['me_original_function'])) {
+      $function = $candidate;
     }
-    elseif (isset($GLOBALS['theme_key']) && function_exists($GLOBALS['theme_key'] .'_menu_item_link')) {
-      $function = $GLOBALS['theme_key'] .'_menu_item_link';
+    else if (isset($GLOBALS['theme_info'])) {
+      $themes = $GLOBALS['base_theme_info'];
+      $themes[] = $GLOBALS['theme_info'];
+      foreach (array_reverse($themes) as $theme_info) {
+        $candidate = $theme_info->name .'_menu_item_link';
+        if (function_exists($candidate)) {
+          $function = $candidate;
+          break;
+        }
+      }
     }
-    elseif (isset($GLOBALS['theme_engine']) && function_exists($GLOBALS['theme_engine'] .'_menu_item_link')) {
-      $function = $GLOBALS['theme_engine'] .'_menu_item_link';
+    if (isset($function)) {
+      // do nothing
     }
-    else {
+    elseif (isset($GLOBALS['theme_key']) && function_exists($candidate = $GLOBALS['theme_key'] .'_menu_item_link')) {
+      $function = $candidate;
+    }
+    elseif (isset($GLOBALS['theme_engine']) && function_exists($candidate = $GLOBALS['theme_engine'] .'_menu_item_link')) {
+      $function = $candidate;
+    }
+    elseif (function_exists('theme_menu_item_link')) {
       $function = 'theme_menu_item_link';
     }
+    $_functions[$theme] = $function;
   }
 
-  return $function($link);
+  if (isset($_functions[$theme]) && $_functions[$theme] !== __FUNCTION__) {
+    _me_check_path($link);
+    $function = $_functions[$theme];
+    return $function($link);
+  }
+  else {
+    // This should never happen.
+    return __FUNCTION__;
+  }
 }
 
 /**
@@ -340,7 +366,12 @@ function me_menu_alter(&$callbacks) {
 /**
  * Helper function to set up arguments in meun _load callbacks.
  */
-function _me_load_arguments($uid, &$map = NULL, $index = NULL, $map_index = FALSE, $args = array(), $function = 'user_load') {
+function _me_load_arguments($uid, &$map = NULL, $index = NULL, $map_index = FALSE, $args = array(), $function = 'user_load', $reset = FALSE) {
+  global $user;
+  static $cache = array();
+  if ($reset) {
+    $cache = array();
+  }
   // We need to get all the arguments, remove our custom ones,
   // put %map in the right place, then call the menu load callack.
   array_splice($args, 0, min(4, count($args)));
@@ -357,7 +388,24 @@ function _me_load_arguments($uid, &$map = NULL, $index = NULL, $map_index = FALS
 
   // If we have a valid function to call, call it.
   if (function_exists($function)) {
-    return call_user_func_array($function, $args);
+    if ($function == 'user_load' || $function == 'user_category_load') {
+      if (!isset($cache[$function][$args[0]])) {
+        // Use already created object for current user:
+        if ($args[0] == $user->uid) {
+          $cache[$function][$args[0]] = $user;
+        }
+        else {
+          // Call user_load and store in cache:
+          $cache[$function][$args[0]] = call_user_func_array($function, $args);
+        }
+      }
+      // Use cached user's object:
+      $result = $cache[$function][$args[0]];
+    }
+    else {
+      $result = call_user_func_array($function, $args);
+    }
+    return $result;
   }
 
   return FALSE;
@@ -375,6 +423,9 @@ function me_load($uid, &$map = NULL, $index = NULL, $map_index = FALSE) {
  * Menu load callback in place of user_uid_optional_load().
  */
 function me_uid_optional_load($uid, &$map = NULL, $index = NULL, $map_index = FALSE) {
+  if (!$GLOBALS['user']->uid) {
+    return;
+  }
   $args = func_get_args();
   return _me_load_arguments((isset($uid) ? $uid : $GLOBALS['user']->uid), $map, $index, $map_index, $args);
 }
@@ -709,5 +760,16 @@ function me_user($op, &$edit, &$account, $category = NULL) {
         );
       }
       break;
+  }
+}
+
+/**
+ * Implementation of CTools hook_ctools_plugin_dierctory().
+ *
+ * See http://drupal.org/project/ctools for module and hook information.
+ */
+function me_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && $plugin == 'arguments') {
+    return 'plugins';
   }
 }

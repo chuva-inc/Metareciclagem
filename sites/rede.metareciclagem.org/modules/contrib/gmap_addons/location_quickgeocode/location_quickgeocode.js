@@ -1,4 +1,3 @@
-// $Id: location_quickgeocode.js,v 1.4 2008/11/24 20:11:07 bdragon Exp $
 
 Drupal.behaviors.location_quickgeocode = function (context) {
   $('div.location_quickgeocode:not(.location-quickgeocode-processed)', context).addClass('location-quickgeocode-processed').each(function() {

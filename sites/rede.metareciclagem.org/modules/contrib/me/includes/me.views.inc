@@ -1,5 +1,4 @@
 <?php
-// $Id: me.views.inc,v 1.1.2.3.2.6 2009/06/18 12:30:43 cdale Exp $
 
 /**
  * @file

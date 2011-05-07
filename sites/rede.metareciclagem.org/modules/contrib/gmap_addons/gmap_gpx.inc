@@ -1,5 +1,4 @@
 <?php
-// $Id: gmap_gpx.inc,v 1.2 2008/09/30 20:33:57 bdragon Exp $
 
 /*
  * Created on 11.04.2007

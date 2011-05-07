@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.3 2008/09/30 21:19:08 bdragon Exp $
 
 This will let you use PLT tracks.
 
