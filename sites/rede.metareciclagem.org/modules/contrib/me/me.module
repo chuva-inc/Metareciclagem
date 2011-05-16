@@ -390,14 +390,8 @@ function _me_load_arguments($uid, &$map = NULL, $index = NULL, $map_index = FALS
   if (function_exists($function)) {
     if ($function == 'user_load' || $function == 'user_category_load') {
       if (!isset($cache[$function][$args[0]])) {
-        // Use already created object for current user:
-        if ($args[0] == $user->uid) {
-          $cache[$function][$args[0]] = $user;
-        }
-        else {
-          // Call user_load and store in cache:
-          $cache[$function][$args[0]] = call_user_func_array($function, $args);
-        }
+        // Call user_load and store in cache:
+        $cache[$function][$args[0]] = call_user_func_array($function, $args);
       }
       // Use cached user's object:
       $result = $cache[$function][$args[0]];
@@ -423,7 +417,7 @@ function me_load($uid, &$map = NULL, $index = NULL, $map_index = FALSE) {
  * Menu load callback in place of user_uid_optional_load().
  */
 function me_uid_optional_load($uid, &$map = NULL, $index = NULL, $map_index = FALSE) {
-  if (!$GLOBALS['user']->uid) {
+  if (!isset($uid) && !$GLOBALS['user']->uid) {
     return;
   }
   $args = func_get_args();
