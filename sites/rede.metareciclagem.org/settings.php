@@ -188,7 +188,7 @@ ini_set('url_rewriter.tags',        '');
  * cross between your various domains.
  */
 # $cookie_domain = 'example.com';
-$cookie_domain = 'metareciclagem.org';
+$cookie_domain = 'rede.metareciclagem.org';
 
 /**
  * Variable overrides:
